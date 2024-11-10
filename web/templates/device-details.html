@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Details</title>
+    <link href="../assets/css/all.min.css" rel="stylesheet">
+    <link href="../static/css/device-details.css" rel="stylesheet">
+
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1>جزئیات دستگاه</h1>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="input-field" placeholder="نام دستگاه" id="deviceName">
+        </div>
+
+        <div class="form-group">
+            <select class="input-field" id="converterType">
+                <option value="">نوع تبدیل را انتخاب کنید</option>
+                <option value="type1">نوع 1</option>
+                <option value="type2">نوع 2</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="filterCheckbox"> صافی
+            </label>
+        </div>
+
+        <div class="search-container">
+            <input type="search" class="search-input" placeholder="جستجو..." id="searchInput">
+        </div>
+
+        <div class="parts-container" id="partsContainer">
+            <!-- Parts will be dynamically added here -->
+        </div>
+
+        <div class="price-display">
+            <p>قیمت کل: <span id="totalPrice">0</span> تومان</p>
+        </div>
+
+        <div class="button-container">
+         
+            <button class="fab" onclick="saveDetails()">
+                <i class="fas fa-save"></i>
+            </button>
+        </div>
+    </div>
+
+    <button class="fab" onclick="showOverlay()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-content">
+            <button class="close-button" onclick="hideOverlay()">&times;</button>
+            <h2 class="form-title">Add Part Device</h2>
+            
+            <div class="form-group">
+                <label class="form-label">Part Name</label>
+                <select class="form-control" id="partName">
+                    <option value="">Select part name</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Size</label>
+                <select class="form-control" id="size">
+                    <option value="">Select size</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Material</label>
+                <select class="form-control" id="material">
+                    <option value="">Select material</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Brand</label>
+                <select class="form-control" id="brand">
+                    <option value="">Select brand</option>
+                </select>
+            </div>
+
+            <div class="price-container">
+                <span>Price:</span>
+                <span id="price">0</span>
+            </div>
+
+            <div class="count-container">
+                <label>Count:</label>
+                <input type="number" class="form-control count-input" id="count" min="1" value="1">
+            </div>
+
+            <div class="action-buttons">
+                <button class="save-button" onclick="savePart()">
+                    <i class="fas fa-save"></i>
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/js/device/device-details.js"> </script>
+</body>
+</html>

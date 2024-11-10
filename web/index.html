@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Theme App</title>
+    <link rel="stylesheet" href="./assets/css/all.min.css">
+    <link rel="stylesheet" href="./static/css/styles.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background" id="background"></div>
+
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="logo">
+            <i class="fas fa-cube"></i>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="button-container">
+            <button id="btnProjectPage" class="glass-button project">
+                <i class="fas fa-project-diagram"></i> Projects
+            </button>
+            <button id="btnDevicePage" class="glass-button device">
+                <i class="fas fa-mobile-alt"></i> Devices
+            </button>
+            <button id="btnPartPage" class="glass-button part">
+                <i class="fas fa-cogs"></i> Parts
+            </button>
+            
+            <div class="utility-container">
+                <button id="btnDownloadDB" class="glass-button utility">
+                    <i class="fas fa-download"></i> Export DB
+                </button>
+                <button id="btnUploadDB" class="glass-button utility">
+                    <i class="fas fa-upload"></i> Import DB
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./static/js/index.js" defer></script>
+</body>
+</html>
