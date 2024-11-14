@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects Management</title>
+    <link rel="stylesheet" href="../assets/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/projects.css">
+</head>
+<body>
+    <div id="homePage" class="page">
+        <!-- Home page content -->
+    </div>
+
+    <div id="projectsPage" class="page">
+        <div class="container">
+            <h1 class="page-title">Projects</h1>
+            
+            <div class="search-container">
+                <input type="search" class="search-input" placeholder="Search projects..." id="searchProjects">
+            </div>
+
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Projects will be dynamically added here -->
+            </div>
+
+            <div id="projectDetails" class="project-details"></div>
+
+
+            <button class="fab-button" id="addProjectButton">+</button>
+        </div>
+    </div>
+
+    <script src="../static/js/project/projects.js"></script>
+</body>
+</html>

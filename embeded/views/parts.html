@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=part-width, initial-scale=1.0">
+    <title>Parts Management</title>
+    <link rel="stylesheet" href="../assets/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/parts.css">
+</head>
+<body>
+    <div id="homePage" class="page">
+        <!-- Home page content -->
+    </div>
+
+    <div id="partsPage" class="page">
+        <div class="container">
+            <h1 class="page-title">Parts</h1>
+            
+            <div class="search-container">
+                <input type="search" class="search-input" placeholder="Search parts..." id="searchParts">
+            </div>
+
+            <div class="parts-grid" id="partsGrid">
+                <!-- Parts will be dynamically added here -->
+            </div>
+
+            <div id="partDetails" class="part-details"></div>
+
+
+            <button class="fab-button" id="addPartButton">+</button>
+        </div>
+    </div>
+
+    <script src="../static/js/part/parts.js"></script>
+</body>
+</html>

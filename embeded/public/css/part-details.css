@@ -1,0 +1,117 @@
+:root {
+    --primary-color: #e0e5ec;
+    --text-color: #2d4263;
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --accent-color: #4CAF50;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 20px;
+    background: var(--primary-color);
+    box-shadow: 8px 8px 16px var(--shadow-dark),
+               -8px -8px 16px var(--shadow-light);
+}
+
+.title {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px var(--shadow-dark);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    direction: rtl;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary-color);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark),
+               inset -4px -4px 8px var(--shadow-light);
+    color: var(--text-color);
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    box-shadow: inset 6px 6px 10px var(--shadow-dark),
+               inset -6px -6px 10px var(--shadow-light);
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.save-button {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 25px;
+    background: var(--accent-color);
+    color: white;
+    cursor: pointer;
+    box-shadow: 4px 4px 8px var(--shadow-dark),
+               -4px -4px 8px var(--shadow-light);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.save-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 12px var(--shadow-dark),
+               -6px -6px 12px var(--shadow-light);
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .form-group input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+}
