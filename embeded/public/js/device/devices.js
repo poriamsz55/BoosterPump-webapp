@@ -41,7 +41,7 @@ function initDevicesPage() {
     
     function handleDeviceClick(id) {
         // Redirect to device-details.html with the device ID as a query parameter
-        window.location.href = `/templates/device-details.html?id=${id}`;
+        window.location.href = `/devices/details?id=${id}`;
     }
 
     // Initial render

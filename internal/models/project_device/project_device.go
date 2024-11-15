@@ -1,4 +1,4 @@
-package projectdevice
+package projectd
 
 import (
 	"math"
@@ -18,11 +18,11 @@ func NewEmptyProjectDevice() *ProjectDevice {
 	return &ProjectDevice{}
 }
 
-func NewProjectDevice(prjId int, count float32, device *device.Device) *ProjectDevice {
+func NewProjectDevice(prjId int, count float32, d *device.Device) *ProjectDevice {
 	return &ProjectDevice{
 		ProjectId: prjId,
 		Count:     count,
-		Device:    device,
+		Device:    d,
 	}
 }
 

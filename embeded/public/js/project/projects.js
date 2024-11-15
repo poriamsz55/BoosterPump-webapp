@@ -41,7 +41,7 @@ function initProjectsPage() {
     
     function handleProjectClick(id) {
         // Redirect to project-details.html with the project ID as a query parameter
-        window.location.href = `/templates/project-details.html?id=${id}`;
+        window.location.href = `/projects/details?id=${id}`;
     }
 
     // Initial render

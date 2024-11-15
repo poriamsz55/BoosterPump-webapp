@@ -41,7 +41,7 @@ function initPartsPage() {
     
     function handlePartClick(id) {
         // Redirect to part-details.html with the part ID as a query parameter
-        window.location.href = `/templates/part-details.html?id=${id}`;
+        window.location.href = `/parts/details?id=${id}`;
     }
 
     // Initial render

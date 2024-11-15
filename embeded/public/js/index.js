@@ -51,9 +51,9 @@ document.getElementById("btnProjectPage").addEventListener("click", function() {
 });
 
 document.getElementById("btnDevicePage").addEventListener("click", function() {
-    window.location.href = "/devices.html";
+    window.location.href = "/devices";
 });
 
 document.getElementById("btnPartPage").addEventListener("click", function() {
-    window.location.href = "./parts.html";
+    window.location.href = "/parts";
 });
