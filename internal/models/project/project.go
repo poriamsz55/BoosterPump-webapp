@@ -10,13 +10,13 @@ type Project struct {
 	Name              string                         `json:"name"`
 	Price             uint64                         `json:"price"`
 	ProjectDeviceList []*projectdevice.ProjectDevice `json:"project_device"`
-	ExtraPriceLsit    []*extraprice.ExtraPrice       `json:"extra_price"`
+	ExtraPriceList    []*extraprice.ExtraPrice       `json:"extra_price"`
 }
 
 func NewEmptyProject() *Project {
 	return &Project{
 		ProjectDeviceList: []*projectdevice.ProjectDevice{},
-		ExtraPriceLsit:    []*extraprice.ExtraPrice{},
+		ExtraPriceList:    []*extraprice.ExtraPrice{},
 	}
 }
 
@@ -24,7 +24,7 @@ func NewProject(name string) *Project {
 	return &Project{
 		Name:              name,
 		ProjectDeviceList: []*projectdevice.ProjectDevice{},
-		ExtraPriceLsit:    []*extraprice.ExtraPrice{},
+		ExtraPriceList:    []*extraprice.ExtraPrice{},
 	}
 }
 
@@ -38,8 +38,8 @@ func (p *Project) UpdatePrice() {
 		}
 	}
 
-	if p.ExtraPriceLsit != nil {
-		for _, ep := range p.ExtraPriceLsit {
+	if p.ExtraPriceList != nil {
+		for _, ep := range p.ExtraPriceList {
 			p.Price += ep.Price
 		}
 	}

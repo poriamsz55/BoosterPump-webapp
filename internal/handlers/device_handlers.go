@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"database/sql"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
@@ -10,15 +13,33 @@ import (
 )
 
 func GetAllDevices(e echo.Context) error {
-	panic("dasdas")
+	devices, err := database.GetAllDevicesFromDB()
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.JSON(http.StatusOK, devices)
 }
 
 func GetDeviceById(e echo.Context) error {
-	panic("dasdas")
+	id, err := strconv.Atoi(e.Param("id"))
+	if err != nil {
+		return e.String(http.StatusBadRequest, "invalid device id")
+	}
+
+	device, err := getDeviceById(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return e.String(http.StatusNotFound, "device not found")
+		}
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.JSON(http.StatusOK, device)
 }
 
 func getDeviceById(dvcId int) (*device.Device, error) {
-	panic("dasdas")
+	return database.GetDeviceByIdFromDB(dvcId)
 }
 
 func AddDevice(e echo.Context) error {
@@ -45,13 +66,81 @@ func AddDevice(e echo.Context) error {
 }
 
 func CopyDevice(e echo.Context) error {
-	panic("dasdas")
+	id, err := strconv.Atoi(e.Param("id"))
+	if err != nil {
+		return e.String(http.StatusBadRequest, "invalid device id")
+	}
+
+	originalDevice, err := getDeviceById(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return e.String(http.StatusNotFound, "device not found")
+		}
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	// Create new device with copied properties
+	newDevice := device.NewDevice(
+		fmt.Sprintf("%s (Copy)", originalDevice.Name),
+		originalDevice.Converter,
+		originalDevice.Filter,
+	)
+	newDevice.DevicePartList = originalDevice.DevicePartList
+
+	err = database.AddDeviceToDB(newDevice)
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.String(http.StatusOK, "device copied successfully")
 }
 
 func DeleteDevice(e echo.Context) error {
-	panic("dasdas")
+	id, err := strconv.Atoi(e.Param("id"))
+	if err != nil {
+		return e.String(http.StatusBadRequest, "invalid device id")
+	}
+
+	err = database.DeleteDeviceFromDB(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return e.String(http.StatusNotFound, "device not found")
+		}
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.String(http.StatusOK, "device deleted successfully")
 }
 
 func UpdateDevice(e echo.Context) error {
-	panic("dasdas")
+	id, err := strconv.Atoi(e.Param("id"))
+	if err != nil {
+		return e.String(http.StatusBadRequest, "invalid device id")
+	}
+
+	name := e.FormValue("name")
+	converterInt, err := upload.Int(e, "converter")
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	converter, err := device.ConverterFromValue(converterInt)
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	filter := e.FormValue("filter") == "true"
+
+	updatedDevice := device.NewDevice(name, converter, filter)
+	updatedDevice.Id = id
+
+	err = database.UpdateDeviceInDB(updatedDevice)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return e.String(http.StatusNotFound, "device not found")
+		}
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.String(http.StatusOK, "device updated successfully")
 }

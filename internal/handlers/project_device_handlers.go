@@ -9,11 +9,11 @@ import (
 )
 
 func GetAllProjectDevices(e echo.Context) error {
-	panic("dasdas")
+	panic("to be implement")
 }
 
 func GetProjectDeviceById(e echo.Context) error {
-	panic("dasdas")
+	panic("to be implement")
 }
 
 func AddProjectDevice(e echo.Context) error {
@@ -41,13 +41,13 @@ func AddProjectDevice(e echo.Context) error {
 }
 
 func CopyProjectDevice(e echo.Context) error {
-	panic("dasdas")
+	panic("to be implement")
 }
 
 func DeleteProjectDevice(e echo.Context) error {
-	panic("dasdas")
+	panic("to be implement")
 }
 
 func UpdateProjectDevice(e echo.Context) error {
-	panic("dasdas")
+	panic("to be implement")
 }

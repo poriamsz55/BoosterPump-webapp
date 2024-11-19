@@ -1,6 +1,8 @@
 package database
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
@@ -24,6 +26,169 @@ func AddPartToDB(p *part.Part) error {
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return err
+	}
+
+	return nil
+}
+
+func GetAllPartsFromDB() ([]*part.Part, error) {
+	dbHelper := GetDBHelperInstance()
+	err := dbHelper.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer dbHelper.Close()
+
+	query := fmt.Sprintf(`
+        SELECT %s, %s, %s, %s, %s, %s
+        FROM %s
+    `, columnPartID, columnPartName, columnPartSize,
+		columnPartMaterial, columnPartBrand, columnPartPrice,
+		tableParts)
+
+	rows, err := dbHelper.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var parts []*part.Part
+	for rows.Next() {
+		var p part.Part
+		err := rows.Scan(
+			&p.Id,
+			&p.Name,
+			&p.Size,
+			&p.Material,
+			&p.Brand,
+			&p.Price,
+		)
+		if err != nil {
+			return nil, err
+		}
+		parts = append(parts, &p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return parts, nil
+}
+
+func GetPartByIdFromDB(id int) (*part.Part, error) {
+	dbHelper := GetDBHelperInstance()
+	err := dbHelper.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer dbHelper.Close()
+
+	query := fmt.Sprintf(`
+        SELECT %s, %s, %s, %s, %s, %s
+        FROM %s
+        WHERE %s = ?
+    `, columnPartID, columnPartName, columnPartSize,
+		columnPartMaterial, columnPartBrand, columnPartPrice,
+		tableParts, columnPartID)
+
+	var p part.Part
+	err = dbHelper.db.QueryRow(query, id).Scan(
+		&p.Id,
+		&p.Name,
+		&p.Size,
+		&p.Material,
+		&p.Brand,
+		&p.Price,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
+}
+
+func DeletePartFromDB(id int) error {
+	dbHelper := GetDBHelperInstance()
+	err := dbHelper.Open()
+	if err != nil {
+		return err
+	}
+	defer dbHelper.Close()
+
+	// Check if part exists
+	checkQuery := fmt.Sprintf(`
+        SELECT COUNT(*) 
+        FROM %s 
+        WHERE %s = ?
+    `, tableParts, columnPartID)
+
+	var count int
+	err = dbHelper.db.QueryRow(checkQuery, id).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	query := fmt.Sprintf(`
+        DELETE FROM %s 
+        WHERE %s = ?
+    `, tableParts, columnPartID)
+
+	result, err := dbHelper.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func UpdatePartInDB(updatedPart *part.Part) error {
+	dbHelper := GetDBHelperInstance()
+	err := dbHelper.Open()
+	if err != nil {
+		return err
+	}
+	defer dbHelper.Close()
+
+	query := fmt.Sprintf(`
+        UPDATE %s 
+        SET %s = ?, %s = ?, %s = ?, %s = ?, %s = ?
+        WHERE %s = ?
+    `, tableParts,
+		columnPartName, columnPartSize, columnPartMaterial,
+		columnPartBrand, columnPartPrice, columnPartID)
+
+	result, err := dbHelper.db.Exec(query,
+		updatedPart.Name,
+		updatedPart.Size,
+		updatedPart.Material,
+		updatedPart.Brand,
+		updatedPart.Price,
+		updatedPart.Id,
+	)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
 	}
 
 	return nil
