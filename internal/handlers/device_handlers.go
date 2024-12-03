@@ -22,7 +22,7 @@ func GetAllDevices(e echo.Context) error {
 }
 
 func GetDeviceById(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "deviceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid device id")
 	}

@@ -109,10 +109,10 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 
 	var id int
 	var name string
-	var converterInt int
+	var converterStr string
 	var filter bool
 
-	err := row.Scan(&id, &name, &converterInt, &filter)
+	err := row.Scan(&id, &name, &converterStr, &filter)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
@@ -120,7 +120,7 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 		return nil, err
 	}
 
-	converter, err := device.ConverterFromValue(converterInt)
+	converter, err := device.ConverterFromName(converterStr)
 	if err != nil {
 		return nil, err
 	}

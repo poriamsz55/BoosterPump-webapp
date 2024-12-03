@@ -11,7 +11,7 @@ type DevicePart struct {
 	DeviceId int        `json:"device_id"`
 	Price    uint64     `json:"price"`
 	Count    float32    `json:"count"`
-	Part     *part.Part `json:"aprt"`
+	Part     *part.Part `json:"part"`
 }
 
 func NewEmptyDevicePart() *DevicePart {

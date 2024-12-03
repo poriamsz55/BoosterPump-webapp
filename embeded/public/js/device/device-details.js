@@ -1,74 +1,95 @@
-// get all parts that belong to this device
-// render them in the device details
+import { HTTP_URL } from '../config.js';
+import { formatPrice } from '../format-price.js';
 
-const urlParams = new URLSearchParams(window.location.search);
-const deviceId = urlParams.get('id');
-
-// get deviceParts from local storage
-const deviceParts = JSON.parse(localStorage.getItem('deviceParts')) || [];
-
-// get deviceParts from database
-const getDeviceParts = async () => {
-    const response = await fetch(`${HTTP_URL}/devicePart/getByDeviceId?id=${deviceId}`);
-    const deviceParts = await response.json();
-    return deviceParts;
-}
-
-// render deviceParts in device details
-const renderDeviceParts = async () => {
-    const deviceParts = await getDeviceParts();
-    const devicePartList = document.getElementById('devicePartList');
-    devicePartList.innerHTML = '';
-    deviceParts.forEach(devicePart => {
-        const li = document.createElement('li');
-        li.textContent = `${devicePart.partName} x${devicePart.count}`;
-        devicePartList.appendChild(li);
+document.addEventListener('DOMContentLoaded', async function () {
+    // Remove e.preventDefault() as it's not needed here
+    const urlParams = new URLSearchParams(window.location.search);
+    const deviceId = urlParams.get('id');
+    // Add event listener for price input
+    const priceInput = document.getElementById('devicePrice');
+    priceInput.addEventListener('input', function () {
+        formatPrice(this);
     });
-}
 
-// addPartToDeviceBtn
-const addPartToDeviceBtn = document.getElementById('addPartToDeviceBtn');
-// get all parts from database
-const getPartsFromDB = async () => {
-    const response = await fetch(`${HTTP_URL}/part/getAll`);
-    const parts = await response.json();
-    return parts;
-}
+    if (deviceId) {
+        try {
+            const formData = new FormData();
+            formData.append('deviceId', deviceId);
 
-// render parts in modal
-const renderParts = async (parts) => {
-    const partsGrid = document.getElementById('partsGrid');
-    partsGrid.innerHTML = '';
-    parts.forEach(part => {
-        // check if part already exists in deviceParts
-        const partExists = deviceParts.some(devicePart => devicePart.partId === part.id);
-        if (partExists) {
-           // TODO
+            const response = await fetch(`${HTTP_URL}/device/getById`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch device details');
+            }
+
+            const deviceDetails = await response.json();
+            console.log(deviceDetails)
+
+            if (deviceDetails) {
+                // Use value instead of textContent for input elements
+                document.getElementById('deviceName').value = deviceDetails.name || '';
+                
+                // converter
+                const converterSelect = document.getElementById('converterType');
+                const converterOption = converterSelect.querySelector(`option[value="${deviceDetails.converter}"]`);
+                if (converterOption) {
+                    converterOption.selected = true;
+                }
+
+                // filter check box
+                const filterCheckbox = document.getElementById('filterCheckbox');
+                filterCheckbox.checked = deviceDetails.filter === 'true';                
+
+                 // Format the initial price value
+                 if (deviceDetails.price) {
+                    priceInput.value = deviceDetails.price;
+                    formatPrice(priceInput);
+                }
+            } else {
+                throw new Error('Device details not found');
+            }
+
+        } catch (error) {
+            console.error('Error fetching device details:', error);
+            alert(error.message || 'An error occurred. Please try again later.');
         }
-        const partCard = document.createElement('div');
-        partCard.classList.add('part-card');
-        partCard.innerHTML = `
-            <div class="part-name">${part.name}</div>
-            <div class="part-count">${part.count}</div>
-        `;
-        partsGrid.appendChild(partCard);
-    });
-}
-// open modal and add disabled class to partsGrid that already exists in deviceParts
-const openModalAndRenderParts = async () => {
-    openModal();
-    const parts = await getPartsFromDB();
-    renderParts(parts);
-}
+    }
+});
 
-// open modal
-const openModal = () => {
-    document.getElementById('addPartToDeviceModal').style.display = 'block';
-}
+document.getElementById('deviceDetailsForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
 
-// close modal
-const closeModal = () => {
-    document.getElementById('addPartToDeviceModal').style.display = 'none';
-}
+    const urlParams = new URLSearchParams(window.location.search);
+    const deviceId = urlParams.get('id');
 
-renderDeviceParts();
+    const formData = new FormData();
+    formData.append('deviceId', deviceId);
+    formData.append('deviceName', document.getElementById('deviceName').value);
+    
+    formData.append('deviceConverter', document.getElementById('deviceConverter').value);
+    formData.append('deviceFilter', document.getElementById('deviceFilter').value);
+
+    try {
+        const response = await fetch(`${HTTP_URL}/device/update`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update device details');
+        }
+
+        // Set update flag in localStorage
+        localStorage.setItem('devicesListNeedsUpdate', 'true');
+
+        alert('اطلاعات با موفقیت ذخیره شد');
+        window.history.back();
+
+    } catch (error) {
+        console.error('Error updating device details:', error);
+        alert(error.message || 'An error occurred while saving. Please try again later.');
+    }
+});
