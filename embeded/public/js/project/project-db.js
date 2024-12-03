@@ -130,8 +130,13 @@ class AddProjectManager {
                     return;
                 }
 
-                this.devicesGrid.querySelectorAll('.card').forEach(c =>
-                    c.classList.remove('selected'));
+                this.devicesGrid.querySelectorAll('.card').forEach(c => {
+                    if (c.classList.contains('selected')) {
+                        c.classList.remove('selected');
+                        const deviceId = c.getAttribute('data-id');
+                        this.removeInputsFromCard(c, deviceId);
+                    }
+                });
                 card.classList.add('selected');
 
                 const deviceId = card.getAttribute('data-id');
@@ -161,6 +166,12 @@ class AddProjectManager {
         card.appendChild(countInput);
         card.appendChild(addButton);
     }
+
+    removeInputsFromCard(card, partId) {
+        // Remove existing inputs if any
+        card.querySelectorAll('input, button').forEach(el => el.remove());
+    }
+
 
     handleSearch(e) {
         const searchTerm = e.target.value.toLowerCase();

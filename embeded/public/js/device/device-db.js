@@ -130,8 +130,13 @@ class AddDeviceManager {
                     return;
                 }
 
-                this.partsGrid.querySelectorAll('.card').forEach(c =>
-                    c.classList.remove('selected'));
+                this.partsGrid.querySelectorAll('.card').forEach(c => {
+                    if (c.classList.contains('selected')) {
+                        c.classList.remove('selected');
+                        const partId = c.getAttribute('data-id');
+                        this.removeInputsFromCard(c, partId);
+                    }
+                });
                 card.classList.add('selected');
 
                 const partId = card.getAttribute('data-id');
@@ -160,6 +165,11 @@ class AddDeviceManager {
 
         card.appendChild(countInput);
         card.appendChild(addButton);
+    }
+
+    removeInputsFromCard(card, partId) {
+        // Remove existing inputs if any
+        card.querySelectorAll('input, button').forEach(el => el.remove());
     }
 
     handleSearch(e) {
@@ -257,13 +267,13 @@ class AddDeviceManager {
                 body: partFormData,
             });
 
-           if (!partResponses.ok) throw new Error('Failed to save device parts');
+            if (!partResponses.ok) throw new Error('Failed to save device parts');
 
             localStorage.removeItem('deviceParts');
 
             // Set update flag in localStorage
             localStorage.setItem('devicesListNeedsUpdate', 'true');
-            
+
             window.history.back();
         } catch (error) {
             console.error('Error:', error);
