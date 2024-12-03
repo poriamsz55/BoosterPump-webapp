@@ -5,60 +5,52 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/lpar/gzipped"
-	"github.com/phayes/freeport"
 	embedded "github.com/poriamsz55/BoosterPump-webapp/embeded"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/lorca"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/routes"
 )
 
-func portSelection() (string, bool) {
-	if len(os.Args) > 1 {
-		port, _ := strconv.Atoi(os.Args[1])
-		if port > 0 {
-			return os.Args[1], true
-		}
-	}
-	port, err := freeport.GetFreePort()
-	if err != nil {
-		fmt.Println("Could not find idle port", err)
-		return strconv.Itoa(port), false
-	}
-	return strconv.Itoa(port), false
-}
-
-func WebServer(e embed.FS, routes ...func(e *echo.Echo)) string {
-	port, block := portSelection()
+func WebServer(e embed.FS, port string, routes ...func(e *echo.Echo)) error {
 	a := echo.New()
+
+	// Enable CORS middleware
+	a.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://127.0.0.1:8080", "http://localhost:8080"}, // Allowed origins
+		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},       // Allowed HTTP methods
+	}))
+
 	for _, r := range routes {
 		r(a)
 	}
 
 	f, err := fs.Sub(e, "public")
 	if err != nil {
-		fmt.Println("Could not embed front", err)
-		return port
+		return err
 	}
 	a.GET("/public/*", echo.WrapHandler(http.StripPrefix("/public/", gzipped.FileServer(http.FS(f)))))
 	a.HideBanner = true
 	opt := &http.Server{
-		Addr:         ":" + port,
+		Addr:         fmt.Sprintf(":%s", port),
 		ReadTimeout:  600 * time.Second,
 		WriteTimeout: 600 * time.Second,
 	}
-	if block {
-		a.StartServer(opt)
-	}
+
 	go a.StartServer(opt)
-	return port
+	return nil
 }
 
 func main() {
-	port := WebServer(embedded.BoosterFiles, routes.MainRoutes)
+
+	// start the database
+	database.InitializeDB()
+
+	port := "8080"
+	WebServer(embedded.BoosterFiles, port, routes.MainRoutes)
 	lorca.Setup(port)
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -63,6 +64,56 @@ func AddDevicePart(e echo.Context) error {
 	}
 
 	return e.String(http.StatusOK, "devicePart added to database successfully")
+}
+
+type PartJson struct {
+	Id    string `json:"id"`
+	Count string `json:"count"`
+}
+
+func AddDevicePartList(e echo.Context) error {
+
+	// Parse `deviceId` from the form data
+	deviceIDStr := e.FormValue("deviceId")
+	deviceID, err := strconv.Atoi(deviceIDStr)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid deviceId",
+		})
+	}
+
+	// Parse `parts` JSON from the form data
+	partsJSON := e.FormValue("parts")
+	var parts []PartJson
+	if err := json.Unmarshal([]byte(partsJSON), &parts); err != nil {
+		return e.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid parts JSON",
+		})
+	}
+
+	for _, p := range parts {
+
+		// convert partId to int
+		partID, err := strconv.Atoi(p.Id)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid partId",
+			})
+		}
+
+		countf64, err := strconv.ParseFloat(p.Count, 32)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid count",
+			})
+		}
+		err = database.AddDevicePartToDB(deviceID, float32(countf64), partID)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	return e.String(http.StatusOK, "deviceParts added to database successfully")
 }
 
 func CopyDevicePart(e echo.Context) error {

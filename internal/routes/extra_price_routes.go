@@ -7,9 +7,9 @@ import (
 
 func extraPriceRoutes(e *echo.Group) {
 	e.GET("/extraPrice/getAll", handlers.GetAllExtraPrices)
-	e.GET("/extraPrice/getById", handlers.GetExtraPriceById)
-	e.GET("/extraPrice/add", handlers.AddExtraPrice)
-	e.GET("/extraPrice/copy", handlers.CopyExtraPrice)
-	e.GET("/extraPrice/delete", handlers.DeleteExtraPrice)
-	e.GET("/extraPrice/update", handlers.UpdateExtraPrice)
+	e.POST("/extraPrice/getById", handlers.GetExtraPriceById)
+	e.POST("/extraPrice/add", handlers.AddExtraPrice)
+	e.POST("/extraPrice/copy", handlers.CopyExtraPrice)
+	e.POST("/extraPrice/delete", handlers.DeleteExtraPrice)
+	e.POST("/extraPrice/update", handlers.UpdateExtraPrice)
 }

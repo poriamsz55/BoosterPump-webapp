@@ -1,53 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Part Details</title>
-    <link rel="stylesheet" href="/public/css/part-details.css">
-   
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script src="/public/assets/js/three.min.js"></script>
+    <script type="module" src="/public/js/part/parts-details.js" defer></script>
+    <script src="/public/js/three.js" defer></script>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="title">تفاصيل القطعة</h1>
+    <div id="scene-container"></div>
+    <button class="back-button" onclick="window.history.back()">بازگشت</button>
+    <div class="form_container">
+        <h1 class="title">جزییات قطعه</h1>
         <form id="partDetailsForm">
             <div class="form-group">
-                <label>اسم القطعة</label>
-                <input type="text" id="partName" placeholder="ادخل اسم القطعة">
+                <label>نام قطعه</label>
+                <input type="text" id="partName" placeholder="نام">
             </div>
 
             <div class="form-group">
-                <label>الحجم</label>
-                <input type="text" id="partSize" placeholder="ادخل الحجم">
+                <label>سایز</label>
+                <input type="text" id="partSize" placeholder="سایز">
             </div>
 
             <div class="form-group">
-                <label>المادة</label>
-                <input type="text" id="partMaterial" placeholder="ادخل المادة">
+                <label>جنس</label>
+                <input type="text" id="partMaterial" placeholder="جنس">
             </div>
 
             <div class="form-group">
-                <label>العلامة التجارية</label>
-                <input type="text" id="partBrand" placeholder="ادخل العلامة التجارية">
+                <label>برند</label>
+                <input type="text" id="partBrand" placeholder="برند">
             </div>
 
             <div class="form-group">
-                <label>السعر</label>
-                <input type="number" id="partPrice" placeholder="ادخل السعر">
+                <label>قیمت</label>
+                <input type="text" 
+                       placeholder="قیمت" 
+                       id="partPrice" 
+                       inputmode="numeric" 
+                       oninput="formatPrice(this)"
+                       required>
             </div>
 
             <div class="button-container">
-                <button type="submit" class="save-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                        <polyline points="7 3 7 8 15 8"></polyline>
-                    </svg>
-                </button>
+                <button type="submit" class="save-button">ذخیره</button>
             </div>
         </form>
     </div>
-
-    <script src="/public/js/part/parts-details.js"></script>
+   
+    <script type="text/javascript" src="/public/js/format-price-html.js"></script>
 </body>
+
 </html>

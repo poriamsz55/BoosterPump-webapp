@@ -29,19 +29,13 @@ func AddProjectToDB(p *project.Project) error {
 }
 
 func GetAllProjectsFromDB() ([]*project.Project, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT %s, %s
         FROM %s
     `, columnProjectID, columnProjectName, tableProjects)
 
-	rows, err := dbHelper.db.Query(query)
+	rows, err := instance.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +68,6 @@ func GetAllProjectsFromDB() ([]*project.Project, error) {
 }
 
 func GetProjectByIdFromDB(id int) (*project.Project, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT %s, %s
@@ -88,7 +76,7 @@ func GetProjectByIdFromDB(id int) (*project.Project, error) {
     `, columnProjectID, columnProjectName, tableProjects, columnProjectID)
 
 	p := project.NewEmptyProject()
-	err = dbHelper.db.QueryRow(query, id).Scan(&p.Id, &p.Name)
+	err := instance.db.QueryRow(query, id).Scan(&p.Id, &p.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -109,19 +97,13 @@ func GetProjectByIdFromDB(id int) (*project.Project, error) {
 }
 
 func DeleteProjectFromDB(id int) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         DELETE FROM %s 
         WHERE %s = ?
     `, tableProjects, columnProjectID)
 
-	result, err := dbHelper.db.Exec(query, id)
+	result, err := instance.db.Exec(query, id)
 	if err != nil {
 		return err
 	}
@@ -139,12 +121,6 @@ func DeleteProjectFromDB(id int) error {
 }
 
 func UpdateProjectInDB(id int, name string) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         UPDATE %s 
@@ -152,7 +128,7 @@ func UpdateProjectInDB(id int, name string) error {
         WHERE %s = ?
     `, tableProjects, columnProjectName, columnProjectID)
 
-	result, err := dbHelper.db.Exec(query, name, id)
+	result, err := instance.db.Exec(query, name, id)
 	if err != nil {
 		return err
 	}

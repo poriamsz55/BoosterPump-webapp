@@ -2,6 +2,9 @@ package database
 
 import (
 	"database/sql"
+
+	_ "github.com/mattn/go-sqlite3" // SQLite driver
+
 	"fmt"
 	"io"
 	"os"
@@ -54,7 +57,7 @@ var (
 	createExtraPriceTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
         %s TEXT,
-        %s FLOAT,
+        %s INTEGER,
         %s INTEGER,
         FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE ON UPDATE CASCADE
     )`, tableExtraPrice, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue, columnProjectIDFK, columnProjectIDFK, tableProjects, columnProjectID)
@@ -90,7 +93,7 @@ var (
         %s TEXT,
         %s TEXT,
         %s TEXT,
-        %s FLOAT
+        %s INTEGER
     )`, tableParts, columnPartID, columnPartName, columnPartSize, columnPartMaterial, columnPartBrand, columnPartPrice)
 )
 
@@ -227,7 +230,6 @@ func InitializeDB() {
 		fmt.Println("Error opening database:", err)
 		return
 	}
-	defer dbHelper.Close()
 
 	// if !dbHelper.CheckDatabase() {
 	// 	err = dbHelper.CopyDatabaseFromAssets("./database/init_db.db")

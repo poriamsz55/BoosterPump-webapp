@@ -7,9 +7,9 @@ import (
 
 func partRoutes(e *echo.Group) {
 	e.GET("/part/getAll", handlers.GetAllParts)
-	e.GET("/part/getById", handlers.GetPartById)
-	e.GET("/part/add", handlers.AddPart)
-	e.GET("/part/copy", handlers.CopyPart)
-	e.GET("/part/delete", handlers.DeletePart)
-	e.GET("/part/update", handlers.UpdatePart)
+	e.POST("/part/getById", handlers.GetPartById)
+	e.POST("/part/add", handlers.AddPart)
+	e.POST("/part/copy", handlers.CopyPart)
+	e.POST("/part/delete", handlers.DeletePart)
+	e.POST("/part/update", handlers.UpdatePart)
 }

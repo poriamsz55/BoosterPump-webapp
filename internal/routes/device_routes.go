@@ -7,9 +7,9 @@ import (
 
 func deviceRoutes(e *echo.Group) {
 	e.GET("/device/getAll", handlers.GetAllDevices)
-	e.GET("/device/getById", handlers.GetDeviceById)
-	e.GET("/device/add", handlers.AddDevice)
-	e.GET("/device/copy", handlers.CopyDevice)
-	e.GET("/device/delete", handlers.DeleteDevice)
-	e.GET("/device/update", handlers.UpdateDevice)
+	e.POST("/device/getById", handlers.GetDeviceById)
+	e.POST("/device/add", handlers.AddDevice)
+	e.POST("/device/copy", handlers.CopyDevice)
+	e.POST("/device/delete", handlers.DeleteDevice)
+	e.POST("/device/update", handlers.UpdateDevice)
 }

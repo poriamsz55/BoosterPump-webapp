@@ -46,7 +46,7 @@ func ConverterFromName(name string) (Converter, error) {
 
 type Device struct {
 	Id             int                      `json:"id"`
-	Name           string                   `json:"string"`
+	Name           string                   `json:"name"`
 	Converter      Converter                `json:"converter"`
 	Filter         bool                     `json:"filter"`
 	DevicePartList []*devicepart.DevicePart `json:"device_part"`

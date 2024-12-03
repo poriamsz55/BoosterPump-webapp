@@ -1,36 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=part-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parts Management</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
-    <link rel="stylesheet" href="/public/css/parts.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script src="/public/assets/js/three.min.js"></script>
 </head>
+
 <body>
-    <div id="homePage" class="page">
-        <!-- Home page content -->
+    <div id="scene-container"></div>
+    <button class="back-button" onclick="window.history.back()">بازگشت</button>
+    <div class="container">
+        <h1 class="page-title">قطعات</h1>
+
+        <div class="search-container">
+            <input type="search" class="search-input" placeholder="جستجوی قطعات..." id="searchParts">
+        </div>
+
+        <div class="grid" id="partsGrid">
+            <!-- Parts will be dynamically added here -->
+        </div>
+
+        <button class="fab-button" id="addPartToDBButton" aria-label="Add new part">+</button>
     </div>
 
-    <div id="partsPage" class="page">
-        <div class="container">
-            <h1 class="page-title">Parts</h1>
-            
-            <div class="search-container">
-                <input type="search" class="search-input" placeholder="Search parts..." id="searchParts">
-            </div>
+    <div class="modal-overlay" id="addPartToDBModal">
+        <div class="modal">
+            <div class="modal-title">افزودن قطعه جدید</div>
+            <form id="addPartToDBForm">
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="نام قطعه" id="partName" required>
+                </div>
 
-            <div class="parts-grid" id="partsGrid">
-                <!-- Parts will be dynamically added here -->
-            </div>
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="سایز" id="partSize" required>
+                </div>
 
-            <div id="partDetails" class="part-details"></div>
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="جنس" id="partMaterial" required>
+                </div>
 
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="برند" id="partBrand" required>
+                </div>
 
-            <button class="fab-button" id="addPartButton">+</button>
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="قیمت" id="partPrice" inputmode="numeric"
+                        oninput="formatPrice(this)" required>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">انصراف</button>
+                    <button type="submit" class="btn btn-save">ذخیره</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script src="/public/js/part/parts.js"></script>
+    <script type="module" src="/public/js/part/parts.js"></script>
+    <script type="text/javascript" src="/public/js/format-price-html.js"></script>
+    <script src="/public/js/three.js"></script>
 </body>
+
 </html>

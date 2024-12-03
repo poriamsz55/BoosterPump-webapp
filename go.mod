@@ -4,7 +4,12 @@ go 1.23.2
 
 require github.com/labstack/echo/v4 v4.12.0
 
-require github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f // indirect
+require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f // indirect
+	github.com/mattn/go-sqlite3 v1.14.24 // indirect
+	golang.org/x/time v0.5.0 // indirect
+)
 
 require (
 	github.com/labstack/gommon v0.4.2 // indirect

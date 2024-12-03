@@ -4,26 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Details</title>
+    <title>Add Device to Database</title>
+    <link rel="stylesheet" href="/public/assets/css/all.min.css">
     <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/grid.css">
     <script src="/public/assets/js/three.min.js"></script>
-    <script type="module" src="/public/js/device/devices-details.js" defer></script>
+    <script type="module" src="/public/js/device/device-db.js" defer></script>
     <script src="/public/js/three.js" defer></script>
 </head>
 
 <body>
     <div id="scene-container"></div>
     <button class="back-button" onclick="window.history.back()">بازگشت</button>
-    <div class="form_container">
-        <h1 class="title">جزییات دستگاه</h1>
-        <form id="deviceDetailsForm">
+    <div class="container">
+        <h1 class="title">اضافه کردن دستگاه</h1>
+        <form id="addDeviceDBForm">
             <div class="form-group">
                 <label>نام دستگاه</label>
                 <input type="text" id="deviceName" placeholder="نام">
             </div>
 
-             <!-- Converter (select) -->
-             <div class="form-group">
+            <!-- Converter (select) -->
+            <div class="form-group">
                 <!--  Converter Selcect here  -->
                 <select class="form-select" id="converterType" required>
                     <option value="-1">انتخاب کنید</option>
@@ -39,55 +41,43 @@
                 <input type="checkbox" id="filterCheckbox">
             </div>
 
-            <div class="form-group">
-                <label>برند</label>
-                <input type="text" id="deviceBrand" placeholder="برند">
-            </div>
-
-            <div class="form-group">
-                <input type="text" 
-                       placeholder="قیمت" 
-                       id="devicePrice" 
-                       inputmode="numeric" 
-                       oninput="formatPrice(this)"
-                       required>
-            </div>
-
             <!-- Add Part to Device (Btn) -->
             <div class="form-group">
-                <button type="button" class="add-part-button" id="addPartToDeviceBtn">
+                <button type="button" class="btn" id="addPartToDeviceBtn">
                     افزودن قطعه به دستگاه</button>
             </div>
 
-            <!-- List of Device Parts, Jenerated by JS -->
-            <div id="devicePartsList">
-
+            <div class="grid" id="addedPartsGrid">
+                <!-- Parts will be dynamically added here -->
             </div>
 
-            <div class="button-container">
-                <button type="submit" class="save-button">ذخیره</button>
-            </div>
         </form>
+        <div class="button-container">
+            <button type="button" class="save-button" id="addDeviceDBBtn">ذخیره</button>
+        </div>
     </div>
 
-    <!-- Modal -->
     <div class="modal-overlay" id="addPartToDeviceModal">
         <div class="modal">
             <div class="modal-title">افزودن قطعه به دستگاه</div>
             <form id="addPartToDeviceForm">
+
                 <div class="search-container">
                     <input type="search" class="search-input" placeholder="جستجوی قطعه..." id="searchParts">
                 </div>
-                <div class="parts-grid" id="partsGrid">
+
+                <div class="grid" id="partsGrid">
                     <!-- Parts will be dynamically added here -->
                 </div>
+
+
                 <div class="form-buttons">
                     <button type="button" class="btn btn-cancel" id="cancelBtn">بستن فرم</button>
                 </div>
             </form>
         </div>
     </div>
-   
+
     <script type="text/javascript" src="/public/js/format-price-html.js"></script>
 </body>
 

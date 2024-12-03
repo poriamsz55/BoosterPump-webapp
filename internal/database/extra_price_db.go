@@ -31,12 +31,6 @@ func AddExtraPriceToDB(p *extraprice.ExtraPrice) error {
 }
 
 func GetAllExtraPricesFromDB() ([]*extraprice.ExtraPrice, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s
@@ -45,7 +39,7 @@ func GetAllExtraPricesFromDB() ([]*extraprice.ExtraPrice, error) {
 		columnProjectIDFK,
 		tableExtraPrice)
 
-	rows, err := dbHelper.db.Query(query)
+	rows, err := instance.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +68,6 @@ func GetAllExtraPricesFromDB() ([]*extraprice.ExtraPrice, error) {
 }
 
 func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s
@@ -90,7 +78,7 @@ func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 		tableExtraPrice, columnExtraPriceID)
 
 	var p extraprice.ExtraPrice
-	err = dbHelper.db.QueryRow(query, id).Scan(
+	err := instance.db.QueryRow(query, id).Scan(
 		&p.Id,
 		&p.Name,
 		&p.Price,
@@ -104,12 +92,6 @@ func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 }
 
 func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s
@@ -120,7 +102,7 @@ func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error
 
 	var exps []*extraprice.ExtraPrice
 
-	rows, err := dbHelper.db.Query(query, prjId)
+	rows, err := instance.db.Query(query, prjId)
 	if err != nil {
 		return nil, err
 	}
@@ -147,12 +129,6 @@ func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error
 }
 
 func DeleteExtraPriceFromDB(id int) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	// Check if extraPrice exists
 	checkQuery := fmt.Sprintf(`
@@ -162,7 +138,7 @@ func DeleteExtraPriceFromDB(id int) error {
     `, tableExtraPrice, columnExtraPriceID)
 
 	var count int
-	err = dbHelper.db.QueryRow(checkQuery, id).Scan(&count)
+	err := instance.db.QueryRow(checkQuery, id).Scan(&count)
 	if err != nil {
 		return err
 	}
@@ -175,7 +151,7 @@ func DeleteExtraPriceFromDB(id int) error {
         WHERE %s = ?
     `, tableExtraPrice, columnExtraPriceID)
 
-	result, err := dbHelper.db.Exec(query, id)
+	result, err := instance.db.Exec(query, id)
 	if err != nil {
 		return err
 	}
@@ -193,12 +169,6 @@ func DeleteExtraPriceFromDB(id int) error {
 }
 
 func UpdateExtraPriceInDB(updatedExtraPrice *extraprice.ExtraPrice) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         UPDATE %s 
@@ -207,7 +177,7 @@ func UpdateExtraPriceInDB(updatedExtraPrice *extraprice.ExtraPrice) error {
     `, tableExtraPrice,
 		columnExtraPriceName, columnExtraPriceValue, columnExtraPriceID)
 
-	result, err := dbHelper.db.Exec(query,
+	result, err := instance.db.Exec(query,
 		updatedExtraPrice.Name,
 		updatedExtraPrice.Price,
 		updatedExtraPrice.Id,
@@ -229,12 +199,6 @@ func UpdateExtraPriceInDB(updatedExtraPrice *extraprice.ExtraPrice) error {
 }
 
 func CheckExtraPriceExists(exp extraprice.ExtraPrice) (bool, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return false, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
 		SELECT COUNT(*) 
@@ -243,7 +207,7 @@ func CheckExtraPriceExists(exp extraprice.ExtraPrice) (bool, error) {
 	`, tableExtraPrice, columnExtraPriceName, columnProjectIDFK)
 
 	var count int
-	err = dbHelper.db.QueryRow(query, exp.Name, exp.ProjectId).Scan(&count)
+	err := instance.db.QueryRow(query, exp.Name, exp.ProjectId).Scan(&count)
 	if err != nil {
 		return false, err
 	}

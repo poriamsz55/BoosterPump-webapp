@@ -1,0 +1,10 @@
+0. farsi sazi
+0. styles
+0. check unsafe and price formatting
+
+
+1. check converter != -1; if == -1 then show text
+2. let change = false
+	- if user change something set to true
+	- when user press get back show the message you will lost
+3. check scroll for lists everywhere like devices, projects and modals

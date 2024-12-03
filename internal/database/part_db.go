@@ -32,13 +32,6 @@ func AddPartToDB(p *part.Part) error {
 }
 
 func GetAllPartsFromDB() ([]*part.Part, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
-
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s, %s, %s
         FROM %s
@@ -46,7 +39,7 @@ func GetAllPartsFromDB() ([]*part.Part, error) {
 		columnPartMaterial, columnPartBrand, columnPartPrice,
 		tableParts)
 
-	rows, err := dbHelper.db.Query(query)
+	rows, err := instance.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -77,12 +70,6 @@ func GetAllPartsFromDB() ([]*part.Part, error) {
 }
 
 func GetPartByIdFromDB(id int) (*part.Part, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s, %s, %s
@@ -93,7 +80,7 @@ func GetPartByIdFromDB(id int) (*part.Part, error) {
 		tableParts, columnPartID)
 
 	var p part.Part
-	err = dbHelper.db.QueryRow(query, id).Scan(
+	err := instance.db.QueryRow(query, id).Scan(
 		&p.Id,
 		&p.Name,
 		&p.Size,
@@ -109,13 +96,6 @@ func GetPartByIdFromDB(id int) (*part.Part, error) {
 }
 
 func DeletePartFromDB(id int) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
-
 	// Check if part exists
 	checkQuery := fmt.Sprintf(`
         SELECT COUNT(*) 
@@ -124,7 +104,7 @@ func DeletePartFromDB(id int) error {
     `, tableParts, columnPartID)
 
 	var count int
-	err = dbHelper.db.QueryRow(checkQuery, id).Scan(&count)
+	err := instance.db.QueryRow(checkQuery, id).Scan(&count)
 	if err != nil {
 		return err
 	}
@@ -137,7 +117,7 @@ func DeletePartFromDB(id int) error {
         WHERE %s = ?
     `, tableParts, columnPartID)
 
-	result, err := dbHelper.db.Exec(query, id)
+	result, err := instance.db.Exec(query, id)
 	if err != nil {
 		return err
 	}
@@ -155,12 +135,6 @@ func DeletePartFromDB(id int) error {
 }
 
 func UpdatePartInDB(updatedPart *part.Part) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         UPDATE %s 
@@ -170,7 +144,7 @@ func UpdatePartInDB(updatedPart *part.Part) error {
 		columnPartName, columnPartSize, columnPartMaterial,
 		columnPartBrand, columnPartPrice, columnPartID)
 
-	result, err := dbHelper.db.Exec(query,
+	result, err := instance.db.Exec(query,
 		updatedPart.Name,
 		updatedPart.Size,
 		updatedPart.Material,

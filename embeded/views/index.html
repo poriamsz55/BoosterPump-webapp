@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glass Theme App</title>
+    <title>Booster Pump</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
     <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/index.css">
+    <script src="/public/assets/js/three.min.js"></script>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="background" id="background"></div>
+    <div id="scene-container"></div>
 
     <!-- Splash Screen -->
     <div class="splash-screen" id="splashScreen">
@@ -22,26 +23,32 @@
     <div class="main-content" id="mainContent">
         <div class="button-container">
             <button id="btnProjectPage" class="glass-button project">
-                <i class="fas fa-project-diagram"></i> Projects
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
             </button>
             <button id="btnDevicePage" class="glass-button device">
-                <i class="fas fa-mobile-alt"></i> Devices
+                <i class="fas fa-mobile-alt"></i>
+                <span>Devices</span>
             </button>
             <button id="btnPartPage" class="glass-button part">
-                <i class="fas fa-cogs"></i> Parts
+                <i class="fas fa-cogs"></i>
+                <span>Parts</span>
             </button>
             
             <div class="utility-container">
                 <button id="btnDownloadDB" class="glass-button utility">
-                    <i class="fas fa-download"></i> Export DB
+                    <i class="fas fa-download"></i>
+                    <span>Export DB</span>
                 </button>
                 <button id="btnUploadDB" class="glass-button utility">
-                    <i class="fas fa-upload"></i> Import DB
+                    <i class="fas fa-upload"></i>
+                    <span>Import DB</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="/public/js/index.js" defer></script>
+    <script src="/public/js/index/index.js" defer></script>
+    <script src="/public/js/three.js" defer></script>
 </body>
 </html>

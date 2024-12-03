@@ -43,8 +43,8 @@ func getDeviceById(dvcId int) (*device.Device, error) {
 }
 
 func AddDevice(e echo.Context) error {
-	name := e.FormValue("name")
-	converterInt, err := upload.Int(e, "converter")
+	name := e.FormValue("deviceName")
+	converterInt, err := upload.Int(e, "converterType")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -57,12 +57,15 @@ func AddDevice(e echo.Context) error {
 	filter := e.FormValue("filter") == "true"
 
 	d := device.NewDevice(name, converter, filter)
-	err = database.AddDeviceToDB(d)
+	id, err := database.AddDeviceToDB(d)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	return e.String(http.StatusOK, "device added to database successfully")
+	return e.JSON(http.StatusOK, map[string]string{
+		"message": "device added successfully",
+		"id":      strconv.Itoa(id),
+	})
 }
 
 func CopyDevice(e echo.Context) error {
@@ -87,12 +90,15 @@ func CopyDevice(e echo.Context) error {
 	)
 	newDevice.DevicePartList = originalDevice.DevicePartList
 
-	err = database.AddDeviceToDB(newDevice)
+	copyId, err := database.AddDeviceToDB(newDevice)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	return e.String(http.StatusOK, "device copied successfully")
+	return e.JSON(http.StatusOK, map[string]string{
+		"message": "device copied successfully",
+		"id":      strconv.Itoa(copyId),
+	})
 }
 
 func DeleteDevice(e echo.Context) error {

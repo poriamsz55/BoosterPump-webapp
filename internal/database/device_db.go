@@ -8,7 +8,7 @@ import (
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 )
 
-func AddDeviceToDB(d *device.Device) error {
+func AddDeviceToDB(d *device.Device) (int, error) {
 	query := `INSERT INTO ` + tableDevices + ` (` +
 		columnDeviceName + `, ` +
 		columnDeviceConverter + `, ` +
@@ -18,7 +18,7 @@ func AddDeviceToDB(d *device.Device) error {
 	stmt, err := instance.db.Prepare(query)
 	if err != nil {
 		log.Printf("Error preparing statement: %v", err)
-		return err
+		return -1, err
 	}
 	defer stmt.Close()
 
@@ -29,30 +29,29 @@ func AddDeviceToDB(d *device.Device) error {
 		filterInt = 0
 	}
 
-	_, err = stmt.Exec(d.Name, d.Converter.String(), filterInt)
+	result, err := stmt.Exec(d.Name, d.Converter.String(), filterInt)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
-		return err
+		return -1, err
 	}
 
-	return nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Printf("Error getting last insert id: %v", err)
+		return -1, err
+	}
+
+	return int(id), nil
 }
 
 func GetAllDevicesFromDB() ([]*device.Device, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
-
 	// First, get all devices
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s 
         FROM %s
     `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, tableDevices)
 
-	rows, err := dbHelper.db.Query(query)
+	rows, err := instance.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -62,20 +61,20 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 	for rows.Next() {
 		var id int
 		var name string
-		var converterInt int
+		var converter string
 		var filter bool
 
-		err := rows.Scan(&id, &name, &converterInt, &filter)
+		err := rows.Scan(&id, &name, &converter, &filter)
 		if err != nil {
 			return nil, err
 		}
 
-		converter, err := device.ConverterFromValue(converterInt)
+		converterConv, err := device.ConverterFromName(converter)
 		if err != nil {
 			return nil, err
 		}
 
-		dev := device.NewDevice(name, converter, filter)
+		dev := device.NewDevice(name, converterConv, filter)
 		dev.Id = id
 
 		// Get device parts for this device
@@ -97,12 +96,6 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 }
 
 func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	// Get device information
 	query := fmt.Sprintf(`
@@ -112,14 +105,14 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
     `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter,
 		tableDevices, columnDeviceID)
 
-	row := dbHelper.db.QueryRow(query, deviceID)
+	row := instance.db.QueryRow(query, deviceID)
 
 	var id int
 	var name string
 	var converterInt int
 	var filter bool
 
-	err = row.Scan(&id, &name, &converterInt, &filter)
+	err := row.Scan(&id, &name, &converterInt, &filter)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
@@ -147,12 +140,6 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 }
 
 func DeleteDeviceFromDB(deviceID int) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	// First check if the device exists
 	checkQuery := fmt.Sprintf(`
@@ -162,7 +149,7 @@ func DeleteDeviceFromDB(deviceID int) error {
     `, tableDevices, columnDeviceID)
 
 	var count int
-	err = dbHelper.db.QueryRow(checkQuery, deviceID).Scan(&count)
+	err := instance.db.QueryRow(checkQuery, deviceID).Scan(&count)
 	if err != nil {
 		return err
 	}
@@ -178,7 +165,7 @@ func DeleteDeviceFromDB(deviceID int) error {
         WHERE %s = ?
     `, tableDevices, columnDeviceID)
 
-	result, err := dbHelper.db.Exec(query, deviceID)
+	result, err := instance.db.Exec(query, deviceID)
 	if err != nil {
 		return err
 	}
@@ -196,12 +183,6 @@ func DeleteDeviceFromDB(deviceID int) error {
 }
 
 func UpdateDeviceInDB(updatedDevice *device.Device) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	// First check if the device exists
 	checkQuery := fmt.Sprintf(`
@@ -211,7 +192,7 @@ func UpdateDeviceInDB(updatedDevice *device.Device) error {
     `, tableDevices, columnDeviceID)
 
 	var count int
-	err = dbHelper.db.QueryRow(checkQuery, updatedDevice.Id).Scan(&count)
+	err := instance.db.QueryRow(checkQuery, updatedDevice.Id).Scan(&count)
 	if err != nil {
 		return err
 	}
@@ -220,7 +201,7 @@ func UpdateDeviceInDB(updatedDevice *device.Device) error {
 	}
 
 	// Begin transaction
-	tx, err := dbHelper.db.Begin()
+	tx, err := instance.db.Begin()
 	if err != nil {
 		return err
 	}

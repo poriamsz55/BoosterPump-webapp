@@ -1,116 +1,74 @@
-let darkMode = false;
+// get all parts that belong to this device
+// render them in the device details
 
-function toggleTheme() {
-    darkMode = !darkMode;
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    document.querySelector('.theme-toggle i').className = darkMode ? 'fas fa-sun' : 'fas fa-moon';
+const urlParams = new URLSearchParams(window.location.search);
+const deviceId = urlParams.get('id');
+
+// get deviceParts from local storage
+const deviceParts = JSON.parse(localStorage.getItem('deviceParts')) || [];
+
+// get deviceParts from database
+const getDeviceParts = async () => {
+    const response = await fetch(`${HTTP_URL}/devicePart/getByDeviceId?id=${deviceId}`);
+    const deviceParts = await response.json();
+    return deviceParts;
 }
 
-// Sample parts data
-const parts = [
-    {
-        name: "قطعه 1",
-        size: "10x20",
-        material: "فولاد",
-        brand: "برند A",
-        price: "1000000"
-    },
-    // Add more sample parts as needed
-];
-
-function createPartCard(part) {
-    return `
-        <div class="part-card">
-            <div class="part-info">
-                <span>نام: ${part.name}</span>
-            </div>
-            <div class="part-info">
-                <span>سایز: ${part.size}</span>
-            </div>
-            <div class="part-info">
-                <span>جنس: ${part.material}</span>
-            </div>
-            <div class="part-info">
-                <span>برند: ${part.brand}</span>
-            </div>
-            <div class="part-info">
-                <span>قیمت: ${part.price} تومان</span>
-            </div>
-            <div class="card-actions">
-                <button class="action-button" onclick="deletePart(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    `;
+// render deviceParts in device details
+const renderDeviceParts = async () => {
+    const deviceParts = await getDeviceParts();
+    const devicePartList = document.getElementById('devicePartList');
+    devicePartList.innerHTML = '';
+    deviceParts.forEach(devicePart => {
+        const li = document.createElement('li');
+        li.textContent = `${devicePart.partName} x${devicePart.count}`;
+        devicePartList.appendChild(li);
+    });
 }
 
-function initializeParts() {
-    const container = document.getElementById('partsContainer');
+// addPartToDeviceBtn
+const addPartToDeviceBtn = document.getElementById('addPartToDeviceBtn');
+// get all parts from database
+const getPartsFromDB = async () => {
+    const response = await fetch(`${HTTP_URL}/part/getAll`);
+    const parts = await response.json();
+    return parts;
+}
+
+// render parts in modal
+const renderParts = async (parts) => {
+    const partsGrid = document.getElementById('partsGrid');
+    partsGrid.innerHTML = '';
     parts.forEach(part => {
-        container.innerHTML += createPartCard(part);
+        // check if part already exists in deviceParts
+        const partExists = deviceParts.some(devicePart => devicePart.partId === part.id);
+        if (partExists) {
+           // TODO
+        }
+        const partCard = document.createElement('div');
+        partCard.classList.add('part-card');
+        partCard.innerHTML = `
+            <div class="part-name">${part.name}</div>
+            <div class="part-count">${part.count}</div>
+        `;
+        partsGrid.appendChild(partCard);
     });
 }
-
-function addNewPart() {
-    const container = document.getElementById('partsContainer');
-    const newPart = {
-        name: "قطعه جدید",
-        size: "0x0",
-        material: "نامشخص",
-        brand: "نامشخص",
-        price: "0"
-    };
-    container.innerHTML += createPartCard(newPart);
+// open modal and add disabled class to partsGrid that already exists in deviceParts
+const openModalAndRenderParts = async () => {
+    openModal();
+    const parts = await getPartsFromDB();
+    renderParts(parts);
 }
 
-function deletePart(button) {
-    button.closest('.part-card').remove();
+// open modal
+const openModal = () => {
+    document.getElementById('addPartToDeviceModal').style.display = 'block';
 }
 
-function saveDetails() {
-    // Implement save functionality
-    alert('ذخیره شد!');
+// close modal
+const closeModal = () => {
+    document.getElementById('addPartToDeviceModal').style.display = 'none';
 }
 
-// Search functionality
-document.getElementById('searchInput').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const cards = document.querySelectorAll('.part-card');
-    
-    cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(searchTerm) ? 'block' : 'none';
-    });
-});
-
-function showOverlay() {
-    document.getElementById('overlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function hideOverlay() {
-    document.getElementById('overlay').style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-function savePart() {
-    // Add your save logic here
-    console.log('Saving part...');
-    hideOverlay();
-}
-
-// Close overlay when clicking outside the content
-document.getElementById('overlay').addEventListener('click', function(e) {
-    if (e.target === this) {
-        hideOverlay();
-    }
-});
-
-// Prevent closing when clicking inside the content
-document.querySelector('.overlay-content').addEventListener('click', function(e) {
-    e.stopPropagation();
-});
-
-// Initialize the page
-document.addEventListener('DOMContentLoaded', initializeParts);
+renderDeviceParts();

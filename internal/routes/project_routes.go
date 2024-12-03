@@ -7,9 +7,9 @@ import (
 
 func projectRoutes(e *echo.Group) {
 	e.GET("/project/getAll", handlers.GetAllProjects)
-	e.GET("/project/getById", handlers.GetProjectById)
-	e.GET("/project/add", handlers.AddProject)
-	e.GET("/project/copy", handlers.CopyProject)
-	e.GET("/project/delete", handlers.DeleteProject)
-	e.GET("/project/update", handlers.UpdateProject)
+	e.POST("/project/getById", handlers.GetProjectById)
+	e.POST("/project/add", handlers.AddProject)
+	e.POST("/project/copy", handlers.CopyProject)
+	e.POST("/project/delete", handlers.DeleteProject)
+	e.POST("/project/update", handlers.UpdateProject)
 }

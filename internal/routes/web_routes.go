@@ -7,14 +7,16 @@ import (
 
 func webRoutes(e *echo.Echo) {
 	// main
-	e.GET("/", handlers.HandleIndex)
-	e.GET("/projects", handlers.HandleProjects)
-	e.GET("/devices", handlers.HandleDevices)
-	e.GET("/parts", handlers.HandleParts)
+	e.GET("/", handlers.IndexView)
+	e.GET("/projects", handlers.ProjectsView)
+	e.GET("/add/project/db", handlers.AddProjectDBView)
+	e.GET("/devices", handlers.DevicesView)
+	e.GET("/add/device/db", handlers.AddDeviceDBView)
+	e.GET("/parts", handlers.PartsView)
 
 	// details
-	e.GET("/projects/details", handlers.HandleProjectDetails)
-	e.GET("/devices/details", handlers.HandleDeviceDetails)
-	e.GET("/parts/details", handlers.HandlePartDetails)
+	e.GET("/projects/details", handlers.ProjectDetailsView)
+	e.GET("/devices/details", handlers.DeviceDetailsView)
+	e.GET("/parts/details", handlers.PartDetailsView)
 
 }

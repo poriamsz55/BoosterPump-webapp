@@ -22,7 +22,7 @@ func AddDevicePartToDB(dvcId int, count float32, prtId int) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(dvcId, count, prtId)
+	_, err = stmt.Exec(count, prtId, dvcId)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return err
@@ -33,7 +33,6 @@ func AddDevicePartToDB(dvcId int, count float32, prtId int) error {
 
 // Helper function to get device parts for a specific device
 func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
-	dbHelper := GetDBHelperInstance()
 
 	query := fmt.Sprintf(`
         SELECT dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s
@@ -47,7 +46,7 @@ func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
 		tableParts, columnPartIDK, columnPartID,
 		columnDeviceIDFK)
 
-	rows, err := dbHelper.db.Query(query, deviceID)
+	rows, err := instance.db.Query(query, deviceID)
 	if err != nil {
 		return nil, err
 	}
@@ -85,12 +84,6 @@ func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
 }
 
 func GetDevicePartByIdFromDB(id int) (*devicepart.DevicePart, error) {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         SELECT dp.%s, dp.%s, dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s
@@ -106,7 +99,7 @@ func GetDevicePartByIdFromDB(id int) (*devicepart.DevicePart, error) {
 
 	var dp devicepart.DevicePart
 	var p part.Part
-	err = dbHelper.db.QueryRow(query, id).Scan(
+	err := instance.db.QueryRow(query, id).Scan(
 		&dp.Id,
 		&dp.Count,
 		&dp.DeviceId,
@@ -128,19 +121,13 @@ func GetDevicePartByIdFromDB(id int) (*devicepart.DevicePart, error) {
 }
 
 func DeleteDevicePartFromDB(id int) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         DELETE FROM %s 
         WHERE %s = ?
     `, tableDeviceParts, columnDevicePartID)
 
-	result, err := dbHelper.db.Exec(query, id)
+	result, err := instance.db.Exec(query, id)
 	if err != nil {
 		return err
 	}
@@ -158,12 +145,6 @@ func DeleteDevicePartFromDB(id int) error {
 }
 
 func UpdateDevicePartInDB(id, projectId int, count float32, deviceId int) error {
-	dbHelper := GetDBHelperInstance()
-	err := dbHelper.Open()
-	if err != nil {
-		return err
-	}
-	defer dbHelper.Close()
 
 	query := fmt.Sprintf(`
         UPDATE %s 
@@ -173,7 +154,7 @@ func UpdateDevicePartInDB(id, projectId int, count float32, deviceId int) error 
 		columnProjectIDFK, columnDevicePartCount, columnDeviceIDFK,
 		columnDevicePartID)
 
-	result, err := dbHelper.db.Exec(query, projectId, count, deviceId, id)
+	result, err := instance.db.Exec(query, projectId, count, deviceId, id)
 	if err != nil {
 		return err
 	}

@@ -21,9 +21,9 @@ func GetAllParts(e echo.Context) error {
 }
 
 func GetPartById(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := strconv.Atoi(e.FormValue("partId"))
 	if err != nil {
-		return e.String(http.StatusBadRequest, "invalid part id")
+		e.JSON(http.StatusBadRequest, "invalid part id")
 	}
 
 	part, err := database.GetPartByIdFromDB(id)
@@ -38,11 +38,14 @@ func GetPartById(e echo.Context) error {
 }
 
 func AddPart(e echo.Context) error {
-	name := e.FormValue("name")
-	size := e.FormValue("size")
-	material := e.FormValue("material")
-	brand := e.FormValue("brand")
-	price, err := upload.Uint64(e, "price")
+	name := e.FormValue("partName")
+	size := e.FormValue("partSize")
+	material := e.FormValue("partMaterial")
+	brand := e.FormValue("partBrand")
+	price, err := upload.Uint64(e, "partPrice")
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
 
 	p := part.NewPart(name, size, material, brand, price)
 	err = database.AddPartToDB(p)
@@ -101,16 +104,16 @@ func DeletePart(e echo.Context) error {
 }
 
 func UpdatePart(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := strconv.Atoi(e.FormValue("partId"))
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid part id")
 	}
 
-	name := e.FormValue("name")
-	size := e.FormValue("size")
-	material := e.FormValue("material")
-	brand := e.FormValue("brand")
-	price, err := upload.Uint64(e, "price")
+	name := e.FormValue("partName")
+	size := e.FormValue("partSize")
+	material := e.FormValue("partMaterial")
+	brand := e.FormValue("partBrand")
+	price, err := upload.Uint64(e, "partPrice")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}

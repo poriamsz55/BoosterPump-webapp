@@ -1,89 +1,164 @@
-// Sample devices data
-const devices = [
-    { id: 1, name: "Device 1", price: "$1000" },
-    { id: 2, name: "Device 2", price: "$2000" },
-    { id: 3, name: "Device 3", price: "$3000" },
-];
+import { HTTP_URL } from '../config.js';
 
-// Initialize the devices page
-function initDevicesPage() {
-    const devicesGrid = document.getElementById('devicesGrid');
-    const searchInput = document.getElementById('searchDevices');
-    const deviceDetails = document.getElementById('deviceDetails');
+class DevicesManager {
+    constructor() {
+        this.devices = [];
+        this.devicesGrid = document.getElementById('devicesGrid');
+        this.searchInput = document.getElementById('searchDevices');
 
-    function renderDevices(devicesList) {
-        devicesGrid.innerHTML = devicesList.map(device => `
-            <div class="device-card" data-id="${device.id}">
-                <div class="device-header">
-                    <span class="device-title">${device.name}</span>
+        this.init();
+        
+        // Add focus event listener
+        window.addEventListener('focus', () => this.checkForUpdates());
+    }
+
+    async checkForUpdates() {
+        if (localStorage.getItem('devicesListNeedsUpdate') === 'true') {
+            await this.getDevicesFromDB();
+            this.renderDevices(this.devices);
+            localStorage.removeItem('devicesListNeedsUpdate');
+        }
+    }
+
+    async init() {
+        console.log('Initializing DevicesManager...');
+        await this.getDevicesFromDB();
+        this.renderDevices(this.devices);
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        this.searchInput.addEventListener('input', (e) => this.handleSearch(e));
+        document.getElementById('addDeviceToDBButton').addEventListener('click', () =>{
+            window.location.href = '/add/device/db';
+        });
+        // Remove the form submit event listener from here
+        this.form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent form submission
+            await this.saveDevice();
+        });
+    }
+
+
+    renderDevices(devicesList) {
+        this.devicesGrid.innerHTML = devicesList.map(device => `
+            <div class="card" data-id="${device.id}">
+                <div class="card-header">
+                    <span class="card-title">${this.escapeHtml(device.name)}</span>
                 </div>
-                <div class="device-price">${device.price}</div>
-                <div class="device-actions">
-                    <button class="action-button" onclick="deleteDevice(${device.id})">
+                <div class="card-price">${this.formatPrice(device.price)}</div>
+                <div class="card-actions">
+                    <button class="action-button delete-btn" data-id="${device.id}">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="action-button" onclick="copyDevice(${device.id})">
+                    <button class="action-button copy-btn" data-id="${device.id}">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
             </div>
         `).join('');
 
-        // Add event listeners to each device card for click handling
-        devicesGrid.querySelectorAll('.device-card').forEach(card => {
+        this.attachCardEventListeners();
+    }
+
+    attachCardEventListeners() {
+        this.devicesGrid.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', (e) => {
-                const deviceId = card.getAttribute('data-id');
-                handleDeviceClick(deviceId);
+                if (!e.target.closest('.action-button')) {
+                    const deviceId = card.getAttribute('data-id');
+                    this.handleDeviceClick(deviceId);
+                }
+            });
+        });
+
+        this.devicesGrid.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteDevice(btn.dataset.id);
+            });
+        });
+
+        this.devicesGrid.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.copyDevice(btn.dataset.id);
             });
         });
     }
 
-    
-    function handleDeviceClick(id) {
-        // Redirect to device-details.html with the device ID as a query parameter
+    handleDeviceClick(id) {
         window.location.href = `/devices/details?id=${id}`;
     }
 
-    // Initial render
-    renderDevices(devices);
-
-    // Search functionality
-    searchInput.addEventListener('input', (e) => {
+    handleSearch(e) {
         const searchTerm = e.target.value.toLowerCase();
-        const filteredDevices = devices.filter(device => 
+        const filteredDevices = this.devices.filter(device =>
             device.name.toLowerCase().includes(searchTerm)
         );
-        renderDevices(filteredDevices);
-    });
+        this.renderDevices(filteredDevices);
+    }
 
-    // Add device button
-    document.getElementById('addDeviceButton').addEventListener('click', () => {
-        // Implement add device functionality
-        console.log('Add device clicked');
-    });
-}
+    async getDevicesFromDB() {
+        try {
+            const response = await fetch(`${HTTP_URL}/device/getAll`);
+            const data = await response.json();
+            console.log(data);
 
-// Navigation functions
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
-}
+            if (Array.isArray(data)) {
+                this.devices = data;
+            } else {
+                console.error('Invalid response format:', data);
+                this.devices = [];
+            }
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+            this.devices = [];
+        }
+    }
 
-// Device actions
-function deleteDevice(id) {
-    console.log('Delete device:', id);
-    // Implement delete functionality
-}
+    async deleteDevice(id) {
+        if (confirm('Are you sure you want to delete this device?')) {
+            try {
+                const response = await fetch(`${HTTP_URL}/device/delete/${id}`, {
+                    method: 'POST'
+                });
 
-function copyDevice(id) {
-    console.log('Copy device:', id);
-    // Implement copy functionality
+                if (response.ok) {
+                    await this.getDevicesFromDB();
+                    this.renderDevices(this.devices);
+                } else {
+                    alert('Failed to delete device.');
+                }
+            } catch (error) {
+                console.error('Error deleting device:', error);
+                alert('An error occurred while deleting the device.');
+            }
+        }
+    }
+
+    async copyDevice(id) {
+        const deviceToCopy = this.devices.find(device => device.id === id);
+        if (deviceToCopy) {
+            // Implementation for copying device
+            console.log('Copying device:', deviceToCopy);
+        }
+    }
+
+    escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    formatPrice(price) {
+        return new Intl.NumberFormat('fa-IR').format(price);
+    }
 }
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-    initDevicesPage();
-    showPage('devicesPage'); // Show devices page by default
+    new DevicesManager();
 });

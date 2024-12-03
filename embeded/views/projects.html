@@ -1,36 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=project-width, initial-scale=1.0">
     <title>Projects Management</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
-    <link rel="stylesheet" href="/public/css/projects.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script src="/public/assets/js/three.min.js"></script>
 </head>
+
 <body>
-    <div id="homePage" class="page">
-        <!-- Home page content -->
-    </div>
+    <div id="scene-container"></div>
+    <button class="back-button" onclick="window.history.back()">بازگشت</button>
+    <div class="container">
+        <h1 class="page-title">پروژه ها</h1>
 
-    <div id="projectsPage" class="page">
-        <div class="container">
-            <h1 class="page-title">Projects</h1>
-            
-            <div class="search-container">
-                <input type="search" class="search-input" placeholder="Search projects..." id="searchProjects">
-            </div>
-
-            <div class="projects-grid" id="projectsGrid">
-                <!-- Projects will be dynamically added here -->
-            </div>
-
-            <div id="projectDetails" class="project-details"></div>
-
-
-            <button class="fab-button" id="addProjectButton">+</button>
+        <div class="search-container">
+            <input type="search" class="search-input" placeholder="جستجوی دستگاه..." id="searchProjects">
         </div>
+
+        <div class="grid" id="projectsGrid">
+            <!-- Projects will be dynamically added here -->
+        </div>
+
+        <button class="fab-button" id="addProjectToDBButton" aria-label="Add new project">+</button>
     </div>
 
-    <script src="/public/js/project/projects.js"></script>
+    <script type="module" src="/public/js/project/projects.js"></script>
+    <script src="/public/js/three.js"></script>
 </body>
+
 </html>

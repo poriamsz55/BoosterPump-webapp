@@ -8,7 +8,7 @@ import (
 )
 
 // Handlers
-func HandleIndex(c echo.Context) error {
+func IndexView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/index.html")
 	if err != nil {
 		return err
@@ -16,7 +16,7 @@ func HandleIndex(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, html)
 }
 
-func HandleProjects(c echo.Context) error {
+func ProjectsView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/projects.html")
 	if err != nil {
 		return err
@@ -24,7 +24,15 @@ func HandleProjects(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, html)
 }
 
-func HandleDevices(c echo.Context) error {
+func AddProjectDBView(c echo.Context) error {
+	html, err := embedded.BoosterFiles.ReadFile("views/project-db.html")
+	if err != nil {
+		return err
+	}
+	return c.HTMLBlob(http.StatusOK, html)
+}
+
+func DevicesView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/devices.html")
 	if err != nil {
 		return err
@@ -32,7 +40,15 @@ func HandleDevices(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, html)
 }
 
-func HandleParts(c echo.Context) error {
+func AddDeviceDBView(c echo.Context) error {
+	html, err := embedded.BoosterFiles.ReadFile("views/device-db.html")
+	if err != nil {
+		return err
+	}
+	return c.HTMLBlob(http.StatusOK, html)
+}
+
+func PartsView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/parts.html")
 	if err != nil {
 		return err
@@ -42,7 +58,7 @@ func HandleParts(c echo.Context) error {
 
 // Detail
 
-func HandleProjectDetails(c echo.Context) error {
+func ProjectDetailsView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/project-details.html")
 	if err != nil {
 		return err
@@ -50,7 +66,7 @@ func HandleProjectDetails(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, html)
 }
 
-func HandleDeviceDetails(c echo.Context) error {
+func DeviceDetailsView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/device-details.html")
 	if err != nil {
 		return err
@@ -58,7 +74,7 @@ func HandleDeviceDetails(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, html)
 }
 
-func HandlePartDetails(c echo.Context) error {
+func PartDetailsView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/part-details.html")
 	if err != nil {
 		return err

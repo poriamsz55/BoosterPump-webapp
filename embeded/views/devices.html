@@ -1,36 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devices Management</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
-    <link rel="stylesheet" href="/public/css/devices.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script src="/public/assets/js/three.min.js"></script>
 </head>
+
 <body>
-    <div id="homePage" class="page">
-        <!-- Home page content -->
-    </div>
+    <div id="scene-container"></div>
+    <button class="back-button" onclick="window.history.back()">بازگشت</button>
+    <div class="container">
+        <h1 class="page-title">دستگاه ها</h1>
 
-    <div id="devicesPage" class="page">
-        <div class="container">
-            <h1 class="page-title">Devices</h1>
-            
-            <div class="search-container">
-                <input type="search" class="search-input" placeholder="Search devices..." id="searchDevices">
-            </div>
-
-            <div class="devices-grid" id="devicesGrid">
-                <!-- Devices will be dynamically added here -->
-            </div>
-
-            <div id="deviceDetails" class="device-details"></div>
-
-
-            <button class="fab-button" id="addDeviceButton">+</button>
+        <div class="search-container">
+            <input type="search" class="search-input" placeholder="جستجوی دستگاه..." id="searchDevices">
         </div>
+
+        <div class="grid" id="devicesGrid">
+            <!-- Devices will be dynamically added here -->
+        </div>
+
+        <button class="fab-button" id="addDeviceToDBButton" aria-label="Add new device">+</button>
     </div>
 
-    <script src="/public/js/device/devices.js"></script>
+    <script type="module" src="/public/js/device/devices.js"></script>
+    <script src="/public/js/three.js"></script>
 </body>
+
 </html>

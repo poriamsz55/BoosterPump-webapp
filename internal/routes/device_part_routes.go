@@ -7,9 +7,10 @@ import (
 
 func devicePartRoutes(e *echo.Group) {
 	e.GET("/devicePart/getAll", handlers.GetAllDeviceParts)
-	e.GET("/devicePart/getById", handlers.GetDevicePartById)
-	e.GET("/devicePart/add", handlers.AddDevicePart)
-	e.GET("/devicePart/copy", handlers.CopyDevicePart)
-	e.GET("/devicePart/delete", handlers.DeleteDevicePart)
-	e.GET("/devicePart/update", handlers.UpdateDevicePart)
+	e.POST("/devicePart/getById", handlers.GetDevicePartById)
+	e.POST("/devicePart/add", handlers.AddDevicePart)
+	e.POST("/devicePart/add/list", handlers.AddDevicePartList)
+	e.POST("/devicePart/copy", handlers.CopyDevicePart)
+	e.POST("/devicePart/delete", handlers.DeleteDevicePart)
+	e.POST("/devicePart/update", handlers.UpdateDevicePart)
 }

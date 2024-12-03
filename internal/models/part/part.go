@@ -5,7 +5,7 @@ type Part struct {
 	Name     string `json:"name"`
 	Price    uint64 `json:"price"`
 	Size     string `json:"size"`
-	Material string `json:"matrial"`
+	Material string `json:"material"`
 	Brand    string `json:"brand"`
 }
 
