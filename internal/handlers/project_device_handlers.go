@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
@@ -35,6 +37,45 @@ func AddProjectDevice(e echo.Context) error {
 	err = database.AddProjectDeviceToDB(prjId, count, dvcId)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.String(http.StatusOK, "projectDevice added to database successfully")
+}
+
+type DeviceJson struct {
+	Id    string `json:"id"`
+	Count string `json:"count"`
+}
+
+func AddProjectDeviceList(e echo.Context) error {
+	prjId, err := upload.Int(e, "projectId")
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	// Parse `devices` JSON from the form data
+	devicesJSON := e.FormValue("devices")
+	var devices []DeviceJson
+	if err := json.Unmarshal([]byte(devicesJSON), &devices); err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	for _, d := range devices {
+
+		// convert deviceId to int
+		deviceId, err := strconv.Atoi(d.Id)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+
+		countf64, err := strconv.ParseFloat(d.Count, 32)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+		err = database.AddProjectDeviceToDB(prjId, float32(countf64), deviceId)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	return e.String(http.StatusOK, "projectDevice added to database successfully")

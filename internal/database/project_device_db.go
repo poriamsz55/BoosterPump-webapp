@@ -20,7 +20,7 @@ func AddProjectDeviceToDB(prjId int, count float32, dvcId int) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(prjId, count, dvcId)
+	_, err = stmt.Exec(count, dvcId, prjId)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return err

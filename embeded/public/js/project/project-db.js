@@ -246,8 +246,6 @@ class AddProjectManager {
     async saveProject() {
         const formData = new FormData();
         formData.append('projectName', document.getElementById('projectName').value);
-        formData.append('converterType', document.getElementById('converterType').value); // Fixed field name
-        formData.append('filter', document.getElementById('filterCheckbox').checked); // Fixed field name
 
         try {
             const response = await fetch(`${HTTP_URL}/project/add`, {

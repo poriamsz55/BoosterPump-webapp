@@ -77,37 +77,29 @@ func AddDevicePartList(e echo.Context) error {
 	deviceIDStr := e.FormValue("deviceId")
 	deviceID, err := strconv.Atoi(deviceIDStr)
 	if err != nil {
-		return e.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid deviceId",
-		})
+		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
 	// Parse `parts` JSON from the form data
 	partsJSON := e.FormValue("parts")
 	var parts []PartJson
 	if err := json.Unmarshal([]byte(partsJSON), &parts); err != nil {
-		return e.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid parts JSON",
-		})
+		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
 	for _, p := range parts {
 
 		// convert partId to int
-		partID, err := strconv.Atoi(p.Id)
+		partId, err := strconv.Atoi(p.Id)
 		if err != nil {
-			return e.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Invalid partId",
-			})
+			return e.String(http.StatusInternalServerError, err.Error())
 		}
 
 		countf64, err := strconv.ParseFloat(p.Count, 32)
 		if err != nil {
-			return e.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Invalid count",
-			})
+			return e.String(http.StatusInternalServerError, err.Error())
 		}
-		err = database.AddDevicePartToDB(deviceID, float32(countf64), partID)
+		err = database.AddDevicePartToDB(deviceID, float32(countf64), partId)
 		if err != nil {
 			return e.String(http.StatusInternalServerError, err.Error())
 		}
