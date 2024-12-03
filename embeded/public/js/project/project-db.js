@@ -167,7 +167,7 @@ class AddProjectManager {
         card.appendChild(addButton);
     }
 
-    removeInputsFromCard(card, partId) {
+    removeInputsFromCard(card) {
         // Remove existing inputs if any
         card.querySelectorAll('input, button').forEach(el => el.remove());
     }

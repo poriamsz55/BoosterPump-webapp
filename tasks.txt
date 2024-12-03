@@ -8,3 +8,10 @@
 	- if user change something set to true
 	- when user press get back show the message you will lost
 3. check scroll for lists everywhere like devices, projects and modals
+	* style scroll
+X. remove input and button wehen I click on other item
+X. disable style
+X. move close modal button to top of modal
+	* set scroll just for grid
+7. back to home has loading screen
+
