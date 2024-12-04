@@ -56,6 +56,62 @@ class AddDeviceManager {
         this.attachCardEventListeners();
     }
 
+
+    attachCardEventListeners() {
+
+        this.partsGrid.querySelectorAll('.card').forEach(card => {
+            if (card.hasEventListener) return; // Prevent duplicate listeners
+            card.hasEventListener = true;
+
+            card.addEventListener('click', (e) => {
+                if (card.classList.contains('disabled') ||
+                    card.classList.contains('selected') ||
+                    e.target.closest('.action-button')) {
+                    return;
+                }
+
+                this.partsGrid.querySelectorAll('.card').forEach(c => {
+                    if (c.classList.contains('selected')) {
+                        c.classList.remove('selected');
+                        const partId = c.getAttribute('data-id');
+                        this.removeInputsFromCard(c, partId);
+                    }
+                });
+                card.classList.add('selected');
+
+                const partId = card.getAttribute('data-id');
+                this.addInputsToCard(card, partId);
+            });
+        });
+    }
+
+    addInputsToCard(card, partId) {
+        // Remove existing inputs if any
+        card.querySelectorAll('input, button').forEach(el => el.remove());
+
+        const countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.value = 1;
+        countInput.min = '1';
+        countInput.id = `count-${partId}`;
+
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.textContent = 'افزودن به دستگاه';
+        addButton.id = `add-to-device-${partId}`;
+
+        addButton.addEventListener('click', () =>
+            this.addToDevice(partId, countInput.value));
+
+        card.appendChild(countInput);
+        card.appendChild(addButton);
+    }
+
+    removeInputsFromCard(card) {
+        // Remove existing inputs if any
+        card.querySelectorAll('input, button').forEach(el => el.remove());
+    }
+
     // render added parts in modal
     renderAddedParts(addedParts) {
         const partsGrid = document.getElementById('addedPartsGrid');
@@ -114,63 +170,6 @@ class AddDeviceManager {
         }
     }
 
-
-
-    attachCardEventListeners() {
-
-
-        this.partsGrid.querySelectorAll('.card').forEach(card => {
-            if (card.hasEventListener) return; // Prevent duplicate listeners
-            card.hasEventListener = true;
-
-            card.addEventListener('click', (e) => {
-                if (card.classList.contains('disabled') ||
-                    card.classList.contains('selected') ||
-                    e.target.closest('.action-button')) {
-                    return;
-                }
-
-                this.partsGrid.querySelectorAll('.card').forEach(c => {
-                    if (c.classList.contains('selected')) {
-                        c.classList.remove('selected');
-                        const partId = c.getAttribute('data-id');
-                        this.removeInputsFromCard(c, partId);
-                    }
-                });
-                card.classList.add('selected');
-
-                const partId = card.getAttribute('data-id');
-                this.addInputsToCard(card, partId);
-            });
-        });
-    }
-
-    addInputsToCard(card, partId) {
-        // Remove existing inputs if any
-        card.querySelectorAll('input, button').forEach(el => el.remove());
-
-        const countInput = document.createElement('input');
-        countInput.type = 'number';
-        countInput.value = 1;
-        countInput.min = '1';
-        countInput.id = `count-${partId}`;
-
-        const addButton = document.createElement('button');
-        addButton.type = 'button';
-        addButton.textContent = 'افزودن به دستگاه';
-        addButton.id = `add-to-device-${partId}`;
-
-        addButton.addEventListener('click', () =>
-            this.addToDevice(partId, countInput.value));
-
-        card.appendChild(countInput);
-        card.appendChild(addButton);
-    }
-
-    removeInputsFromCard(card) {
-        // Remove existing inputs if any
-        card.querySelectorAll('input, button').forEach(el => el.remove());
-    }
 
     handleSearch(e) {
         const searchTerm = e.target.value.toLowerCase();
