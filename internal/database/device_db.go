@@ -221,10 +221,22 @@ func UpdateDeviceInDB(updatedDevice *device.Device) error {
 		columnDeviceName, columnDeviceConverter, columnDeviceFilter,
 		columnDeviceID)
 
+	converter, err := device.ConverterFromValue(int(updatedDevice.Converter))
+	if err != nil {
+		return err
+	}
+
+	var filterInt int
+	if updatedDevice.Filter {
+		filterInt = 1
+	} else {
+		filterInt = 0
+	}
+
 	result, err := tx.Exec(query,
 		updatedDevice.Name,
-		int(updatedDevice.Converter),
-		updatedDevice.Filter,
+		converter,
+		filterInt,
 		updatedDevice.Id)
 	if err != nil {
 		return err

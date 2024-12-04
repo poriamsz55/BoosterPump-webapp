@@ -1,4 +1,5 @@
 import { HTTP_URL } from '../config.js';
+import { formatPriceValue } from '../format-price.js';
 
 class DevicesManager {
     constructor() {
@@ -7,7 +8,7 @@ class DevicesManager {
         this.searchInput = document.getElementById('searchDevices');
 
         this.init();
-        
+
         // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
     }
@@ -29,13 +30,8 @@ class DevicesManager {
 
     setupEventListeners() {
         this.searchInput.addEventListener('input', (e) => this.handleSearch(e));
-        document.getElementById('addDeviceToDBButton').addEventListener('click', () =>{
+        document.getElementById('addDeviceToDBButton').addEventListener('click', () => {
             window.location.href = '/add/device/db';
-        });
-        // Remove the form submit event listener from here
-        this.form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent form submission
-            await this.saveDevice();
         });
     }
 
@@ -46,7 +42,7 @@ class DevicesManager {
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(device.name)}</span>
                 </div>
-                <div class="card-price">${this.formatPrice(device.price)}</div>
+                <div class="card-price">${formatPriceValue(device.price)}</div>
                 <div class="card-actions">
                     <button class="action-button delete-btn" data-id="${device.id}">
                         <i class="fas fa-trash"></i>
@@ -153,9 +149,6 @@ class DevicesManager {
             .replace(/'/g, "&#039;");
     }
 
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
 }
 
 // Initialize the application

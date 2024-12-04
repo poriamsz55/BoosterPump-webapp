@@ -48,7 +48,7 @@ func AddDevicePart(e echo.Context) error {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	count, err := upload.Float32(e, "count")
+	count, err := upload.Float64(e, "count")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -99,7 +99,7 @@ func AddDevicePartList(e echo.Context) error {
 		if err != nil {
 			return e.String(http.StatusInternalServerError, err.Error())
 		}
-		err = database.AddDevicePartToDB(deviceID, float32(countf64), partId)
+		err = database.AddDevicePartToDB(deviceID, float64(countf64), partId)
 		if err != nil {
 			return e.String(http.StatusInternalServerError, err.Error())
 		}
@@ -157,7 +157,7 @@ func UpdateDevicePart(e echo.Context) error {
 		return e.String(http.StatusBadRequest, "invalid device part id")
 	}
 
-	count, err := upload.Float32(e, "count")
+	count, err := upload.Float64(e, "count")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}

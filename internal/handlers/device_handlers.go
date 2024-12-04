@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -119,13 +120,13 @@ func DeleteDevice(e echo.Context) error {
 }
 
 func UpdateDevice(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "id")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid device id")
 	}
 
-	name := e.FormValue("name")
-	converterInt, err := upload.Int(e, "converter")
+	name := e.FormValue("deviceName")
+	converterInt, err := upload.Int(e, "converterType")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -139,6 +140,31 @@ func UpdateDevice(e echo.Context) error {
 
 	updatedDevice := device.NewDevice(name, converter, filter)
 	updatedDevice.Id = id
+
+	// Parse `parts` JSON from the form data
+	partsJSON := e.FormValue("parts")
+	var parts []PartJson
+	if err := json.Unmarshal([]byte(partsJSON), &parts); err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	for _, p := range parts {
+
+		// convert partId to int
+		partId, err := strconv.Atoi(p.Id)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+
+		countf64, err := strconv.ParseFloat(p.Count, 32)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+		err = database.AddDevicePartToDB(id, float64(countf64), partId)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+	}
 
 	err = database.UpdateDeviceInDB(updatedDevice)
 	if err != nil {

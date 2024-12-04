@@ -84,6 +84,23 @@ func Float32(c echo.Context, paramName string) (float32, error) {
 	return float32(val), nil
 }
 
+func Float64(c echo.Context, paramName string) (float64, error) {
+	valStr := c.FormValue(paramName)
+
+	// If key is not present, FormValue returns the empty string.
+	if len(valStr) == 0 {
+		return 0, errors.New("expected parameter is not set: " + paramName + " : " + valStr)
+	}
+
+	val, err := strconv.ParseFloat(valStr, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return float64(val), nil
+}
+
+
 func AsBytes(c echo.Context, param string) ([]byte, error) {
 	f, err := c.FormFile(param)
 	if err != nil {

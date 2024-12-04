@@ -1,4 +1,5 @@
 import { HTTP_URL } from '../config.js';
+import {formatPriceValue} from '../format-price.js';
 
 class PartsManager {
     constructor() {
@@ -47,7 +48,7 @@ class PartsManager {
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
-                <div class="card-price">${this.formatPrice(part.price)}</div>
+                <div class="card-price">${formatPriceValue(part.price)}</div>
                 <div class="card-actions">
                     <button class="action-button delete-btn" data-id="${part.id}">
                         <i class="fas fa-trash"></i>
@@ -196,9 +197,7 @@ class PartsManager {
             .replace(/'/g, "&#039;");
     }
 
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
+    
 }
 
 // Initialize the application

@@ -24,7 +24,7 @@ func AddProjectDevice(e echo.Context) error {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	count, err := upload.Float32(e, "count")
+	count, err := upload.Float64(e, "count")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -72,7 +72,7 @@ func AddProjectDeviceList(e echo.Context) error {
 		if err != nil {
 			return e.String(http.StatusInternalServerError, err.Error())
 		}
-		err = database.AddProjectDeviceToDB(prjId, float32(countf64), deviceId)
+		err = database.AddProjectDeviceToDB(prjId, float64(countf64), deviceId)
 		if err != nil {
 			return e.String(http.StatusInternalServerError, err.Error())
 		}

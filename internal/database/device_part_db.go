@@ -9,7 +9,7 @@ import (
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
 )
 
-func AddDevicePartToDB(dvcId int, count float32, prtId int) error {
+func AddDevicePartToDB(dvcId int, count float64, prtId int) error {
 	query := `INSERT INTO ` + tableDeviceParts + ` (` + columnDevicePartCount + `, ` +
 		columnPartIDK + `, ` +
 		columnDeviceIDFK + `) 
@@ -144,7 +144,7 @@ func DeleteDevicePartFromDB(id int) error {
 	return nil
 }
 
-func UpdateDevicePartInDB(id, projectId int, count float32, deviceId int) error {
+func UpdateDevicePartInDB(id, projectId int, count float64, deviceId int) error {
 
 	query := fmt.Sprintf(`
         UPDATE %s 

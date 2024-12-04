@@ -1,93 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=project-width, initial-scale=1.0">
     <title>Project Details</title>
-    <link href="/public/assets/css/all.min.css" rel="stylesheet">
-    <link href="/public/css/project-details.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/assets/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/card.css">
+    <script src="/public/assets/js/three.min.js"></script>
+    <script type="module" src="/public/js/project/project-details.js" defer></script>
+    <script src="/public/js/three.js" defer></script>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 id="projectName">جزئیات پروژه: پروژه نمونه</h1>
-        </div>
-
-        <div class="search-container">
-            <input type="search" class="search-input" placeholder="جستجو در دستگاه‌ها...">
-        </div>
-
-        <div class="devices-container">
-            <!-- Device cards will be dynamically added here -->
-        </div>
-
-        <div class="price-summary">
-            <span>مجموع قیمت:</span>
-            <span id="totalPrice">۱,۵۰۰,۰۰۰ تومان</span>
-        </div>
-
-        <button class="fab-add" onclick="openModal()">
-            <i class="fas fa-plus"></i>
-        </button>
-
-        <div class="modal-overlay" id="addDeviceModal">
-            <div class="modal">
-                <div class="modal-title">افزودن دستگاه جدید</div>
-                <form id="addDeviceForm" onsubmit="handleAddDevice(event)">
-                    <div class="form-group">
-                        <label class="form-label">نام دستگاه</label>
-                        <select class="form-select" id="deviceName" required>
-                            <option value="">انتخاب کنید</option>
-                            <option value="دستگاه ۱">دستگاه ۱</option>
-                            <option value="دستگاه ۲">دستگاه ۲</option>
-                        </select>
-                    </div>
-    
-                    <div class="form-group">
-                        <label class="form-label">نوع مبدل</label>
-                        <select class="form-select" id="converterType" required>
-                            <option value="">انتخاب کنید</option>
-                            <option value="مبدل A">مبدل A</option>
-                            <option value="مبدل B">مبدل B</option>
-                        </select>
-                    </div>
-    
-                    <div class="form-group">
-                        <label class="form-label">نوع فیلتر</label>
-                        <select class="form-select" id="filterType" required>
-                            <option value="">انتخاب کنید</option>
-                            <option value="فیلتر X">فیلتر X</option>
-                            <option value="فیلتر Y">فیلتر Y</option>
-                        </select>
-                    </div>
-    
-                    <div class="form-group">
-                        <label class="form-label">تعداد</label>
-                        <input type="number" class="form-input" id="deviceCount" min="1" required>
-                    </div>
-    
-                    <div class="form-buttons">
-                        <button type="button" class="btn btn-cancel" onclick="closeModal()">انصراف</button>
-                        <button type="submit" class="btn btn-save">ذخیره</button>
-                    </div>
-                </form>
+    <div id="scene-container"></div>
+    <button class="back-button" onclick="window.history.back()">بازگشت</button>
+    <div class="form_container">
+        <h1 class="title">جزییات پروژه</h1>
+        <form id="projectDetailsForm">
+            <div class="form-group">
+                <label>نام پروژه</label>
+                <input type="text" id="projectName" placeholder="نام">
             </div>
-        </div>
 
-        <div class="actions">
-          
+            <div class="form-group">
+                <label>قیمت</label>
+                <!-- show price as label -->
+                <label id="projectPrice"></label>
 
-            <button class="btn btn-add">
-                <i class="fas fa-plus"></i>
-                افزودن دستگاه
-            </button>
-            <button class="btn btn-export">
-                <i class="fas fa-file-export"></i>
-                خروجی گرفتن
-            </button>
+                <!-- <input type="text" 
+                       placeholder="قیمت" 
+                       id="projectPrice" 
+                       inputmode="numeric" 
+                       oninput="formatPrice(this)"
+                       required> -->
+            </div>
+
+            <!-- Add Device to Project (Btn) -->
+            <div class="form-group">
+                <button type="button" class="add-device-button" id="addDeviceToProjectBtn">
+                    افزودن دستگاه به پروژه</button>
+            </div>
+
+            <!-- List of Project Devices, Generated by JS -->
+            <div class="grid" id="addedDevicesGrid">
+                <!-- Devices will be dynamically added here -->
+            </div>
+        
+        </form>
+        <div class="button-container">
+            <button type="button" class="save-button" id="saveProjectDBBtn">ذخیره</button>
         </div>
     </div>
 
-    <script src="/public/js/project/project-details.js"></script>
+    <!-- Modal -->
+    <div class="modal-overlay" id="addDeviceToProjectModal">
+        <div class="modal">
+            <div class="modal-title">افزودن دستگاه به پروژه</div>
+            <form id="addDeviceToProjectForm">
+                <div class="search-container">
+                    <input type="search" class="search-input" placeholder="جستجوی دستگاه..." id="searchDevices">
+                </div>
+                <div class="grid" id="devicesGrid">
+                    <!-- Devices will be dynamically added here -->
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">بستن فرم</button>
+                </div>
+            </form>
+        </div>
+    </div>
+   
+    <script type="text/javascript" src="/public/js/format-price-html.js"></script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 import { HTTP_URL } from '../config.js';
-import { formatPrice } from '../format-price.js';
+import { convertPriceToNumber, formatPriceValue, formatPriceInput } from '../format-price.js';
+import { DevicePart } from './device-part.js';
 
 document.getElementById('deviceDetailsForm').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -40,6 +41,7 @@ document.getElementById('deviceDetailsForm').addEventListener('submit', async fu
 // Device Details Manager
 class AddDeviceDetailsManager {
     constructor() {
+
         this.parts = [];
         this.addedParts = [];
         this.partsGrid = document.getElementById('partsGrid');
@@ -52,7 +54,7 @@ class AddDeviceDetailsManager {
         // Add event listener for price input
         this.priceInput = document.getElementById('devicePrice');
         this.priceInput.addEventListener('input', function () {
-            formatPrice(this);
+            formatPriceInput(this);
         });
 
         this.init();
@@ -71,6 +73,7 @@ class AddDeviceDetailsManager {
         await this.getPartsFromDB();
         await this.getDeviceDetails();
         this.renderAddedParts(this.addedParts);
+        this.renderParts(this.parts);
         this.setupEventListeners();
     }
 
@@ -81,6 +84,32 @@ class AddDeviceDetailsManager {
         document.getElementById('saveDeviceDBBtn').addEventListener('click', () => this.saveDevice());
     }
 
+    async saveDevice() {
+        const formData = new FormData();
+        formData.append('deviceName', document.getElementById('deviceName').value);
+        formData.append('converterType', document.getElementById('converterType').value); // Fixed field name
+        formData.append('filter', document.getElementById('filterCheckbox').checked); // Fixed field name
+        formData.append('parts', JSON.stringify(deviceParts));
+
+        try {
+            const response = await fetch(`${HTTP_URL}/device/update`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Failed to save device');
+
+            localStorage.removeItem('deviceParts');
+
+            // Set update flag in localStorage
+            localStorage.setItem('devicesListNeedsUpdate', 'true');
+
+            window.history.back();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again later.');
+        }
+    }
 
     async getDeviceDetails() {
         if (this.deviceId) {
@@ -98,10 +127,25 @@ class AddDeviceDetailsManager {
                 }
 
                 const deviceDetails = await response.json();
-                this.addedParts = deviceDetails.device_part;
-                console.log(deviceDetails)
 
                 if (deviceDetails) {
+                    for (const part of deviceDetails.device_part) {
+                        console.log(part)
+                        this.addedParts.push(
+                            new DevicePart(
+                                part.id,
+                                part.part.id,
+                                this.deviceId,
+                                part.part.name,
+                                part.part.price,
+                                part.count
+                            )
+                        );
+                    }
+
+                    // add addedParts to localStorage
+                    localStorage.setItem('deviceParts', JSON.stringify(this.addedParts));
+
                     // Use value instead of textContent for input elements
                     document.getElementById('deviceName').value = deviceDetails.name || '';
 
@@ -119,7 +163,7 @@ class AddDeviceDetailsManager {
                     // Format the initial price value
                     if (deviceDetails.price) {
                         this.priceInput.value = deviceDetails.price;
-                        formatPrice(this.priceInput);
+                        formatPriceInput(this.priceInput);
                     }
                 } else {
                     throw new Error('Device details not found');
@@ -134,16 +178,37 @@ class AddDeviceDetailsManager {
 
     renderParts(partsList) {
 
-        this.partsGrid.innerHTML = partsList.map(part =>
+        this.partsGrid.innerHTML = partsList.map(part => {
 
-            `
-                    <div class="card" data-id="${part.id}">
-                        <div class="card-header">
-                            <span class="card-title">${this.escapeHtml(part.name)}</span>
+            // check if part is already added 
+            let added = false;
+            for (let i = 0; i < this.addedParts.length; i++) {
+                if (this.addedParts[i].partId === part.id) {
+                    added = true;
+                    break;
+                }
+            }
+
+            if (added) {
+                return `
+                        <div class="card disabled" data-id="${part.id}">
+                            <div class="card-header">
+                                <span class="card-title">${this.escapeHtml(part.name)}</span>
+                            </div>
+                            <div class="card-price">${formatPriceValue(part.price)}</div>
                         </div>
-                        <div class="card-price">${this.formatPrice(part.price)}</div>
-                    </div>
-                `
+                    `;
+            } else {
+                return `
+                        <div class="card" data-id="${part.id}">
+                            <div class="card-header">
+                                <span class="card-title">${this.escapeHtml(part.name)}</span>
+                            </div>
+                            <div class="card-price">${formatPriceValue(part.price)}</div>
+                        </div>
+                    `;
+            }
+        }
 
         ).join('');
 
@@ -200,6 +265,51 @@ class AddDeviceDetailsManager {
         card.appendChild(addButton);
     }
 
+
+    async addToDevice(partId, count) {
+
+        // remove selected class from card
+        const card = this.partsGrid.querySelector(`.card[data-id="${partId}"]`);
+        card.classList.remove('selected');
+
+        // add disabled class to card
+        card.classList.add('disabled');
+
+        // remove count input field
+        const countInput = document.getElementById(`count-${partId}`);
+        countInput.remove();
+
+        // remove add to device button
+        const addToDeviceBtn = document.getElementById(`add-to-device-${partId}`);
+        addToDeviceBtn.remove();
+
+        // update price
+        let part;
+        for (let i = 0; i < this.parts.length; i++) {
+            if (this.parts[i].id.toString() === partId.toString()) {
+                part = this.parts[i];
+                break;
+            }
+        }
+
+        const devicePart = new DevicePart(-1, partId, this.deviceId, part.name, part.price, count);
+
+        const deviceParts = JSON.parse(localStorage.getItem('deviceParts')) || [];
+        deviceParts.push(devicePart);
+        localStorage.setItem('deviceParts', JSON.stringify(deviceParts));
+
+
+        // this.priceInput.value is string and (part.price * count) is number
+        // convert this.priceInput.value to number
+        console.log("new value : ", formatPriceValue(part.price * count));
+        this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) + (part.price * count));
+
+
+        this.addedParts.push(devicePart);
+        this.renderAddedParts(this.addedParts);
+    }
+
+
     removeInputsFromCard(card) {
         // Remove existing inputs if any
         card.querySelectorAll('input, button').forEach(el => el.remove());
@@ -207,19 +317,18 @@ class AddDeviceDetailsManager {
 
     // render added parts in modal
     renderAddedParts(addedParts) {
-        console.log(addedParts)
         const partsGrid = document.getElementById('addedPartsGrid');
         partsGrid.innerHTML = '';
         addedParts.forEach(part => {
 
             const partCard = document.createElement('div');
             partCard.classList.add('card');
-            partCard.setAttribute('data-part-id', part.id);
+            partCard.setAttribute('data-part-id', part.partId);
             partCard.innerHTML = `
-                <div class="card-title">${this.escapeHtml(part.part.name)}</div>
-                <div class="card-price">${this.formatPrice(part.price)}</div>
+                <div class="card-title">${this.escapeHtml(part.name)}</div>
+                <div class="card-price">${formatPriceValue(part.price)}</div>
                 <div class="card-count">${part.count}</div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${part.id}">
+                <button type="button" class="action-button delete-btn" data-id="delete-${part.partId}">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
@@ -238,15 +347,12 @@ class AddDeviceDetailsManager {
                 e.stopPropagation();
                 // get id data-id="delete-${part.id}
                 const partId = button.dataset.id.replace('delete-', '');
-                console.log(partId);
                 this.deletePart(partId);
             });
         });
     }
 
     deletePart(partId) {
-        this.addedParts = this.addedParts.filter(part => part.id !== partId);
-        localStorage.setItem('deviceParts', JSON.stringify(this.addedParts));
 
         // Remove just the specific card instead of re-rendering everything
         const cardToRemove = document.querySelector(`[data-part-id="${partId}"]`);
@@ -260,6 +366,22 @@ class AddDeviceDetailsManager {
             originalCard.classList.remove('disabled');
             originalCard.classList.remove('selected');
         }
+
+        // update price
+        let part;
+        for (let i = 0; i < this.addedParts.length; i++) {
+            if (this.addedParts[i].partId.toString() === partId.toString()) {
+                part = this.addedParts[i];
+                // remove from this.addedParts
+                this.addedParts.splice(i, 1);
+                localStorage.setItem('deviceParts', JSON.stringify(this.addedParts));
+                break;
+            }
+        }
+        console.log("delete part : ", part);
+        console.log("delete value : ", formatPriceValue(part.price * part.count));
+        this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) - (part.price * part.count));
+
     }
 
 
@@ -312,9 +434,6 @@ class AddDeviceDetailsManager {
             .replace(/'/g, "&#039;");
     }
 
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
 }
 
 // Initialize the application

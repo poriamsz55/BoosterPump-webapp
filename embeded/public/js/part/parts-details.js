@@ -1,5 +1,5 @@
 import { HTTP_URL } from '../config.js';
-import { formatPrice } from '../format-price.js';
+import { formatPriceInput } from '../format-price.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     // Remove e.preventDefault() as it's not needed here
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Add event listener for price input
     const priceInput = document.getElementById('partPrice');
     priceInput.addEventListener('input', function () {
-        formatPrice(this);
+        formatPriceInput(this);
     });
 
     if (partId) {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                  // Format the initial price value
                  if (partDetails.price) {
                     priceInput.value = partDetails.price;
-                    formatPrice(priceInput);
+                    formatPriceInput(priceInput);
                 }
             } else {
                 throw new Error('Part details not found');

@@ -7,7 +7,7 @@ import (
 	projectd "github.com/poriamsz55/BoosterPump-webapp/internal/models/project_device"
 )
 
-func AddProjectDeviceToDB(prjId int, count float32, dvcId int) error {
+func AddProjectDeviceToDB(prjId int, count float64, dvcId int) error {
 	query := `INSERT INTO ` + tableProjectDevices + ` (` + columnProjectDeviceCount + `, ` +
 		columnDeviceIDK + `, ` +
 		columnProjectIDFK + `) 
