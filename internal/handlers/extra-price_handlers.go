@@ -11,8 +11,9 @@ import (
 	extraprice "github.com/poriamsz55/BoosterPump-webapp/internal/models/extra_price"
 )
 
-func GetAllExtraPrices(e echo.Context) error {
-	extraPrices, err := database.GetAllExtraPricesFromDB()
+func GetAllExtraPricesByProjectId(e echo.Context) error {
+	projectId, err := upload.Int(e, "projectId")
+	extraPrices, err := database.GetExtraPricesByProjectIdFromDB(projectId)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -38,9 +39,9 @@ func GetExtraPriceById(e echo.Context) error {
 }
 
 func AddExtraPrice(e echo.Context) error {
-	name := e.FormValue("name")
-	projectId, err := upload.Int(e, "project_id")
-	price, err := upload.Uint64(e, "price")
+	name := e.FormValue("extraPriceName")
+	projectId, err := upload.Int(e, "projectId")
+	price, err := upload.Uint64(e, "extraPriceValue")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -102,22 +103,18 @@ func DeleteExtraPrice(e echo.Context) error {
 }
 
 func UpdateExtraPrice(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "extraPriceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid extraPrice id")
 	}
 
-	name := e.FormValue("name")
-	projectId, err := upload.Int(e, "project_id")
-	if err != nil {
-		return e.String(http.StatusInternalServerError, err.Error())
-	}
-	price, err := upload.Uint64(e, "price")
+	name := e.FormValue("extraPriceName")
+	price, err := upload.Uint64(e, "extraPriceValue")
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	updatedExtraPrice := extraprice.NewExtraPrice(projectId, name, price)
+	updatedExtraPrice := extraprice.NewExtraPrice(-1, name, price)
 	updatedExtraPrice.Id = id
 
 	err = database.UpdateExtraPriceInDB(updatedExtraPrice)

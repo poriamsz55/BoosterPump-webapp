@@ -32,6 +32,14 @@ func AddProjectDBView(c echo.Context) error {
 	return c.HTMLBlob(http.StatusOK, html)
 }
 
+func ExtraPricesView(c echo.Context) error {
+	html, err := embedded.BoosterFiles.ReadFile("views/extra-prices.html")
+	if err != nil {
+		return err
+	}
+	return c.HTMLBlob(http.StatusOK, html)
+}
+
 func DevicesView(c echo.Context) error {
 	html, err := embedded.BoosterFiles.ReadFile("views/devices.html")
 	if err != nil {

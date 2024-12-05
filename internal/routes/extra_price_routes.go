@@ -6,7 +6,7 @@ import (
 )
 
 func extraPriceRoutes(e *echo.Group) {
-	e.GET("/extraPrice/getAll", handlers.GetAllExtraPrices)
+	e.POST("/extraPrice/getAll", handlers.GetAllExtraPricesByProjectId)
 	e.POST("/extraPrice/getById", handlers.GetExtraPriceById)
 	e.POST("/extraPrice/add", handlers.AddExtraPrice)
 	e.POST("/extraPrice/copy", handlers.CopyExtraPrice)

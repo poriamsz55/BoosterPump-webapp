@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExtraPrices Management</title>
+    <link rel="stylesheet" href="/public/assets/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script src="/public/assets/js/three.min.js"></script>
+</head>
+
+<body>
+    <div id="scene-container"></div>
+    <button class="back-button" onclick="window.history.back()">بازگشت</button>
+    <div class="container">
+        <h1 class="page-title">هزینه های اضافی</h1>
+
+        <div class="search-container">
+            <input type="search" class="search-input" placeholder="جستجوی هزینه اضافی..." id="searchExtraPrices">
+        </div>
+
+        <div class="grid" id="extraPricesGrid">
+            <!-- Extra Prices will be dynamically added here -->
+        </div>
+
+        <button class="fab-button" id="addExtraPriceToDBButton" aria-label="Add New Extra Price">+</button>
+    </div>
+
+    <div class="modal-overlay" id="addExtraPriceToDBModal">
+        <div class="modal">
+            <div class="modal-title">افزودن هزینه اضافی جدید</div>
+            <form id="addExtraPriceToDBForm">
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="عنوان" id="extraPriceName" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="قیمت" id="extraPriceValue" inputmode="numeric"
+                        oninput="formatPrice(this)" required>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">انصراف</button>
+                    <button type="submit" class="btn btn-save">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="extraPriceDetailModal">
+        <div class="modal">
+            <div class="modal-title">جزییات هزینه اضافی</div>
+            <form id="extraPriceDetailForm">
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="عنوان" id="detailExtraPriceName" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="input-field" placeholder="قیمت" id="detailExtraPriceValue" inputmode="numeric"
+                        oninput="formatPrice(this)" required>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-cancel" id="cancelDetailBtn">انصراف</button>
+                    <button type="submit" class="btn btn-save" id="saveDetailBtn">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="/public/js/project/extra-prices.js"></script>
+    <script type="text/javascript" src="/public/js/format-price-html.js"></script>
+    <script src="/public/js/three.js"></script>
+</body>
+
+</html>

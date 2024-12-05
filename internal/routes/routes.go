@@ -19,7 +19,7 @@ func apiRoutes(e *echo.Echo) {
 	partRoutes(apiGrp)
 	projectRoutes(apiGrp)
 	deviceRoutes(apiGrp)
-	partRoutes(apiGrp)
+	extraPriceRoutes(apiGrp)
 	projectDeviceRoutes(apiGrp)
 	devicePartRoutes(apiGrp)
 }

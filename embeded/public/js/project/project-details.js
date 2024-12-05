@@ -47,6 +47,16 @@ class AddProjectDetailsManager {
         document.getElementById('addDeviceToProjectBtn').addEventListener('click', () => this.openModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('saveProjectDBBtn').addEventListener('click', () => this.saveProject());
+        document.getElementById('extraPricesBtn').addEventListener('click', () => this.navigateToExtraPrices());
+        document.getElementById('exportBtn').addEventListener('click', () => this.export());
+    }
+
+    navigateToExtraPrices() {
+        window.location.href = `/extra-prices?id=${this.projectId}`;
+    }
+
+    export() {
+        
     }
 
     async saveProject() {
@@ -78,7 +88,7 @@ class AddProjectDetailsManager {
             // Set update flag in localStorage
             localStorage.setItem('projectsListNeedsUpdate', 'true');
 
-            // window.history.back();
+            window.history.back();
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred. Please try again later.');
