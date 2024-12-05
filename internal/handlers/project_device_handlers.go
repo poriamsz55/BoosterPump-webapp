@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/handlers/upload"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 )
 
 func GetAllProjectDevices(e echo.Context) error {
@@ -42,11 +43,6 @@ func AddProjectDevice(e echo.Context) error {
 	return e.String(http.StatusOK, "projectDevice added to database successfully")
 }
 
-type DeviceJson struct {
-	Id    string `json:"id"`
-	Count string `json:"count"`
-}
-
 func AddProjectDeviceList(e echo.Context) error {
 	prjId, err := upload.Int(e, "projectId")
 	if err != nil {
@@ -55,7 +51,7 @@ func AddProjectDeviceList(e echo.Context) error {
 
 	// Parse `devices` JSON from the form data
 	devicesJSON := e.FormValue("devices")
-	var devices []DeviceJson
+	var devices []device.DeviceJson
 	if err := json.Unmarshal([]byte(devicesJSON), &devices); err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}

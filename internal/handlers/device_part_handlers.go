@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/handlers/upload"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
 )
 
 func GetAllDeviceParts(e echo.Context) error {
@@ -66,11 +67,6 @@ func AddDevicePart(e echo.Context) error {
 	return e.String(http.StatusOK, "devicePart added to database successfully")
 }
 
-type PartJson struct {
-	Id    string `json:"id"`
-	Count string `json:"count"`
-}
-
 func AddDevicePartList(e echo.Context) error {
 
 	// Parse `deviceId` from the form data
@@ -82,7 +78,7 @@ func AddDevicePartList(e echo.Context) error {
 
 	// Parse `parts` JSON from the form data
 	partsJSON := e.FormValue("parts")
-	var parts []PartJson
+	var parts []part.PartJson
 	if err := json.Unmarshal([]byte(partsJSON), &parts); err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}

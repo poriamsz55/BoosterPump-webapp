@@ -64,3 +64,41 @@ func GetProjectDevicesByProjectId(projectID int) ([]*projectd.ProjectDevice, err
 
 	return projectDevices, nil
 }
+
+func DeleteProjectDeviceFromDB(id int) error {
+	query := `DELETE FROM ` + tableProjectDevices + ` WHERE ` + columnProjectDeviceID + ` = ?`
+
+	stmt, err := instance.db.Prepare(query)
+	if err != nil {
+		log.Printf("Error preparing statement: %v", err)
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		log.Printf("Error executing statement: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func DeleteProjectDevicesByProjectId(projectID int) error {
+	query := `DELETE FROM ` + tableProjectDevices + ` WHERE ` + columnProjectIDFK + ` = ?`
+
+	stmt, err := instance.db.Prepare(query)
+	if err != nil {
+		log.Printf("Error preparing statement: %v", err)
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(projectID)
+	if err != nil {
+		log.Printf("Error executing statement: %v", err)
+		return err
+	}
+
+	return nil
+}

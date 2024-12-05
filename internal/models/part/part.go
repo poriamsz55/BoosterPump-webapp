@@ -22,3 +22,13 @@ func NewPart(name, size, material, brand string, price uint64) *Part {
 		Price:    price,
 	}
 }
+
+type PartJson struct {
+	Id    string `json:"id"`
+	Count string `json:"count"`
+}
+
+type PartReq struct {
+	Id    int     `json:"id"`
+	Count float64 `json:"count"`
+}

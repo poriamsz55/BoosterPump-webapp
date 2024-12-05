@@ -83,7 +83,7 @@ var (
 	createDevicesTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
         %s TEXT,
-        %s TEXT,
+        %s INTEGER,
         %s INTEGER
     )`, tableDevices, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter)
 

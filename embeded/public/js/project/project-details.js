@@ -1,45 +1,12 @@
 import { HTTP_URL } from '../config.js';
-import { formatPrice } from '../format-price.js';
-
-document.getElementById('projectDetailsForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectId = urlParams.get('id');
-
-    const formData = new FormData();
-    formData.append('projectId', projectId);
-    formData.append('projectName', document.getElementById('projectName').value);
-
-    formData.append('projectConverter', document.getElementById('projectConverter').value);
-    formData.append('projectFilter', document.getElementById('projectFilter').value);
-
-    try {
-        const response = await fetch(`${HTTP_URL}/project/update`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update project details');
-        }
-
-        // Set update flag in localStorage
-        localStorage.setItem('projectsListNeedsUpdate', 'true');
-
-        alert('اطلاعات با موفقیت ذخیره شد');
-        window.history.back();
-
-    } catch (error) {
-        console.error('Error updating project details:', error);
-        alert(error.message || 'An error occurred while saving. Please try again later.');
-    }
-});
+import { convertPriceToNumber, formatPriceValue, formatPriceInput } from '../format-price.js';
+import { ProjectDevice } from './project-device.js';
 
 
 // Project Details Manager
 class AddProjectDetailsManager {
     constructor() {
+
         this.devices = [];
         this.addedDevices = [];
         this.devicesGrid = document.getElementById('devicesGrid');
@@ -52,7 +19,7 @@ class AddProjectDetailsManager {
         // Add event listener for price input
         this.priceInput = document.getElementById('projectPrice');
         this.priceInput.addEventListener('input', function () {
-            formatPrice(this);
+            formatPriceInput(this);
         });
 
         this.init();
@@ -71,6 +38,7 @@ class AddProjectDetailsManager {
         await this.getDevicesFromDB();
         await this.getProjectDetails();
         this.renderAddedDevices(this.addedDevices);
+        this.renderDevices(this.devices);
         this.setupEventListeners();
     }
 
@@ -82,11 +50,20 @@ class AddProjectDetailsManager {
     }
 
     async saveProject() {
+        console.log('Saving project...');
         const formData = new FormData();
+        formData.append('projectId', this.projectId);
         formData.append('projectName', document.getElementById('projectName').value);
-        formData.append('converterType', document.getElementById('converterType').value); // Fixed field name
-        formData.append('filter', document.getElementById('filterCheckbox').checked); // Fixed field name
-        formData.append('devices', JSON.stringify(projectDevices));
+  
+        let devicesJson = [];
+        for (const device of this.addedDevices) {
+            devicesJson.push({
+                id: device.deviceId.toString(),
+                count: device.count.toString(),
+            });
+        }
+
+        formData.append('devices', JSON.stringify(devicesJson));
 
         try {
             const response = await fetch(`${HTTP_URL}/project/update`, {
@@ -101,7 +78,7 @@ class AddProjectDetailsManager {
             // Set update flag in localStorage
             localStorage.setItem('projectsListNeedsUpdate', 'true');
 
-            window.history.back();
+            // window.history.back();
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred. Please try again later.');
@@ -124,31 +101,36 @@ class AddProjectDetailsManager {
                 }
 
                 const projectDetails = await response.json();
-                console.log(projectDetails)
 
                 if (projectDetails) {
-                    this.addedDevices = projectDetails.project_device;
+                    if (projectDetails.project_device === null || projectDetails.project_device === undefined || projectDetails.project_device.length === 0) {
+                        this.addedDevices = [];
+                    }else{
+                        for (const device of projectDetails.project_device) {
+                            console.log(device)
+                            this.addedDevices.push(
+                                new ProjectDevice(
+                                    device.id,
+                                    device.device.id,
+                                    this.projectId,
+                                    device.device.name,
+                                    device.device.price,
+                                    device.count
+                                )
+                            );
+                        }
+                    }
+
                     // add addedDevices to localStorage
                     localStorage.setItem('projectDevices', JSON.stringify(this.addedDevices));
 
                     // Use value instead of textContent for input elements
                     document.getElementById('projectName').value = projectDetails.name || '';
 
-                    // converter
-                    const converterSelect = document.getElementById('converterType');
-                    const converterOption = converterSelect.querySelector(`option[value="${projectDetails.converter}"]`);
-                    if (converterOption) {
-                        converterOption.selected = true;
-                    }
-
-                    // filter check box
-                    const filterCheckbox = document.getElementById('filterCheckbox');
-                    filterCheckbox.checked = projectDetails.filter === 'true';
-
                     // Format the initial price value
                     if (projectDetails.price) {
                         this.priceInput.value = projectDetails.price;
-                        formatPrice(this.priceInput);
+                        formatPriceInput(this.priceInput);
                     }
                 } else {
                     throw new Error('Project details not found');
@@ -162,46 +144,41 @@ class AddProjectDetailsManager {
     }
 
     renderDevices(devicesList) {
-        console.log("this.addedDevices => ", this.addedDevices);
-        console.log("devicesList => ", devicesList);
 
         this.devicesGrid.innerHTML = devicesList.map(device => {
 
             // check if device is already added 
             let added = false;
             for (let i = 0; i < this.addedDevices.length; i++) {
-                console.log("this.addedDevices[i].device.id => ", this.addedDevices[i].device.id);
-                console.log("device.id => ", device.id);
-                if (this.addedDevices[i].device.id === device.id) {
+                if (this.addedDevices[i].deviceId === device.id) {
                     added = true;
                     break;
                 }
             }
 
-            console.log("added => ", added);
             if (added) {
                 return `
                         <div class="card disabled" data-id="${device.id}">
                             <div class="card-header">
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
-                            <div class="card-price">${this.formatPrice(device.price)}</div>
+                            <div class="card-price">${formatPriceValue(device.price)}</div>
                         </div>
                     `;
-                }else{
-                    return `
+            } else {
+                return `
                         <div class="card" data-id="${device.id}">
                             <div class="card-header">
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
-                            <div class="card-price">${this.formatPrice(device.price)}</div>
+                            <div class="card-price">${formatPriceValue(device.price)}</div>
                         </div>
                     `;
-                }
             }
+        }
 
-        ).join(''); 
-        
+        ).join('');
+
         this.attachCardEventListeners();
     }
 
@@ -273,14 +250,27 @@ class AddProjectDetailsManager {
         const addToProjectBtn = document.getElementById(`add-to-project-${deviceId}`);
         addToProjectBtn.remove();
 
-        const projectDevice = {
-            id: deviceId,
-            count: count
-        };
+        // update price
+        let device;
+        for (let i = 0; i < this.devices.length; i++) {
+            if (this.devices[i].id.toString() === deviceId.toString()) {
+                device = this.devices[i];
+                break;
+            }
+        }
+
+        const projectDevice = new ProjectDevice(-1, deviceId, this.projectId, device.name, device.price, count);
 
         const projectDevices = JSON.parse(localStorage.getItem('projectDevices')) || [];
         projectDevices.push(projectDevice);
         localStorage.setItem('projectDevices', JSON.stringify(projectDevices));
+
+
+        // this.priceInput.value is string and (device.price * count) is number
+        // convert this.priceInput.value to number
+        console.log("new value : ", formatPriceValue(device.price * count));
+        this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) + (device.price * count));
+
 
         this.addedDevices.push(projectDevice);
         this.renderAddedDevices(this.addedDevices);
@@ -294,19 +284,18 @@ class AddProjectDetailsManager {
 
     // render added devices in modal
     renderAddedDevices(addedDevices) {
-        console.log(addedDevices)
         const devicesGrid = document.getElementById('addedDevicesGrid');
         devicesGrid.innerHTML = '';
         addedDevices.forEach(device => {
 
             const deviceCard = document.createElement('div');
             deviceCard.classList.add('card');
-            deviceCard.setAttribute('data-device-id', device.id);
+            deviceCard.setAttribute('data-device-id', device.deviceId);
             deviceCard.innerHTML = `
-                <div class="card-title">${this.escapeHtml(device.device.name)}</div>
-                <div class="card-price">${this.formatPrice(device.price)}</div>
+                <div class="card-title">${this.escapeHtml(device.name)}</div>
+                <div class="card-price">${formatPriceValue(device.price)}</div>
                 <div class="card-count">${device.count}</div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${device.id}">
+                <button type="button" class="action-button delete-btn" data-id="delete-${device.deviceId}">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
@@ -325,15 +314,12 @@ class AddProjectDetailsManager {
                 e.stopPropagation();
                 // get id data-id="delete-${device.id}
                 const deviceId = button.dataset.id.replace('delete-', '');
-                console.log(deviceId);
                 this.deleteDevice(deviceId);
             });
         });
     }
 
     deleteDevice(deviceId) {
-        this.addedDevices = this.addedDevices.filter(device => device.id !== deviceId);
-        localStorage.setItem('projectDevices', JSON.stringify(this.addedDevices));
 
         // Remove just the specific card instead of re-rendering everything
         const cardToRemove = document.querySelector(`[data-device-id="${deviceId}"]`);
@@ -347,6 +333,22 @@ class AddProjectDetailsManager {
             originalCard.classList.remove('disabled');
             originalCard.classList.remove('selected');
         }
+
+        // update price
+        let device;
+        for (let i = 0; i < this.addedDevices.length; i++) {
+            if (this.addedDevices[i].deviceId.toString() === deviceId.toString()) {
+                device = this.addedDevices[i];
+                // remove from this.addedDevices
+                this.addedDevices.splice(i, 1);
+                localStorage.setItem('projectDevices', JSON.stringify(this.addedDevices));
+                break;
+            }
+        }
+        console.log("delete device : ", device);
+        console.log("delete value : ", formatPriceValue(device.price * device.count));
+        this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) - (device.price * device.count));
+
     }
 
 
@@ -376,7 +378,6 @@ class AddProjectDetailsManager {
     }
 
     openModal() {
-        this.renderDevices(this.devices);
         this.modal.style.display = 'flex';
         this.deviceForm.reset();
     }
@@ -400,9 +401,6 @@ class AddProjectDetailsManager {
             .replace(/'/g, "&#039;");
     }
 
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
 }
 
 // Initialize the application

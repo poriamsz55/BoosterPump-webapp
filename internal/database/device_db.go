@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
 )
 
 func AddDeviceToDB(d *device.Device) (int, error) {
@@ -29,7 +30,7 @@ func AddDeviceToDB(d *device.Device) (int, error) {
 		filterInt = 0
 	}
 
-	result, err := stmt.Exec(d.Name, d.Converter.String(), filterInt)
+	result, err := stmt.Exec(d.Name, int(d.Converter), filterInt)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return -1, err
@@ -61,7 +62,7 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 	for rows.Next() {
 		var id int
 		var name string
-		var converter string
+		var converter int
 		var filter bool
 
 		err := rows.Scan(&id, &name, &converter, &filter)
@@ -69,7 +70,7 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 			return nil, err
 		}
 
-		converterConv, err := device.ConverterFromName(converter)
+		converterConv, err := device.ConverterFromValue(converter)
 		if err != nil {
 			return nil, err
 		}
@@ -109,10 +110,10 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 
 	var id int
 	var name string
-	var converterStr string
+	var converterInt int
 	var filter bool
 
-	err := row.Scan(&id, &name, &converterStr, &filter)
+	err := row.Scan(&id, &name, &converterInt, &filter)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
@@ -120,7 +121,7 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 		return nil, err
 	}
 
-	converter, err := device.ConverterFromName(converterStr)
+	converter, err := device.ConverterFromValue(converterInt)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +183,7 @@ func DeleteDeviceFromDB(deviceID int) error {
 	return nil
 }
 
-func UpdateDeviceInDB(updatedDevice *device.Device) error {
+func UpdateDeviceInDB(updatedDevice *device.Device, partsReq []part.PartReq) error {
 
 	// First check if the device exists
 	checkQuery := fmt.Sprintf(`
@@ -221,11 +222,6 @@ func UpdateDeviceInDB(updatedDevice *device.Device) error {
 		columnDeviceName, columnDeviceConverter, columnDeviceFilter,
 		columnDeviceID)
 
-	converter, err := device.ConverterFromValue(int(updatedDevice.Converter))
-	if err != nil {
-		return err
-	}
-
 	var filterInt int
 	if updatedDevice.Filter {
 		filterInt = 1
@@ -235,7 +231,7 @@ func UpdateDeviceInDB(updatedDevice *device.Device) error {
 
 	result, err := tx.Exec(query,
 		updatedDevice.Name,
-		converter,
+		int(updatedDevice.Converter),
 		filterInt,
 		updatedDevice.Id)
 	if err != nil {
@@ -262,17 +258,17 @@ func UpdateDeviceInDB(updatedDevice *device.Device) error {
 	}
 
 	// Insert new device parts if any
-	if len(updatedDevice.DevicePartList) > 0 {
+	if len(partsReq) > 0 {
 		insertPartsQuery := fmt.Sprintf(`
             INSERT INTO %s (%s, %s, %s) 
             VALUES (?, ?, ?)
         `, tableDeviceParts,
 			columnDevicePartCount, columnPartIDK, columnDeviceIDFK)
 
-		for _, dp := range updatedDevice.DevicePartList {
+		for _, dp := range partsReq {
 			_, err = tx.Exec(insertPartsQuery,
 				dp.Count,
-				dp.Part.Id,
+				dp.Id,
 				updatedDevice.Id)
 			if err != nil {
 				return err

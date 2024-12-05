@@ -56,6 +56,62 @@ class AddProjectManager {
         this.attachCardEventListeners();
     }
 
+
+    attachCardEventListeners() {
+
+        this.devicesGrid.querySelectorAll('.card').forEach(card => {
+            if (card.hasEventListener) return; // Prevent duplicate listeners
+            card.hasEventListener = true;
+
+            card.addEventListener('click', (e) => {
+                if (card.classList.contains('disabled') ||
+                    card.classList.contains('selected') ||
+                    e.target.closest('.action-button')) {
+                    return;
+                }
+
+                this.devicesGrid.querySelectorAll('.card').forEach(c => {
+                    if (c.classList.contains('selected')) {
+                        c.classList.remove('selected');
+                        const deviceId = c.getAttribute('data-id');
+                        this.removeInputsFromCard(c, deviceId);
+                    }
+                });
+                card.classList.add('selected');
+
+                const deviceId = card.getAttribute('data-id');
+                this.addInputsToCard(card, deviceId);
+            });
+        });
+    }
+
+    addInputsToCard(card, deviceId) {
+        // Remove existing inputs if any
+        card.querySelectorAll('input, button').forEach(el => el.remove());
+
+        const countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.value = 1;
+        countInput.min = '1';
+        countInput.id = `count-${deviceId}`;
+
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.textContent = 'افزودن به دستگاه';
+        addButton.id = `add-to-project-${deviceId}`;
+
+        addButton.addEventListener('click', () =>
+            this.addToProject(deviceId, countInput.value));
+
+        card.appendChild(countInput);
+        card.appendChild(addButton);
+    }
+
+    removeInputsFromCard(card) {
+        // Remove existing inputs if any
+        card.querySelectorAll('input, button').forEach(el => el.remove());
+    }
+
     // render added devices in modal
     renderAddedDevices(addedDevices) {
         const devicesGrid = document.getElementById('addedDevicesGrid');
@@ -112,64 +168,6 @@ class AddProjectManager {
             originalCard.classList.remove('disabled');
             originalCard.classList.remove('selected');
         }
-    }
-
-
-
-    attachCardEventListeners() {
-
-
-        this.devicesGrid.querySelectorAll('.card').forEach(card => {
-            if (card.hasEventListener) return; // Prevent duplicate listeners
-            card.hasEventListener = true;
-
-            card.addEventListener('click', (e) => {
-                if (card.classList.contains('disabled') ||
-                    card.classList.contains('selected') ||
-                    e.target.closest('.action-button')) {
-                    return;
-                }
-
-                this.devicesGrid.querySelectorAll('.card').forEach(c => {
-                    if (c.classList.contains('selected')) {
-                        c.classList.remove('selected');
-                        const deviceId = c.getAttribute('data-id');
-                        this.removeInputsFromCard(c, deviceId);
-                    }
-                });
-                card.classList.add('selected');
-
-                const deviceId = card.getAttribute('data-id');
-                this.addInputsToCard(card, deviceId);
-            });
-        });
-    }
-
-    addInputsToCard(card, deviceId) {
-        // Remove existing inputs if any
-        card.querySelectorAll('input, button').forEach(el => el.remove());
-
-        const countInput = document.createElement('input');
-        countInput.type = 'number';
-        countInput.value = 1;
-        countInput.min = '1';
-        countInput.id = `count-${deviceId}`;
-
-        const addButton = document.createElement('button');
-        addButton.type = 'button';
-        addButton.textContent = 'افزودن به دستگاه';
-        addButton.id = `add-to-project-${deviceId}`;
-
-        addButton.addEventListener('click', () =>
-            this.addToProject(deviceId, countInput.value));
-
-        card.appendChild(countInput);
-        card.appendChild(addButton);
-    }
-
-    removeInputsFromCard(card) {
-        // Remove existing inputs if any
-        card.querySelectorAll('input, button').forEach(el => el.remove());
     }
 
 
@@ -266,13 +264,13 @@ class AddProjectManager {
                 body: deviceFormData,
             });
 
-           if (!deviceResponses.ok) throw new Error('Failed to save project devices');
+            if (!deviceResponses.ok) throw new Error('Failed to save project devices');
 
             localStorage.removeItem('projectDevices');
 
             // Set update flag in localStorage
             localStorage.setItem('projectsListNeedsUpdate', 'true');
-            
+
             window.history.back();
         } catch (error) {
             console.error('Error:', error);

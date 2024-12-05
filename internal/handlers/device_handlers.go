@@ -11,6 +11,7 @@ import (
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/handlers/upload"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
 )
 
 func GetAllDevices(e echo.Context) error {
@@ -120,7 +121,7 @@ func DeleteDevice(e echo.Context) error {
 }
 
 func UpdateDevice(e echo.Context) error {
-	id, err := upload.Int(e, "id")
+	id, err := upload.Int(e, "deviceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid device id")
 	}
@@ -143,12 +144,13 @@ func UpdateDevice(e echo.Context) error {
 
 	// Parse `parts` JSON from the form data
 	partsJSON := e.FormValue("parts")
-	var parts []PartJson
+	var parts []part.PartJson
 	if err := json.Unmarshal([]byte(partsJSON), &parts); err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	for _, p := range parts {
+	deviceParts := make([]part.PartReq, len(parts))
+	for pi, p := range parts {
 
 		// convert partId to int
 		partId, err := strconv.Atoi(p.Id)
@@ -160,13 +162,14 @@ func UpdateDevice(e echo.Context) error {
 		if err != nil {
 			return e.String(http.StatusInternalServerError, err.Error())
 		}
-		err = database.AddDevicePartToDB(id, float64(countf64), partId)
-		if err != nil {
-			return e.String(http.StatusInternalServerError, err.Error())
+
+		deviceParts[pi] = part.PartReq{
+			Id:    partId,
+			Count: countf64,
 		}
 	}
 
-	err = database.UpdateDeviceInDB(updatedDevice)
+	err = database.UpdateDeviceInDB(updatedDevice, deviceParts)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return e.String(http.StatusNotFound, "device not found")

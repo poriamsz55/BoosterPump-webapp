@@ -74,3 +74,13 @@ func (d *Device) UpdatePrice() {
 		d.Price += dp.Price
 	}
 }
+
+type DeviceJson struct {
+	Id    string `json:"id"`
+	Count string `json:"count"`
+}
+
+type DeviceReq struct {
+	Id    int     `json:"id"`
+	Count float64 `json:"count"`
+}

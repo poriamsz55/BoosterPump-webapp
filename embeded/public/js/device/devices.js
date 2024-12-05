@@ -97,6 +97,11 @@ class DevicesManager {
     async getDevicesFromDB() {
         try {
             const response = await fetch(`${HTTP_URL}/device/getAll`);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
             const data = await response.json();
             console.log(data);
 

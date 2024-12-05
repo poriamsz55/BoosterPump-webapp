@@ -1,4 +1,5 @@
 import { HTTP_URL } from '../config.js';
+import { formatPriceValue } from '../format-price.js';
 
 class ProjectsManager {
     constructor() {
@@ -7,7 +8,7 @@ class ProjectsManager {
         this.searchInput = document.getElementById('searchProjects');
 
         this.init();
-        
+
         // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
     }
@@ -29,13 +30,8 @@ class ProjectsManager {
 
     setupEventListeners() {
         this.searchInput.addEventListener('input', (e) => this.handleSearch(e));
-        document.getElementById('addProjectToDBButton').addEventListener('click', () =>{
+        document.getElementById('addProjectToDBButton').addEventListener('click', () => {
             window.location.href = '/add/project/db';
-        });
-        // Remove the form submit event listener from here
-        this.form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent form submission
-            await this.saveProject();
         });
     }
 
@@ -46,7 +42,7 @@ class ProjectsManager {
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(project.name)}</span>
                 </div>
-                <div class="card-price">${this.formatPrice(project.price)}</div>
+                <div class="card-price">${formatPriceValue(project.price)}</div>
                 <div class="card-actions">
                     <button class="action-button delete-btn" data-id="${project.id}">
                         <i class="fas fa-trash"></i>
@@ -101,6 +97,11 @@ class ProjectsManager {
     async getProjectsFromDB() {
         try {
             const response = await fetch(`${HTTP_URL}/project/getAll`);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
             const data = await response.json();
             console.log(data);
 
@@ -153,9 +154,6 @@ class ProjectsManager {
             .replace(/'/g, "&#039;");
     }
 
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
 }
 
 // Initialize the application

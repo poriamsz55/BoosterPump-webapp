@@ -2,40 +2,6 @@ import { HTTP_URL } from '../config.js';
 import { convertPriceToNumber, formatPriceValue, formatPriceInput } from '../format-price.js';
 import { DevicePart } from './device-part.js';
 
-document.getElementById('deviceDetailsForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const deviceId = urlParams.get('id');
-
-    const formData = new FormData();
-    formData.append('deviceId', deviceId);
-    formData.append('deviceName', document.getElementById('deviceName').value);
-
-    formData.append('deviceConverter', document.getElementById('deviceConverter').value);
-    formData.append('deviceFilter', document.getElementById('deviceFilter').value);
-
-    try {
-        const response = await fetch(`${HTTP_URL}/device/update`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update device details');
-        }
-
-        // Set update flag in localStorage
-        localStorage.setItem('devicesListNeedsUpdate', 'true');
-
-        alert('اطلاعات با موفقیت ذخیره شد');
-        window.history.back();
-
-    } catch (error) {
-        console.error('Error updating device details:', error);
-        alert(error.message || 'An error occurred while saving. Please try again later.');
-    }
-});
 
 
 // Device Details Manager
@@ -85,11 +51,22 @@ class AddDeviceDetailsManager {
     }
 
     async saveDevice() {
+        console.log('Saving device...');
         const formData = new FormData();
+        formData.append('deviceId', this.deviceId);
         formData.append('deviceName', document.getElementById('deviceName').value);
         formData.append('converterType', document.getElementById('converterType').value); // Fixed field name
         formData.append('filter', document.getElementById('filterCheckbox').checked); // Fixed field name
-        formData.append('parts', JSON.stringify(deviceParts));
+
+        let partsJson = [];
+        for (const part of this.addedParts) {
+            partsJson.push({
+                id: part.partId.toString(),
+                count: part.count.toString(),
+            });
+        }
+
+        formData.append('parts', JSON.stringify(partsJson));
 
         try {
             const response = await fetch(`${HTTP_URL}/device/update`, {
@@ -129,18 +106,22 @@ class AddDeviceDetailsManager {
                 const deviceDetails = await response.json();
 
                 if (deviceDetails) {
-                    for (const part of deviceDetails.device_part) {
-                        console.log(part)
-                        this.addedParts.push(
-                            new DevicePart(
-                                part.id,
-                                part.part.id,
-                                this.deviceId,
-                                part.part.name,
-                                part.part.price,
-                                part.count
-                            )
-                        );
+                    if (deviceDetails.device_part === null || deviceDetails.device_part === undefined || deviceDetails.device_part.length === 0) {
+                        this.addedParts = [];
+                    }else{
+                        for (const part of deviceDetails.device_part) {
+                            console.log(part)
+                            this.addedParts.push(
+                                new DevicePart(
+                                    part.id,
+                                    part.part.id,
+                                    this.deviceId,
+                                    part.part.name,
+                                    part.part.price,
+                                    part.count
+                                )
+                            );
+                        }
                     }
 
                     // add addedParts to localStorage

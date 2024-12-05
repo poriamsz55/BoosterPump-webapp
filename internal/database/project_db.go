@@ -5,27 +5,34 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/project"
 )
 
-func AddProjectToDB(p *project.Project) error {
+func AddProjectToDB(p *project.Project) (int, error) {
 	query := `INSERT INTO ` + tableProjects + ` (` + columnProjectName + `) 
 	          VALUES (?)`
 
 	stmt, err := instance.db.Prepare(query)
 	if err != nil {
 		log.Printf("Error preparing statement: %v", err)
-		return err
+		return -1, err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(p.Name)
+	result, err := stmt.Exec(p.Name)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
-		return err
+		return -1, err
 	}
 
-	return nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Printf("Error getting last insert id: %v", err)
+		return -1, err
+	}
+
+	return int(id), nil
 }
 
 func GetAllProjectsFromDB() ([]*project.Project, error) {
@@ -120,7 +127,35 @@ func DeleteProjectFromDB(id int) error {
 	return nil
 }
 
-func UpdateProjectInDB(id int, name string) error {
+func UpdateProjectInDB(id int, name string, projectDevices []device.DeviceReq) error {
+
+	// First check if the project exists
+	checkQuery := fmt.Sprintf(`
+		SELECT COUNT(*)
+		FROM %s
+		WHERE %s = ?
+	`, tableProjects, columnProjectID)
+
+	var count int
+	err := instance.db.QueryRow(checkQuery, id).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	// Begin transaction
+	tx, err := instance.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+	}()
 
 	query := fmt.Sprintf(`
         UPDATE %s 
@@ -140,6 +175,41 @@ func UpdateProjectInDB(id int, name string) error {
 
 	if rowsAffected == 0 {
 		return sql.ErrNoRows
+	}
+
+	// Delete project devices
+	deleteDevicesQuery := fmt.Sprintf(`
+        DELETE FROM %s 
+        WHERE %s = ?
+    `, tableProjectDevices, columnProjectIDFK)
+
+	_, err = tx.Exec(deleteDevicesQuery, id)
+	if err != nil {
+		return err
+	}
+
+	// Insert project devices
+	if len(projectDevices) > 0 {
+		insertDevicesQuery := fmt.Sprintf(`
+		INSERT INTO %s (%s, %s, %s)
+		VALUES (?, ?, ?)
+	`, tableProjectDevices, columnProjectDeviceCount, columnDeviceIDFK, columnProjectIDFK)
+
+		for _, dp := range projectDevices {
+			_, err = tx.Exec(insertDevicesQuery,
+				dp.Count,
+				dp.Id,
+				id)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Commit transaction
+	err = tx.Commit()
+	if err != nil {
+		return err
 	}
 
 	return nil
