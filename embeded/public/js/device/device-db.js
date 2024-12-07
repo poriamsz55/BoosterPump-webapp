@@ -1,4 +1,5 @@
 import { HTTP_URL } from '../config.js';
+import { formatPriceValue } from '../format-price.js';
 
 class AddDeviceManager {
     constructor() {
@@ -47,7 +48,7 @@ class AddDeviceManager {
                         <div class="card-header">
                             <span class="card-title">${this.escapeHtml(part.name)}</span>
                         </div>
-                        <div class="card-price">${this.formatPrice(part.price)}</div>
+                        <div class="card-price">${formatPriceValue(part.price)}</div>
                     </div>
                 `
 
@@ -125,7 +126,7 @@ class AddDeviceManager {
             partCard.setAttribute('data-part-id', part.id);
             partCard.innerHTML = `
                 <div class="card-title">${founded.name}</div>
-                <div class="card-price">${founded.price}</div>
+                <div class="card-price">${formatPriceValue(founded.price)}</div>
                 <div class="card-count">${part.count}</div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${part.id}">
                     <i class="fas fa-trash"></i>
@@ -288,10 +289,7 @@ class AddDeviceManager {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
+  
 }
 
 // Initialize the application

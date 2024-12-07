@@ -68,6 +68,8 @@ func GetAllProjectsFromDB() ([]*project.Project, error) {
 			return nil, err
 		}
 
+		p.UpdatePrice()
+
 		projects = append(projects, p)
 	}
 
@@ -99,6 +101,8 @@ func GetProjectByIdFromDB(id int) (*project.Project, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	p.UpdatePrice()
 
 	return p, nil
 }

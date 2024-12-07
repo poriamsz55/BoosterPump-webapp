@@ -81,7 +81,6 @@ document.getElementById('partDetailsForm').addEventListener('submit', async func
         // Set update flag in localStorage
         localStorage.setItem('partsListNeedsUpdate', 'true');
 
-        alert('اطلاعات با موفقیت ذخیره شد');
         window.history.back();
 
     } catch (error) {

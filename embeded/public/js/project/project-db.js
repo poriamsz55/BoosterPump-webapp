@@ -1,4 +1,5 @@
 import { HTTP_URL } from '../config.js';
+import { formatPriceValue } from '../format-price.js';
 
 class AddProjectManager {
     constructor() {
@@ -47,7 +48,7 @@ class AddProjectManager {
                         <div class="card-header">
                             <span class="card-title">${this.escapeHtml(device.name)}</span>
                         </div>
-                        <div class="card-price">${this.formatPrice(device.price)}</div>
+                        <div class="card-price">${formatPriceValue(device.price)}</div>
                     </div>
                 `
 
@@ -125,7 +126,7 @@ class AddProjectManager {
             deviceCard.setAttribute('data-device-id', device.id);
             deviceCard.innerHTML = `
                 <div class="card-title">${founded.name}</div>
-                <div class="card-price">${founded.price}</div>
+                <div class="card-price">${formatPriceValue(founded.price)}</div>
                 <div class="card-count">${device.count}</div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${device.id}">
                     <i class="fas fa-trash"></i>
@@ -287,9 +288,6 @@ class AddProjectManager {
             .replace(/'/g, "&#039;");
     }
 
-    formatPrice(price) {
-        return new Intl.NumberFormat('fa-IR').format(price);
-    }
 }
 
 // Initialize the application
