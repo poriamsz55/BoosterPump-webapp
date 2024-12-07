@@ -71,7 +71,7 @@ func AddDevice(e echo.Context) error {
 }
 
 func CopyDevice(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "deviceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid device id")
 	}
@@ -92,9 +92,26 @@ func CopyDevice(e echo.Context) error {
 	)
 	newDevice.DevicePartList = originalDevice.DevicePartList
 
+	// Insure the name is unique
+	for {
+		err = database.CheckDeviceByNameFromDB(newDevice.Name)
+		if err == sql.ErrNoRows {
+			break
+		}
+		newDevice.Name += " (Copy)"
+	}
+
 	copyId, err := database.AddDeviceToDB(newDevice)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	// Copy device parts
+	for _, dp := range newDevice.DevicePartList {
+		err = database.AddDevicePartToDB(copyId, dp.Count, dp.Part.Id)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	return e.JSON(http.StatusOK, map[string]string{
@@ -104,7 +121,7 @@ func CopyDevice(e echo.Context) error {
 }
 
 func DeleteDevice(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "deviceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid device id")
 	}

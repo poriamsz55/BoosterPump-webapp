@@ -95,6 +95,29 @@ func GetPartByIdFromDB(id int) (*part.Part, error) {
 	return &p, nil
 }
 
+// Check if Part exists By Name
+func CheckPartByNameFromDB(name string) error {
+
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) 
+		FROM %s 
+		WHERE %s = ?
+	`, tableParts, columnPartName)
+
+	var count int
+	err := instance.db.QueryRow(query, name).Scan(
+		&count,
+	)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
 func DeletePartFromDB(id int) error {
 	// Check if part exists
 	checkQuery := fmt.Sprintf(`

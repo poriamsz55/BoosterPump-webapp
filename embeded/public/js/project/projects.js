@@ -44,10 +44,10 @@ class ProjectsManager {
                 </div>
                 <div class="card-price">${formatPriceValue(project.price)}</div>
                 <div class="card-actions">
-                    <button class="action-button delete-btn" data-id="${project.id}">
+                    <button class="action-button delete-btn" data-id="delete-${project.id}">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="action-button copy-btn" data-id="${project.id}">
+                    <button class="action-button copy-btn" data-id="copy-${project.id}">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -70,14 +70,14 @@ class ProjectsManager {
         this.projectsGrid.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.deleteProject(btn.dataset.id);
+                this.deleteProject(btn.dataset.id.toString().replace('delete-', ''));
             });
         });
 
         this.projectsGrid.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.copyProject(btn.dataset.id);
+                this.copyProject(btn.dataset.id.toString().replace('copy-', ''));
             });
         });
     }
@@ -120,8 +120,11 @@ class ProjectsManager {
     async deleteProject(id) {
         if (confirm('Are you sure you want to delete this project?')) {
             try {
-                const response = await fetch(`${HTTP_URL}/project/delete/${id}`, {
-                    method: 'POST'
+                const formData = new FormData();
+                formData.append('projectId', id); 
+                const response = await fetch(`${HTTP_URL}/project/delete`, {
+                    method: 'POST',
+                    body: formData
                 });
 
                 if (response.ok) {
@@ -138,10 +141,29 @@ class ProjectsManager {
     }
 
     async copyProject(id) {
-        const projectToCopy = this.projects.find(project => project.id === id);
+        const projectToCopy = this.projects.find(project => project.id.toString() === id.toString());
         if (projectToCopy) {
-            // Implementation for copying project
-            console.log('Copying project:', projectToCopy);
+            try {
+                const formData = new FormData();
+                formData.append('projectId', id);
+
+                const response = await fetch(`${HTTP_URL}/project/copy`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.getProjectsFromDB();
+                    this.renderProjects(this.projects);
+                } else {
+                    alert('Failed to copy project.');
+                }
+            } catch (error) {
+                console.error('Error copying project:', error);
+                alert('An error occurred while copying the project.');
+            }
+        } else {
+            alert('Project not found.');
         }
     }
 

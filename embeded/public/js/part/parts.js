@@ -50,10 +50,10 @@ class PartsManager {
                 </div>
                 <div class="card-price">${formatPriceValue(part.price)}</div>
                 <div class="card-actions">
-                    <button class="action-button delete-btn" data-id="${part.id}">
+                    <button class="action-button delete-btn" data-id="delete-${part.id}">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="action-button copy-btn" data-id="${part.id}">
+                    <button class="action-button copy-btn" data-id="copy-${part.id}">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -76,14 +76,14 @@ class PartsManager {
         this.partsGrid.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.deletePart(btn.dataset.id);
+                this.deletePart(btn.dataset.id.toString().replace('delete-', ''));
             });
         });
 
         this.partsGrid.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.copyPart(btn.dataset.id);
+                this.copyPart(btn.dataset.id.toString().replace('copy-', ''));
             });
         });
     }
@@ -163,8 +163,11 @@ class PartsManager {
     async deletePart(id) {
         if (confirm('Are you sure you want to delete this part?')) {
             try {
-                const response = await fetch(`${HTTP_URL}/part/delete/${id}`, {
-                    method: 'DELETE'
+                const formData = new FormData();
+                formData.append('partId', id); 
+                const response = await fetch(`${HTTP_URL}/part/delete`, {
+                    method: 'POST',
+                    body: formData
                 });
 
                 if (response.ok) {
@@ -181,10 +184,29 @@ class PartsManager {
     }
 
     async copyPart(id) {
-        const partToCopy = this.parts.find(part => part.id === id);
+        const partToCopy = this.parts.find(part => part.id.toString() === id.toString());
         if (partToCopy) {
-            // Implementation for copying part
-            console.log('Copying part:', partToCopy);
+            try {
+                const formData = new FormData();
+                formData.append('partId', id);
+
+                const response = await fetch(`${HTTP_URL}/part/copy`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.getPartsFromDB();
+                    this.renderParts(this.parts);
+                } else {
+                    alert('Failed to copy part.');
+                }
+            } catch (error) {
+                console.error('Error copying part:', error);
+                alert('An error occurred while copying the part.');
+            }
+        } else {
+            alert('Part not found.');
         }
     }
 

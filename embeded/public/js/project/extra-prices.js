@@ -65,10 +65,10 @@ class ExtraPricesManager {
                 </div>
                 <div class="card-price">${formatPriceValue(extraPrice.price)}</div>
                 <div class="card-actions">
-                    <button class="action-button delete-btn" data-id="${extraPrice.id}">
+                    <button class="action-button delete-btn" data-id="delete-${extraPrice.id}">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="action-button copy-btn" data-id="${extraPrice.id}">
+                    <button class="action-button copy-btn" data-id="copy-${extraPrice.id}">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -91,14 +91,14 @@ class ExtraPricesManager {
         this.extraPricesGrid.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.deleteExtraPrice(btn.dataset.id);
+                this.deleteExtraPrice(btn.dataset.id.toString().replace('delete-', ''));
             });
         });
 
         this.extraPricesGrid.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.copyExtraPrice(btn.dataset.id);
+                this.copyExtraPrice(btn.dataset.id.toString().replace('copy-', ''));
             });
         });
     }
@@ -227,8 +227,11 @@ class ExtraPricesManager {
     async deleteExtraPrice(id) {
         if (confirm('Are you sure you want to delete this extraPrice?')) {
             try {
-                const response = await fetch(`${HTTP_URL}/extraPrice/delete/${id}`, {
-                    method: 'DELETE'
+                const formData = new FormData();
+                formData.append('extraPriceId', id);
+                const response = await fetch(`${HTTP_URL}/extraPrice/delete`, {
+                    method: 'POST',
+                    body: formData
                 });
 
                 if (response.ok) {
@@ -245,10 +248,29 @@ class ExtraPricesManager {
     }
 
     async copyExtraPrice(id) {
-        const extraPriceToCopy = this.extraPrices.find(extraPrice => extraPrice.id === id);
+        const extraPriceToCopy = this.extraPrices.find(extraPrice => extraPrice.id.toString() === id.toString());
         if (extraPriceToCopy) {
-            // Implementation for copying extraPrice
-            console.log('Copying extraPrice:', extraPriceToCopy);
+            try {
+                const formData = new FormData();
+                formData.append('extraPriceId', id);
+
+                const response = await fetch(`${HTTP_URL}/extraPrice/copy`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.getExtraPricesFromDB();
+                    this.renderExtraPrices(this.extraPrices);
+                } else {
+                    alert('Failed to copy extraPrice.');
+                }
+            } catch (error) {
+                console.error('Error copying extraPrice:', error);
+                alert('An error occurred while copying the extraPrice.');
+            }
+        } else {
+            alert('ExtraPrice not found.');
         }
     }
 
@@ -260,8 +282,6 @@ class ExtraPricesManager {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-
-
 }
 
 // Initialize the application

@@ -44,10 +44,10 @@ class DevicesManager {
                 </div>
                 <div class="card-price">${formatPriceValue(device.price)}</div>
                 <div class="card-actions">
-                    <button class="action-button delete-btn" data-id="${device.id}">
+                    <button class="action-button delete-btn" data-id="delete-${device.id}">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <button class="action-button copy-btn" data-id="${device.id}">
+                    <button class="action-button copy-btn" data-id="copy-${device.id}">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -70,14 +70,14 @@ class DevicesManager {
         this.devicesGrid.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.deleteDevice(btn.dataset.id);
+                this.deleteDevice(btn.dataset.id.toString().replace('delete-', ''));
             });
         });
 
         this.devicesGrid.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.copyDevice(btn.dataset.id);
+                this.copyDevice(btn.dataset.id.toString().replace('copy-', ''));
             });
         });
     }
@@ -120,8 +120,11 @@ class DevicesManager {
     async deleteDevice(id) {
         if (confirm('Are you sure you want to delete this device?')) {
             try {
-                const response = await fetch(`${HTTP_URL}/device/delete/${id}`, {
-                    method: 'POST'
+                const formData = new FormData();
+                formData.append('deviceId', id); 
+                const response = await fetch(`${HTTP_URL}/device/delete`, {
+                    method: 'POST',
+                    body: formData
                 });
 
                 if (response.ok) {
@@ -138,10 +141,29 @@ class DevicesManager {
     }
 
     async copyDevice(id) {
-        const deviceToCopy = this.devices.find(device => device.id === id);
+        const deviceToCopy = this.devices.find(device => device.id.toString() === id.toString());
         if (deviceToCopy) {
-            // Implementation for copying device
-            console.log('Copying device:', deviceToCopy);
+            try {
+                const formData = new FormData();
+                formData.append('deviceId', id);
+
+                const response = await fetch(`${HTTP_URL}/device/copy`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.getDevicesFromDB();
+                    this.renderDevices(this.devices);
+                } else {
+                    alert('Failed to copy device.');
+                }
+            } catch (error) {
+                console.error('Error copying device:', error);
+                alert('An error occurred while copying the device.');
+            }
+        } else {
+            alert('Device not found.');
         }
     }
 

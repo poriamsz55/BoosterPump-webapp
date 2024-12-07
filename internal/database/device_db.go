@@ -140,6 +140,28 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 	return dev, nil
 }
 
+// Check if Device exists By Name
+func CheckDeviceByNameFromDB(name string) error {
+
+	// First check if the device exists
+	checkQuery := fmt.Sprintf(`
+		SELECT COUNT(*) 
+		FROM %s 
+		WHERE %s = ?
+	`, tableDevices, columnDeviceName)
+
+	var count int
+	err := instance.db.QueryRow(checkQuery, name).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
 func DeleteDeviceFromDB(deviceID int) error {
 
 	// First check if the device exists

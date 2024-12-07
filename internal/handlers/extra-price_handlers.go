@@ -46,8 +46,7 @@ func AddExtraPrice(e echo.Context) error {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	p := extraprice.NewExtraPrice(projectId, name, price)
-	err = database.AddExtraPriceToDB(p)
+	err = database.AddExtraPriceToDB(projectId, name, price)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -56,7 +55,7 @@ func AddExtraPrice(e echo.Context) error {
 }
 
 func CopyExtraPrice(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "extraPriceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid extraPrice id")
 	}
@@ -75,9 +74,16 @@ func CopyExtraPrice(e echo.Context) error {
 		originalExtraPrice.Price,
 	)
 
-	// check if extraPrice already exists
+	// Insure the name is unique
+	for {
+		err = database.CheckExtraPriceByNameFromDB(newExtraPrice.Name)
+		if err == sql.ErrNoRows {
+			break
+		}
+		newExtraPrice.Name += " (Copy)"
+	}
 
-	err = database.AddExtraPriceToDB(newExtraPrice)
+	err = database.AddExtraPriceToDB(newExtraPrice.ProjectId, newExtraPrice.Name, newExtraPrice.Price)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -86,7 +92,7 @@ func CopyExtraPrice(e echo.Context) error {
 }
 
 func DeleteExtraPrice(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "extraPriceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid extraPrice id")
 	}

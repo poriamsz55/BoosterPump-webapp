@@ -55,12 +55,12 @@ func AddProject(e echo.Context) error {
 }
 
 func CopyProject(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	prjId, err := upload.Int(e, "projectId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid project id")
 	}
 
-	originalProject, err := database.GetProjectByIdFromDB(id)
+	originalProject, err := database.GetProjectByIdFromDB(prjId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return e.String(http.StatusNotFound, "project not found")
@@ -72,24 +72,49 @@ func CopyProject(e echo.Context) error {
 	newProject.ProjectDeviceList = originalProject.ProjectDeviceList
 	newProject.ExtraPriceList = originalProject.ExtraPriceList
 
-	id, err = database.AddProjectToDB(newProject)
+	// Insure the name is unique
+	for {
+		err = database.CheckDeviceByNameFromDB(newProject.Name)
+		if err == sql.ErrNoRows {
+			break
+		}
+		newProject.Name += " (Copy)"
+	}
+
+	newId, err := database.AddProjectToDB(newProject)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
+	// Add project devices
+	for _, pd := range newProject.ProjectDeviceList {
+		err = database.AddProjectDeviceToDB(newId, pd.Count, pd.Device.Id)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	// Add extra prices
+	for _, ep := range newProject.ExtraPriceList {
+		err = database.AddExtraPriceToDB(newId, ep.Name, ep.Price)
+		if err != nil {
+			return e.String(http.StatusInternalServerError, err.Error())
+		}
+	}
+
 	return e.JSON(http.StatusOK, map[string]string{
 		"message": "project copied successfully",
-		"id":      strconv.Itoa(id),
+		"id":      strconv.Itoa(newId),
 	})
 }
 
 func DeleteProject(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	prjId, err := upload.Int(e, "projectId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid project id")
 	}
 
-	err = database.DeleteProjectFromDB(id)
+	err = database.DeleteProjectFromDB(prjId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return e.String(http.StatusNotFound, "project not found")

@@ -8,7 +8,7 @@ import (
 	extraprice "github.com/poriamsz55/BoosterPump-webapp/internal/models/extra_price"
 )
 
-func AddExtraPriceToDB(p *extraprice.ExtraPrice) error {
+func AddExtraPriceToDB(prjId int, expName string, expValue uint64) error {
 	query := `INSERT INTO ` + tableExtraPrice + ` (` + columnExtraPriceName + `, ` +
 		columnExtraPriceValue + `, ` +
 		columnProjectIDFK + `) 
@@ -21,7 +21,7 @@ func AddExtraPriceToDB(p *extraprice.ExtraPrice) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(p.Name, p.Price, p.ProjectId)
+	_, err = stmt.Exec(expName, expValue, prjId)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return err
@@ -126,6 +126,28 @@ func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error
 	}
 
 	return exps, nil
+}
+
+// CheckExtraPriceByNameFromDB
+func CheckExtraPriceByNameFromDB(expName string) error {
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) 
+		FROM %s 
+		WHERE %s = ?
+	`, tableExtraPrice, columnExtraPriceName)
+
+	var count int
+	err := instance.db.QueryRow(query, expName).Scan(
+		&count,
+	)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }
 
 func DeleteExtraPriceFromDB(id int) error {

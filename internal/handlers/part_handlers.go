@@ -57,7 +57,7 @@ func AddPart(e echo.Context) error {
 }
 
 func CopyPart(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "partId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid part id")
 	}
@@ -78,6 +78,15 @@ func CopyPart(e echo.Context) error {
 		originalPart.Price,
 	)
 
+	// Insure the name is unique
+	for {
+		err = database.CheckPartByNameFromDB(newPart.Name)
+		if err == sql.ErrNoRows {
+			break
+		}
+		newPart.Name += " (Copy)"
+	}
+
 	err = database.AddPartToDB(newPart)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
@@ -87,7 +96,7 @@ func CopyPart(e echo.Context) error {
 }
 
 func DeletePart(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "partId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid part id")
 	}
