@@ -12,4 +12,5 @@ func projectRoutes(e *echo.Group) {
 	e.POST("/project/copy", handlers.CopyProject)
 	e.POST("/project/delete", handlers.DeleteProject)
 	e.POST("/project/update", handlers.UpdateProject)
+	e.POST("/project/export", handlers.ExportProject)
 }

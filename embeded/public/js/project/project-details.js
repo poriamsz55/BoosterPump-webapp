@@ -88,7 +88,34 @@ class AddProjectDetailsManager {
     }
 
     export() {
-
+        // ask a name for the file
+        const fileName = prompt('Enter a name for the file:');
+        if (fileName) {
+            try {
+                const formData = new FormData();
+                formData.append('projectId', this.projectId);
+                formData.append('fileName', fileName);
+                // send request to server
+                fetch(`${HTTP_URL}/project/export`, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('File exported successfully');
+                        } else {
+                            throw new Error('Failed to export file');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again later.');
+                })
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        }
     }
 
     async saveProject() {

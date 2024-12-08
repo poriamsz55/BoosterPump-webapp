@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/excel"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/handlers/upload"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/project"
@@ -169,4 +170,29 @@ func UpdateProject(e echo.Context) error {
 	}
 
 	return e.String(http.StatusOK, "project updated successfully")
+}
+
+// ExportProject
+func ExportProject(e echo.Context) error {
+	prjId, err := upload.Int(e, "projectId")
+	if err != nil {
+		return e.String(http.StatusBadRequest, "invalid project id")
+	}
+
+	fileName := e.FormValue("fileName")
+
+	prj, err := database.GetProjectByIdFromDB(prjId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return e.String(http.StatusNotFound, "project not found")
+		}
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	err = excel.GenerateProjectReport(prj, fileName)
+	if err != nil {
+		return e.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return e.String(http.StatusOK, "project exported successfully")
 }
