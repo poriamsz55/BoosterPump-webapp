@@ -190,6 +190,22 @@ func DeleteExtraPriceFromDB(id int) error {
 	return nil
 }
 
+// DeleteExtraPricesByProjectId
+func DeleteExtraPricesByProjectId(prjId int) error {
+
+	query := fmt.Sprintf(`
+		DELETE FROM %s 
+		WHERE %s = ?
+	`, tableExtraPrice, columnProjectIDFK)
+
+	_, err := instance.db.Exec(query, prjId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func UpdateExtraPriceInDB(updatedExtraPrice *extraprice.ExtraPrice) error {
 
 	query := fmt.Sprintf(`
