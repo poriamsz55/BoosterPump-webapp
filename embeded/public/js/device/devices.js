@@ -22,7 +22,6 @@ class DevicesManager {
     }
 
     async init() {
-        console.log('Initializing DevicesManager...');
         await this.getDevicesFromDB();
         this.renderDevices(this.devices);
         this.setupEventListeners();
@@ -103,7 +102,6 @@ class DevicesManager {
             }
 
             const data = await response.json();
-            console.log(data);
 
             if (Array.isArray(data)) {
                 this.devices = data;

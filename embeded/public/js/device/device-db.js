@@ -11,15 +11,27 @@ class AddDeviceManager {
         this.form = document.getElementById('addDeviceDBForm')
         this.partForm = document.getElementById('addPartToDeviceForm');
 
-        this.init();
+        this.hasChanged = false;
 
-        // Add this to handle back button
-        window.addEventListener('popstate', () => {
-            localStorage.removeItem('deviceParts');
-            this.parts = [];
-            this.addedParts = [];
-            this.renderAddedParts([]);
+        // check projectName div is changed
+        const projectNameDiv = document.getElementById('deviceName');
+        projectNameDiv.addEventListener('input', () => {
+            this.hasChanged = true;
         });
+
+        // check if converterType is changed
+        const converterTypeDiv = document.getElementById('converterType');
+        converterTypeDiv.addEventListener('change', () => {
+            this.hasChanged = true;
+        });
+
+        // check if checkbox is changed
+        const filterCheckbox = document.getElementById('filterCheckbox');
+        filterCheckbox.addEventListener('change', () => {
+            this.hasChanged = true;
+        });
+
+        this.init();
 
     }
 
@@ -36,8 +48,26 @@ class AddDeviceManager {
         document.getElementById('addPartToDeviceBtn').addEventListener('click', () => this.openModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('addDeviceDBBtn').addEventListener('click', () => this.saveDevice());
+        document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
     }
 
+    handleBackButton() {
+        if (this.hasChanged) {
+            if (confirm('Are you sure you want to leave?')) {
+                localStorage.removeItem('deviceParts');
+                this.parts = [];
+                this.addedParts = [];
+                this.renderAddedParts([]);
+                window.history.back();
+            }
+        }else {
+            localStorage.removeItem('deviceParts');
+            this.parts = [];
+            this.addedParts = [];
+            this.renderAddedParts([]);
+            window.history.back();
+        }
+    }
 
     renderParts(partsList) {
 
@@ -147,14 +177,16 @@ class AddDeviceManager {
                 e.stopPropagation();
                 // get id data-id="delete-${part.id}
                 const partId = button.dataset.id.replace('delete-', '');
-                console.log(partId);
                 this.deletePart(partId);
             });
         });
     }
 
     deletePart(partId) {
-        this.addedParts = this.addedParts.filter(part => part.id !== partId);
+        
+        this.hasChanged = true;
+        
+        this.addedParts = this.addedParts.filter(part => part.id.toString() !== partId.toString());
         localStorage.setItem('deviceParts', JSON.stringify(this.addedParts));
 
         // Remove just the specific card instead of re-rendering everything
@@ -220,6 +252,8 @@ class AddDeviceManager {
         deviceParts.push(devicePart);
         localStorage.setItem('deviceParts', JSON.stringify(deviceParts));
 
+        this.hasChanged = true;
+
         this.addedParts.push(devicePart);
         this.renderAddedParts(this.addedParts);
     }
@@ -245,7 +279,19 @@ class AddDeviceManager {
     async saveDevice() {
         const formData = new FormData();
         formData.append('deviceName', document.getElementById('deviceName').value);
+
+        // check if device name is empty or contains only spaces
+        if (document.getElementById('deviceName').value.trim() === '') {
+            alert('Please enter a device name.');
+            return;
+        }
+
         formData.append('converterType', document.getElementById('converterType').value); // Fixed field name
+        // check if converter is not selected
+        if (document.getElementById('converterType').value === '-1') {
+            alert('Please select a converter type.');
+            return;
+        }
         formData.append('filter', document.getElementById('filterCheckbox').checked); // Fixed field name
 
         try {

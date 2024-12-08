@@ -119,10 +119,21 @@ class PartsManager {
         // Get form data directly from the form elements
         const formData = new FormData();
         formData.append('partName', document.getElementById('partName').value);
-        formData.append('partSize', document.getElementById('partSize').value);
-        formData.append('partMaterial', document.getElementById('partMaterial').value);
-        formData.append('partBrand', document.getElementById('partBrand').value);
+        formData.append('partSize', document.getElementById('partSize').value) || '';
+        formData.append('partMaterial', document.getElementById('partMaterial').value) || '';
+        formData.append('partBrand', document.getElementById('partBrand').value) || '';
         formData.append('partPrice', document.getElementById('partPrice').value.replace(/,/g, ''));
+
+        // Check if any of the required fields are empty
+        if (document.getElementById('partName').value.trim() === '') {
+            alert('Please enter a part name.');
+            return;
+        }
+
+        if (document.getElementById('partPrice').value.trim() === '') {
+            // update partPrice in formData with value 0 if empty
+            formData.append('partPrice', '0');
+        }
 
         try {
             const response = await fetch(`${HTTP_URL}/part/add`, {

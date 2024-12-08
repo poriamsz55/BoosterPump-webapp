@@ -10,16 +10,16 @@ class AddProjectManager {
         this.modal = document.getElementById('addDeviceToProjectModal');
         this.form = document.getElementById('addProjectDBForm')
         this.deviceForm = document.getElementById('addDeviceToProjectForm');
+        
+        this.hasChanged = false;
+
+        // check projectName div is changed
+        const projectNameDiv = document.getElementById('projectName');
+        projectNameDiv.addEventListener('input', () => {
+            this.hasChanged = true;
+        });
 
         this.init();
-
-        // Add this to handle back button
-        window.addEventListener('popstate', () => {
-            localStorage.removeItem('projectDevices');
-            this.devices = [];
-            this.addedDevices = [];
-            this.renderAddedDevices([]);
-        });
 
     }
 
@@ -36,8 +36,27 @@ class AddProjectManager {
         document.getElementById('addDeviceToProjectBtn').addEventListener('click', () => this.openModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('addProjectDBBtn').addEventListener('click', () => this.saveProject());
+        document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
     }
 
+    // handle back button
+    handleBackButton() {
+        if (this.hasChanged) {
+            if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                localStorage.removeItem('projectDevices');
+                this.devices = [];
+                this.addedDevices = [];
+                this.renderAddedDevices([]);
+                window.history.back();
+            }
+        }else{
+            localStorage.removeItem('projectDevices');
+            this.devices = [];
+            this.addedDevices = [];
+            this.renderAddedDevices([]);
+            window.history.back();
+        }
+    }
 
     renderDevices(devicesList) {
 
@@ -147,7 +166,7 @@ class AddProjectManager {
                 e.stopPropagation();
                 // get id data-id="delete-${device.id}
                 const deviceId = button.dataset.id.replace('delete-', '');
-                console.log(deviceId);
+                this.hasChanged = true;
                 this.deleteDevice(deviceId);
             });
         });
@@ -220,6 +239,8 @@ class AddProjectManager {
         projectDevices.push(projectDevice);
         localStorage.setItem('projectDevices', JSON.stringify(projectDevices));
 
+        this.hasChanged = true;
+
         this.addedDevices.push(projectDevice);
         this.renderAddedDevices(this.addedDevices);
     }
@@ -245,6 +266,12 @@ class AddProjectManager {
     async saveProject() {
         const formData = new FormData();
         formData.append('projectName', document.getElementById('projectName').value);
+
+        // check if project name is empty or contains only spaces
+        if (document.getElementById('projectName').value.trim() === '') {
+            alert('Please enter a project name.');
+            return;
+        }
 
         try {
             const response = await fetch(`${HTTP_URL}/project/add`, {

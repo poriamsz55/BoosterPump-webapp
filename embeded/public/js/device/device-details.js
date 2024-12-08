@@ -23,15 +23,28 @@ class AddDeviceDetailsManager {
             formatPriceInput(this);
         });
 
+        this.hasChanged = false;
+
+        // check projectName div is changed
+        const projectNameDiv = document.getElementById('deviceName');
+        projectNameDiv.addEventListener('input', () => {
+            this.hasChanged = true;
+        });
+
+        // check if converterType is changed
+        const converterTypeDiv = document.getElementById('converterType');
+        converterTypeDiv.addEventListener('change', () => {
+            this.hasChanged = true;
+        });
+
+        // check if filterCheckbox is changed
+        const filterCheckbox = document.getElementById('filterCheckbox');
+        filterCheckbox.addEventListener('change', () => {
+            this.hasChanged = true;
+        });
+
         this.init();
 
-        // Add this to handle back button
-        window.addEventListener('popstate', () => {
-            localStorage.removeItem('deviceParts');
-            this.parts = [];
-            this.addedParts = [];
-            this.renderAddedParts([]);
-        });
     }
 
     async init() {
@@ -48,15 +61,39 @@ class AddDeviceDetailsManager {
         document.getElementById('addPartToDeviceBtn').addEventListener('click', () => this.openModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('saveDeviceDBBtn').addEventListener('click', () => this.saveDevice());
+        document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
+    }
+
+    handleBackButton() {
+        if (this.hasChanged) {
+            if (confirm('Are you sure you want to leave without saving?')) {
+                localStorage.removeItem('deviceParts');
+                this.parts = [];
+                this.addedParts = [];
+                this.renderAddedParts([]);
+                window.history.back();
+            }
+        } else {
+            localStorage.removeItem('deviceParts');
+            this.parts = [];
+            this.addedParts = [];
+            this.renderAddedParts([]);
+            window.history.back();
+        }
     }
 
     async saveDevice() {
-        console.log('Saving device...');
         const formData = new FormData();
         formData.append('deviceId', this.deviceId);
         formData.append('deviceName', document.getElementById('deviceName').value);
         formData.append('converterType', document.getElementById('converterType').value); // Fixed field name
         formData.append('filter', document.getElementById('filterCheckbox').checked); // Fixed field name
+
+        // check if device name is empty or contains only spaces
+        if (document.getElementById('deviceName').value.trim() === '') {
+            alert('Please enter a device name.');
+            return;
+        }
 
         let partsJson = [];
         for (const part of this.addedParts) {
@@ -110,7 +147,6 @@ class AddDeviceDetailsManager {
                         this.addedParts = [];
                     }else{
                         for (const part of deviceDetails.device_part) {
-                            console.log(part)
                             this.addedParts.push(
                                 new DevicePart(
                                     part.id,
@@ -282,9 +318,9 @@ class AddDeviceDetailsManager {
 
         // this.priceInput.value is string and (part.price * count) is number
         // convert this.priceInput.value to number
-        console.log("new value : ", formatPriceValue(part.price * count));
         this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) + (part.price * count));
 
+        this.hasChanged = true;
 
         this.addedParts.push(devicePart);
         this.renderAddedParts(this.addedParts);
@@ -359,8 +395,8 @@ class AddDeviceDetailsManager {
                 break;
             }
         }
-        console.log("delete part : ", part);
-        console.log("delete value : ", formatPriceValue(part.price * part.count));
+        this.hasChanged = true;
+
         this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) - (part.price * part.count));
 
     }

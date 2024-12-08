@@ -202,6 +202,26 @@ func DeleteDeviceFromDB(deviceID int) error {
 		return sql.ErrNoRows
 	}
 
+	// Delete device parts for this device
+	deleteDevicePartsQuery := fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE %s = ?
+	`, tableDeviceParts, columnDeviceID)
+	_, err = instance.db.Exec(deleteDevicePartsQuery, deviceID)
+	if err != nil {
+		return err
+	}
+
+	// Delete project devices for this device
+	deleteProjectDevicesQuery := fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE %s = ?
+	`, tableProjectDevices, columnDeviceID)
+	_, err = instance.db.Exec(deleteProjectDevicesQuery, deviceID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

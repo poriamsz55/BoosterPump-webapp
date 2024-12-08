@@ -154,6 +154,17 @@ func DeletePartFromDB(id int) error {
 		return sql.ErrNoRows
 	}
 
+	// delete from device_parts
+	query = fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE %s = ?
+	`, tableDeviceParts, columnPartID)
+
+	_, err = instance.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

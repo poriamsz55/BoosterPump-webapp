@@ -128,6 +128,11 @@ func DeleteProjectFromDB(id int) error {
 		return sql.ErrNoRows
 	}
 
+	// Since we have ON DELETE CASCADE in our foreign keys,
+	// deleting from the devices table will automatically delete
+	// related records in device_parts and project_devices tables
+	// and project_extra_price tables
+
 	return nil
 }
 

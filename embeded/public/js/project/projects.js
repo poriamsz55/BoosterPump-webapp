@@ -22,7 +22,6 @@ class ProjectsManager {
     }
 
     async init() {
-        console.log('Initializing ProjectsManager...');
         await this.getProjectsFromDB();
         this.renderProjects(this.projects);
         this.setupEventListeners();
@@ -103,7 +102,6 @@ class ProjectsManager {
             }
 
             const data = await response.json();
-            console.log(data);
 
             if (Array.isArray(data)) {
                 this.projects = data;

@@ -22,15 +22,26 @@ class AddProjectDetailsManager {
             formatPriceInput(this);
         });
 
+        this.hasChanged = false;
+
+        // check projectName div is changed
+        const projectNameDiv = document.getElementById('projectName');
+        projectNameDiv.addEventListener('input', () => {
+            this.hasChanged = true;
+        });
+
         this.init();
 
-        // Add this to handle back button
-        window.addEventListener('popstate', () => {
-            localStorage.removeItem('projectDevices');
-            this.devices = [];
-            this.addedDevices = [];
-            this.renderAddedDevices([]);
-        });
+         // Add focus event listener
+         window.addEventListener('focus', () => this.checkForUpdates());
+    }
+
+    async checkForUpdates() {
+        // extra price
+        if (localStorage.getItem('projectDetailNeedsUpdate') === 'true') {
+            await this.getProjectDetails();
+            localStorage.removeItem('projectDetailNeedsUpdate');
+        }
     }
 
     async init() {
@@ -49,6 +60,27 @@ class AddProjectDetailsManager {
         document.getElementById('saveProjectDBBtn').addEventListener('click', () => this.saveProject());
         document.getElementById('extraPricesBtn').addEventListener('click', () => this.navigateToExtraPrices());
         document.getElementById('exportBtn').addEventListener('click', () => this.export());
+        document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
+    }
+
+    // id="backBtn" handle back button
+    handleBackButton() {
+        // ask if user wants to save changes
+        if (this.hasChanged) {
+            if (confirm('Are you sure you want to discard changes?')) {
+                localStorage.removeItem('projectDevices');
+                this.devices = [];
+                this.addedDevices = [];
+                this.renderAddedDevices([]);
+                window.history.back();
+            }
+        }else{
+            localStorage.removeItem('projectDevices');
+            this.devices = [];
+            this.addedDevices = [];
+            this.renderAddedDevices([]);
+            window.history.back();
+        }
     }
 
     navigateToExtraPrices() {
@@ -56,15 +88,21 @@ class AddProjectDetailsManager {
     }
 
     export() {
-        
+
     }
 
     async saveProject() {
-        console.log('Saving project...');
         const formData = new FormData();
         formData.append('projectId', this.projectId);
         formData.append('projectName', document.getElementById('projectName').value);
-  
+
+        // check if project name is empty or contains only spaces
+        if (document.getElementById('projectName').value.trim() === '') {
+            alert('Please enter a project name.');
+            return;
+        }
+
+
         let devicesJson = [];
         for (const device of this.addedDevices) {
             devicesJson.push({
@@ -115,9 +153,9 @@ class AddProjectDetailsManager {
                 if (projectDetails) {
                     if (projectDetails.project_device === null || projectDetails.project_device === undefined || projectDetails.project_device.length === 0) {
                         this.addedDevices = [];
-                    }else{
+                    } else {
                         for (const device of projectDetails.project_device) {
-                            console.log(device)
+                            (device)
                             this.addedDevices.push(
                                 new ProjectDevice(
                                     device.id,
@@ -278,10 +316,9 @@ class AddProjectDetailsManager {
 
         // this.priceInput.value is string and (device.price * count) is number
         // convert this.priceInput.value to number
-        console.log("new value : ", formatPriceValue(device.price * count));
         this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) + (device.price * count));
 
-
+        this.hasChanged = true;
         this.addedDevices.push(projectDevice);
         this.renderAddedDevices(this.addedDevices);
     }
@@ -324,6 +361,7 @@ class AddProjectDetailsManager {
                 e.stopPropagation();
                 // get id data-id="delete-${device.id}
                 const deviceId = button.dataset.id.replace('delete-', '');
+                this.hasChanged = true;
                 this.deleteDevice(deviceId);
             });
         });
@@ -355,8 +393,6 @@ class AddProjectDetailsManager {
                 break;
             }
         }
-        console.log("delete device : ", device);
-        console.log("delete value : ", formatPriceValue(device.price * device.count));
         this.priceInput.value = formatPriceValue(convertPriceToNumber(this.priceInput.value) - (device.price * device.count));
 
     }

@@ -1,6 +1,9 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceInput } from '../format-price.js';
 
+let hasChanged = false;
+let backBtnDiv;
+
 document.addEventListener('DOMContentLoaded', async function () {
     // Remove e.preventDefault() as it's not needed here
     const urlParams = new URLSearchParams(window.location.search);
@@ -9,6 +12,27 @@ document.addEventListener('DOMContentLoaded', async function () {
     const priceInput = document.getElementById('partPrice');
     priceInput.addEventListener('input', function () {
         formatPriceInput(this);
+    });
+
+    // check if the form has changed
+    const formElements = document.querySelectorAll('input, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('input', () => {
+            hasChanged = true;
+            console.log('Form has changed');
+        });
+    });
+
+    backBtnDiv = document.getElementById('backBtn');
+    // handle back button
+    backBtnDiv.addEventListener('click', () => {
+        if (hasChanged) {
+            if (confirm('Are you sure you want to leave without saving?')) {
+                window.history.back();
+            }
+        } else {
+            window.history.back();
+        }
     });
 
     if (partId) {
@@ -26,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
             const partDetails = await response.json();
-            console.log(partDetails)
 
             if (partDetails) {
                 // Use value instead of textContent for input elements
@@ -34,9 +57,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.getElementById('partSize').value = partDetails.size || '';
                 document.getElementById('partMaterial').value = partDetails.material || '';
                 document.getElementById('partBrand').value = partDetails.brand || '';
-                
-                 // Format the initial price value
-                 if (partDetails.price) {
+
+                // Format the initial price value
+                if (partDetails.price) {
                     priceInput.value = partDetails.price;
                     formatPriceInput(priceInput);
                 }
@@ -64,9 +87,20 @@ document.getElementById('partDetailsForm').addEventListener('submit', async func
     formData.append('partMaterial', document.getElementById('partMaterial').value);
     formData.append('partBrand', document.getElementById('partBrand').value);
 
-     // Remove commas from price before sending to server
-     const priceValue = document.getElementById('partPrice').value.replace(/,/g, '');
-     formData.append('partPrice', priceValue);
+    // Remove commas from price before sending to server
+    const priceValue = document.getElementById('partPrice').value.replace(/,/g, '');
+    formData.append('partPrice', priceValue);
+
+    // Check if any of the required fields are empty
+    if (document.getElementById('partName').value.trim() === '') {
+        alert('Please enter a part name.');
+        return;
+    }
+
+    if (document.getElementById('partPrice').value.trim() === '') {
+        // update partPrice in formData with value 0 if empty
+        formData.append('partPrice', '0');
+    }
 
     try {
         const response = await fetch(`${HTTP_URL}/part/update`, {

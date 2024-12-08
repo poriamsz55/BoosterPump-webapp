@@ -16,6 +16,8 @@ class ExtraPricesManager {
 
         this.selectedExtraPrice = null;
 
+        this.hasChanged = false;
+
         this.init();
 
         // Add focus event listener
@@ -43,6 +45,7 @@ class ExtraPricesManager {
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('cancelDetailBtn').addEventListener('click', () => this.closeDetailModal());
         document.getElementById('saveDetailBtn').addEventListener('click', async () => await this.saveDetailExtraPrice());
+        document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
         // Remove the form submit event listener from here
         this.form.addEventListener('submit', async (e) => {
             e.preventDefault(); // Prevent form submission
@@ -53,6 +56,14 @@ class ExtraPricesManager {
         this.detailForm.addEventListener('submit', (e) => e.preventDefault());
     }
 
+
+    handleBackButton() {
+        if (this.hasChanged) {
+            localStorage.setItem('projectsListNeedsUpdate', 'true');
+            localStorage.setItem('projectDetailNeedsUpdate', 'true');
+        }
+        window.history.back();
+    }
 
     renderExtraPrices(extraPricesList) {
 
@@ -148,6 +159,18 @@ class ExtraPricesManager {
         formData.append('extraPriceId', this.selectedExtraPrice.id);
         formData.append('extraPriceName', document.getElementById('detailExtraPriceName').value);
         formData.append('extraPriceValue', document.getElementById('detailExtraPriceValue').value.replace(/,/g, ''));
+        
+        if (document.getElementById('detailExtraPriceName').value.trim() === '') {
+            alert('Please enter a extraPrice name.');
+            return;
+        }
+        
+        if (document.getElementById('detailExtraPriceValue').value.trim() === '') {
+            // set value to 0 if empty
+            formData.append('extraPriceValue', '0');    
+        }
+
+        this.hasChanged = true;
 
         try {
             const response = await fetch(`${HTTP_URL}/extraPrice/update`, {
@@ -180,6 +203,18 @@ class ExtraPricesManager {
         formData.append('projectId', this.projectId);
         formData.append('extraPriceName', document.getElementById('extraPriceName').value);
         formData.append('extraPriceValue', document.getElementById('extraPriceValue').value.replace(/,/g, ''));
+
+        if (document.getElementById('extraPriceName').value.trim() === '') {
+            alert('Please enter a extraPrice name.');
+            return;
+        }
+        
+        if (document.getElementById('extraPriceValue').value.trim() === '') {
+            // set value to 0 if empty
+            formData.append('extraPriceValue', '0');    
+        }
+
+        this.hasChanged = true;
 
         try {
             const response = await fetch(`${HTTP_URL}/extraPrice/add`, {
@@ -226,6 +261,7 @@ class ExtraPricesManager {
 
     async deleteExtraPrice(id) {
         if (confirm('Are you sure you want to delete this extraPrice?')) {
+            this.hasChanged = true;
             try {
                 const formData = new FormData();
                 formData.append('extraPriceId', id);
