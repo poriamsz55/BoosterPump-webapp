@@ -366,7 +366,7 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		// Write header
 		rowi = 1
 		coli = 1
-		headerText := fmt.Sprintf("%s برای %s - %d عدد", deviceSheetText, project.Name, projectDevice.Count)
+		headerText := fmt.Sprintf("%s برای %s - %f عدد", deviceSheetText, project.Name, projectDevice.Count)
 		f.SetCellValue(deviceSheetText, getCellName(coli, rowi), headerText)
 		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+12, rowi+3), ew.deviceStyle)
 		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+12, rowi+3))

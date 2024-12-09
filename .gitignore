@@ -2,3 +2,4 @@ BoosterPump-webapp
 booster_pump.db
 tasks.txt
 .tasks.txt.swp
+*.db

@@ -6,7 +6,6 @@ import (
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
 
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -149,27 +148,6 @@ func (h *DBHelper) CheckDatabase() bool {
 	return err == nil
 }
 
-func (h *DBHelper) CopyDatabaseFromAssets(assetsPath string) error {
-	inputFile, err := os.Open(assetsPath)
-	if err != nil {
-		return err
-	}
-	defer inputFile.Close()
-
-	outputFile, err := os.Create(h.databasePath)
-	if err != nil {
-		return err
-	}
-	defer outputFile.Close()
-
-	_, err = io.Copy(outputFile, inputFile)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (h *DBHelper) CreateTables() error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -225,23 +203,27 @@ func (h *DBHelper) DropTables() error {
 func InitializeDB() {
 	dbHelper := GetDBHelperInstance()
 
+	// check if database exists
+	databaseExists := dbHelper.CheckDatabase()
+
 	err := dbHelper.Open()
 	if err != nil {
 		fmt.Println("Error opening database:", err)
 		return
 	}
 
-	// if !dbHelper.CheckDatabase() {
-	// 	err = dbHelper.CopyDatabaseFromAssets("./database/init_db.db")
-	// 	if err != nil {
-	// 		fmt.Println("Error copying database from assets:", err)
-	// 		return
-	// 	}
-	// }
-
 	err = dbHelper.CreateTables()
 	if err != nil {
 		fmt.Println("Error creating tables:", err)
 		return
 	}
+
+	if !databaseExists {
+		err = dbHelper.LoadInitDatabase()
+		if err != nil {
+			fmt.Println("Error copying database from assets:", err)
+			return
+		}
+	}
+
 }
