@@ -41,7 +41,9 @@ class ProjectsManager {
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(project.name)}</span>
                 </div>
-                <div class="card-price">${formatPriceValue(project.price)}</div>
+                <div class="card-header">
+                <div class="card-price">قیمت: ${formatPriceValue(project.price)}</div>
+                </div>
                 <div class="card-actions">
                     <button class="action-button delete-btn" data-id="delete-${project.id}">
                         <i class="fas fa-trash"></i>

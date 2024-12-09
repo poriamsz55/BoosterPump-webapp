@@ -1,5 +1,6 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
+import { converterToString, filterToString } from '../convert2str.js';
 
 class AddProjectManager {
     constructor() {
@@ -60,18 +61,26 @@ class AddProjectManager {
 
     renderDevices(devicesList) {
 
-        this.devicesGrid.innerHTML = devicesList.map(device =>
-
-            `
+        this.devicesGrid.innerHTML = devicesList.map(device => {
+            const converterStr = converterToString(device.converter);
+            const filterStr = filterToString(device.filter);
+            return `
                     <div class="card" data-id="${device.id}">
-                        <div class="card-header">
-                            <span class="card-title">${this.escapeHtml(device.name)}</span>
-                        </div>
-                        <div class="card-price">${formatPriceValue(device.price)}</div>
+                          <div class="card-header">
+                                <span class="card-title">${this.escapeHtml(device.name)}</span>
+                            </div>
+                             <div class="card-header">
+                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-title">صافی ${filterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
+                            </div>
                     </div>
-                `
-
-        ).join('');
+                `;
+        }).join('');
 
         this.attachCardEventListeners();
     }
@@ -143,10 +152,24 @@ class AddProjectManager {
             const deviceCard = document.createElement('div');
             deviceCard.classList.add('card');
             deviceCard.setAttribute('data-device-id', device.id);
+            const converterStr = converterToString(device.converter);
+            const filterStr = filterToString(device.filter);
             deviceCard.innerHTML = `
-                <div class="card-title">${founded.name}</div>
-                <div class="card-price">${formatPriceValue(founded.price)}</div>
-                <div class="card-count">${device.count}</div>
+                  <div class="card-header">
+                                <span class="card-title">${this.escapeHtml(founded.name)}</span>
+                            </div>
+                             <div class="card-header">
+                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-title">صافی ${filterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-price">قیمت: ${formatPriceValue(founded.price)}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-count">تعداد: ${device.count}</div>
+                            </div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${device.id}">
                     <i class="fas fa-trash"></i>
                 </button>

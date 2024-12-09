@@ -1,5 +1,5 @@
 import { HTTP_URL } from '../config.js';
-import {formatPriceValue} from '../format-price.js';
+import { formatPriceValue } from '../format-price.js';
 
 class PartsManager {
     constructor() {
@@ -10,7 +10,7 @@ class PartsManager {
         this.form = document.getElementById('addPartToDBForm');
 
         this.init();
-        
+
         // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
     }
@@ -48,7 +48,18 @@ class PartsManager {
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
-                <div class="card-price">${formatPriceValue(part.price)}</div>
+                  <div class="card-header">
+                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                </div>
+                   <div class="card-header">
+                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                </div>
+                   <div class="card-header">
+                <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
+                </div>
                 <div class="card-actions">
                     <button class="action-button delete-btn" data-id="delete-${part.id}">
                         <i class="fas fa-trash"></i>
@@ -175,7 +186,7 @@ class PartsManager {
         if (confirm('Are you sure you want to delete this part?')) {
             try {
                 const formData = new FormData();
-                formData.append('partId', id); 
+                formData.append('partId', id);
                 const response = await fetch(`${HTTP_URL}/part/delete`, {
                     method: 'POST',
                     body: formData
@@ -230,7 +241,7 @@ class PartsManager {
             .replace(/'/g, "&#039;");
     }
 
-    
+
 }
 
 // Initialize the application

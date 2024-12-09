@@ -210,18 +210,40 @@ class AddDeviceDetailsManager {
                 return `
                         <div class="card disabled" data-id="${part.id}">
                             <div class="card-header">
-                                <span class="card-title">${this.escapeHtml(part.name)}</span>
-                            </div>
-                            <div class="card-price">${formatPriceValue(part.price)}</div>
+                    <span class="card-title">${this.escapeHtml(part.name)}</span>
+                        </div>
+                        <div class="card-header">
+                            <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                        </div>
+                        <div class="card-header">
+                            <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                        </div>
+                        <div class="card-header">
+                            <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                        </div>
+                        <div class="card-header">
+                        <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
+                        </div>
                         </div>
                     `;
             } else {
                 return `
                         <div class="card" data-id="${part.id}">
-                            <div class="card-header">
-                                <span class="card-title">${this.escapeHtml(part.name)}</span>
-                            </div>
-                            <div class="card-price">${formatPriceValue(part.price)}</div>
+                           <div class="card-header">
+                    <span class="card-title">${this.escapeHtml(part.name)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                </div>
+                   <div class="card-header">
+                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                </div>
+                   <div class="card-header">
+                <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
+                </div>
                         </div>
                     `;
             }
@@ -336,16 +358,41 @@ class AddDeviceDetailsManager {
     renderAddedParts(addedParts) {
         const partsGrid = document.getElementById('addedPartsGrid');
         partsGrid.innerHTML = '';
-        addedParts.forEach(part => {
+        addedParts.forEach(devicepart => {
 
             const partCard = document.createElement('div');
             partCard.classList.add('card');
-            partCard.setAttribute('data-part-id', part.partId);
+            partCard.setAttribute('data-part-id', devicepart.partId);
+
+            // find part in parts array
+            let part;
+            for (let i = 0; i < this.parts.length; i++) {
+                if (this.parts[i].id.toString() === devicepart.partId.toString()) {
+                    part = this.parts[i];
+                    break;
+                }
+            }
+
             partCard.innerHTML = `
-                <div class="card-title">${this.escapeHtml(part.name)}</div>
-                <div class="card-price">${formatPriceValue(part.price)}</div>
-                <div class="card-count">${part.count}</div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${part.partId}">
+                <div class="card-header">
+                    <span class="card-title">${this.escapeHtml(part.name)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                </div>
+                   <div class="card-header">
+                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                </div>
+                   <div class="card-header">
+                <div class="card-price">قیمت: ${formatPriceValue(devicepart.price)}</div>
+                </div>
+                   <div class="card-header">
+                <div class="card-count">تعداد:‌${devicepart.count}</div>
+                </div>
+                <button type="button" class="action-button delete-btn" data-id="delete-${devicepart.partId}">
                     <i class="fas fa-trash"></i>
                 </button>
             `;

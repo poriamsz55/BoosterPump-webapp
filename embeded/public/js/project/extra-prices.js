@@ -74,7 +74,7 @@ class ExtraPricesManager {
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(extraPrice.name)}</span>
                 </div>
-                <div class="card-price">${formatPriceValue(extraPrice.price)}</div>
+                <div class="card-price">قیمت: ${formatPriceValue(extraPrice.price)}</div>
                 <div class="card-actions">
                     <button class="action-button delete-btn" data-id="delete-${extraPrice.id}">
                         <i class="fas fa-trash"></i>

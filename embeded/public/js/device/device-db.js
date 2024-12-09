@@ -75,10 +75,21 @@ class AddDeviceManager {
 
             `
                     <div class="card" data-id="${part.id}">
-                        <div class="card-header">
-                            <span class="card-title">${this.escapeHtml(part.name)}</span>
-                        </div>
-                        <div class="card-price">${formatPriceValue(part.price)}</div>
+                       <div class="card-header">
+                    <span class="card-title">${this.escapeHtml(part.name)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                </div>
+                   <div class="card-header">
+                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                </div>
+                   <div class="card-header">
+                <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
+                </div>
                     </div>
                 `
 
@@ -155,9 +166,24 @@ class AddDeviceManager {
             partCard.classList.add('card');
             partCard.setAttribute('data-part-id', part.id);
             partCard.innerHTML = `
-                <div class="card-title">${founded.name}</div>
-                <div class="card-price">${formatPriceValue(founded.price)}</div>
-                <div class="card-count">${part.count}</div>
+                <div class="card-header">
+                    <span class="card-title">${this.escapeHtml(founded.name)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">سایز: ${this.escapeHtml(founded.size)}</span>
+                </div>
+                  <div class="card-header">
+                    <span class="card-title">جنس: ${this.escapeHtml(founded.material)}</span>
+                </div>
+                   <div class="card-header">
+                    <span class="card-title">برند: ${this.escapeHtml(founded.brand)}</span>
+                </div>
+                   <div class="card-header">
+                <div class="card-price">قیمت: ${formatPriceValue(founded.price)}</div>
+                </div>
+                   <div class="card-header">
+                <div class="card-count">تعداد: ${part.count}</div>
+                </div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${part.id}">
                     <i class="fas fa-trash"></i>
                 </button>

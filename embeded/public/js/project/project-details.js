@@ -1,7 +1,7 @@
 import { HTTP_URL } from '../config.js';
 import { convertPriceToNumber, formatPriceValue, formatPriceInput } from '../format-price.js';
 import { ProjectDevice } from './project-device.js';
-
+import { converterToString, filterToString } from '../convert2str.js';
 
 // Project Details Manager
 class AddProjectDetailsManager {
@@ -222,6 +222,9 @@ class AddProjectDetailsManager {
 
         this.devicesGrid.innerHTML = devicesList.map(device => {
 
+            const converterStr = converterToString(device.converter);
+            const filterStr = filterToString(device.filter);
+
             // check if device is already added 
             let added = false;
             for (let i = 0; i < this.addedDevices.length; i++) {
@@ -237,16 +240,32 @@ class AddProjectDetailsManager {
                             <div class="card-header">
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
-                            <div class="card-price">${formatPriceValue(device.price)}</div>
-                        </div>
+                             <div class="card-header">
+                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-title">صافی ${filterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
+                            </div>
+                            </div>
                     `;
             } else {
                 return `
                         <div class="card" data-id="${device.id}">
-                            <div class="card-header">
+                           <div class="card-header">
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
-                            <div class="card-price">${formatPriceValue(device.price)}</div>
+                             <div class="card-header">
+                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-title">صافی ${filterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
+                            </div>
                         </div>
                     `;
             }
@@ -365,10 +384,26 @@ class AddProjectDetailsManager {
             const deviceCard = document.createElement('div');
             deviceCard.classList.add('card');
             deviceCard.setAttribute('data-device-id', device.deviceId);
+            const converterStr = converterToString(device.converter);
+            const filterStr = filterToString(device.filter);
+
             deviceCard.innerHTML = `
-                <div class="card-title">${this.escapeHtml(device.name)}</div>
-                <div class="card-price">${formatPriceValue(device.price)}</div>
-                <div class="card-count">${device.count}</div>
+
+                            <div class="card-header">
+                                <span class="card-title">${this.escapeHtml(device.name)}</span>
+                            </div>
+                             <div class="card-header">
+                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-title">صافی ${filterStr}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
+                            </div>
+                            <div class="card-header">
+                                <div class="card-count">تعداد: ${device.count}</div>
+                            </div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${device.deviceId}">
                     <i class="fas fa-trash"></i>
                 </button>
