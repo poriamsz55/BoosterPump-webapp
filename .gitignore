@@ -3,3 +3,5 @@ booster_pump.db
 tasks.txt
 .tasks.txt.swp
 *.db
+*.zip
+*.exe
