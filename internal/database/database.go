@@ -200,6 +200,11 @@ func (h *DBHelper) DropTables() error {
 	return nil
 }
 
+func CloseDB() {
+	dbHelper := GetDBHelperInstance()
+	dbHelper.Close()
+}
+
 func InitializeDB() {
 	dbHelper := GetDBHelperInstance()
 

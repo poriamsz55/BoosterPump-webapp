@@ -5,3 +5,4 @@ tasks.txt
 *.db
 *.zip
 *.exe
+*.syso

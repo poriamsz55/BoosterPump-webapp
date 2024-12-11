@@ -1,0 +1,38 @@
+{
+    "FixedFileInfo": {
+        "FileVersion": {
+            "Major": 1,
+            "Minor": 0,
+            "Patch": 0,
+            "Build": 0
+        },
+        "ProductVersion": {
+            "Major": 1,
+            "Minor": 0,
+            "Patch": 0,
+            "Build": 0
+        }
+    },
+    "StringFileInfo": {
+        "Comments": "Booster Pump Application",
+        "CompanyName": "Your Company Name",
+        "FileDescription": "Booster Pump Management System",
+        "FileVersion": "1.0.0",
+        "InternalName": "boosterpump",
+        "LegalCopyright": "© 2024 Your Company Name",
+        "LegalTrademarks": "",
+        "OriginalFilename": "BoosterPump.exe",
+        "PrivateBuild": "",
+        "ProductName": "Booster Pump",
+        "ProductVersion": "1.0.0",
+        "SpecialBuild": ""
+    },
+    "VarFileInfo": {
+        "Translation": {
+            "LangID": "0409",
+            "CharsetID": "04B0"
+        }
+    },
+    "IconPath": "resources/icon.ico",
+    "ManifestPath": "resources/app.manifest"
+}

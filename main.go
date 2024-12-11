@@ -49,6 +49,7 @@ func main() {
 
 	// start the database
 	database.InitializeDB()
+	defer database.CloseDB()
 
 	port := "8080"
 	WebServer(embedded.BoosterFiles, port, routes.MainRoutes)
