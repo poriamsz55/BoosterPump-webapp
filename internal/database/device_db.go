@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -15,6 +16,12 @@ func AddDeviceToDB(d *device.Device) (int, error) {
 		columnDeviceConverter + `, ` +
 		columnDeviceFilter + `) 
 	          VALUES (?, ?, ?)`
+
+	// check if device exists
+	err := CheckDeviceFromDB(d)
+	if err != nil {
+		return -1, err
+	}
 
 	stmt, err := instance.db.Prepare(query)
 	if err != nil {
@@ -43,6 +50,29 @@ func AddDeviceToDB(d *device.Device) (int, error) {
 	}
 
 	return int(id), nil
+}
+
+func CheckDeviceFromDB(d *device.Device) error {
+	// First check if the device exists
+	// check by name and converter and filter
+	query := `
+		SELECT COUNT(*) 
+		FROM ` + tableDevices + `
+		WHERE ` + columnDeviceName + ` = ? AND ` + columnDeviceConverter + ` = ? AND ` + columnDeviceFilter + ` = ?
+	`
+
+	var count int
+	err := instance.db.QueryRow(query, d.Name, int(d.Converter), d.Filter).Scan(&count)
+	if err != nil {
+		log.Printf("Error checking device: %v", err)
+		return err
+	}
+	if count > 0 {
+		log.Printf("Device already exists")
+		return errors.New("Device already exists")
+	}
+
+	return nil
 }
 
 func GetAllDevicesFromDB() ([]*device.Device, error) {

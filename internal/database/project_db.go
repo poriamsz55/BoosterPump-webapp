@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -10,6 +11,13 @@ import (
 )
 
 func AddProjectToDB(p *project.Project) (int, error) {
+
+	// check if the project exists
+	err := CheckProjectFromDB(p.Name)
+	if err == nil {
+		return -1, errors.New("Project already exists")
+	}
+
 	query := `INSERT INTO ` + tableProjects + ` (` + columnProjectName + `) 
 	          VALUES (?)`
 
@@ -33,6 +41,26 @@ func AddProjectToDB(p *project.Project) (int, error) {
 	}
 
 	return int(id), nil
+}
+
+func CheckProjectFromDB(name string) error {
+	// check if the project exists
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) 
+		FROM %s 
+		WHERE %s = ?
+	`, tableProjects, columnProjectName)
+
+	var count int
+	err := instance.db.QueryRow(query, name).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count != 0 {
+		return errors.New("Project already exists")
+	}
+
+	return nil
 }
 
 func GetAllProjectsFromDB() ([]*project.Project, error) {

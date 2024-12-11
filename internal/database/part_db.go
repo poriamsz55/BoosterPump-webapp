@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -9,6 +10,13 @@ import (
 )
 
 func AddPartToDB(p *part.Part) error {
+
+	// Check if part already exists
+	err := CheckPartFromDB(p.Name, p.Size, p.Material, p.Brand)
+	if err == nil {
+		return errors.New("Part already exists")
+	}
+
 	query := `INSERT INTO ` + tableParts + ` (` + columnPartName + `, ` +
 		columnPartSize + `, ` +
 		columnPartMaterial + `, ` +
@@ -26,6 +34,29 @@ func AddPartToDB(p *part.Part) error {
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return err
+	}
+
+	return nil
+}
+
+func CheckPartFromDB(name, size, material, brand string) error {
+
+	// check if the part exists
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) 
+		FROM %s 
+		WHERE %s = ? AND %s = ? AND %s = ? AND %s = ?
+	`, tableParts, columnPartName, columnPartSize, columnPartMaterial, columnPartBrand)
+
+	var count int
+	err := instance.db.QueryRow(query, name, size, material, brand).Scan(
+		&count,
+	)
+	if err != nil {
+		return err
+	}
+	if count != 0 {
+		return errors.New("Part already exists")
 	}
 
 	return nil

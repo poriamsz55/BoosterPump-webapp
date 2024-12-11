@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -9,6 +10,14 @@ import (
 )
 
 func AddExtraPriceToDB(prjId int, expName string, expValue uint64) error {
+
+	// check if the extra price already exists
+	err := extraPriceExists(prjId, expName)
+	if err != nil {
+		return errors.New("extra price already exists")
+
+	}
+
 	query := `INSERT INTO ` + tableExtraPrice + ` (` + columnExtraPriceName + `, ` +
 		columnExtraPriceValue + `, ` +
 		columnProjectIDFK + `) 
@@ -25,6 +34,26 @@ func AddExtraPriceToDB(prjId int, expName string, expValue uint64) error {
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
 		return err
+	}
+
+	return nil
+}
+
+func extraPriceExists(prjId int, expName string) error {
+
+	query := fmt.Sprintf(`
+		SELECT COUNT(*)
+		FROM %s
+		WHERE %s = ? AND %s = ?
+	`, tableExtraPrice, columnProjectIDFK, columnExtraPriceName)
+
+	var count int
+	err := instance.db.QueryRow(query, prjId, expName).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return errors.New("extra price already exists")
 	}
 
 	return nil
