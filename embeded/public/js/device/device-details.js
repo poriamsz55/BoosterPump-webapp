@@ -1,8 +1,7 @@
 import { HTTP_URL } from '../config.js';
 import { convertPriceToNumber, formatPriceValue, formatPriceInput } from '../format-price.js';
 import { DevicePart } from './device-part.js';
-
-
+import { handleEscKey } from '../keyboard-utils.js';
 
 // Device Details Manager
 class AddDeviceDetailsManager {
@@ -44,6 +43,14 @@ class AddDeviceDetailsManager {
         });
 
         this.init();
+
+        handleEscKey(() => {
+            if (window.getComputedStyle(this.modal).display !== 'none') {
+                this.closeModal();
+            } else {
+                this.handleBackButton();
+            }
+        });
 
     }
 

@@ -1,5 +1,6 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
 class ProjectsManager {
     constructor() {
@@ -32,8 +33,11 @@ class ProjectsManager {
         document.getElementById('addProjectToDBButton').addEventListener('click', () => {
             window.location.href = '/add/project/db';
         });
-    }
 
+        handleEscKey(() => {
+            window.history.back();
+        });
+    }
 
     renderProjects(projectsList) {
         this.projectsGrid.innerHTML = projectsList.map(project => `

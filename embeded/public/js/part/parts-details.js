@@ -1,44 +1,65 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceInput } from '../format-price.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
-let hasChanged = false;
-let backBtnDiv;
+class PartDetailsManager {
+    constructor() {
+        this.hasChanged = false;
+        this.partId = new URLSearchParams(window.location.search).get('id');
+        this.priceInput = document.getElementById('partPrice');
+        this.backBtnDiv = document.getElementById('backBtn');
+        this.form = document.getElementById('partDetailsForm');
 
-document.addEventListener('DOMContentLoaded', async function () {
-    // Remove e.preventDefault() as it's not needed here
-    const urlParams = new URLSearchParams(window.location.search);
-    const partId = urlParams.get('id');
-    // Add event listener for price input
-    const priceInput = document.getElementById('partPrice');
-    priceInput.addEventListener('input', function () {
-        formatPriceInput(this);
-    });
+        this.init();
+        this.setupEventListeners();
 
-    // check if the form has changed
-    const formElements = document.querySelectorAll('input, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('input', () => {
-            hasChanged = true;
-            console.log('Form has changed');
+        handleEscKey(() => {
+            window.history.back();
         });
-    });
+    }
 
-    backBtnDiv = document.getElementById('backBtn');
-    // handle back button
-    backBtnDiv.addEventListener('click', () => {
-        if (hasChanged) {
+    init() {
+        if (this.partId) {
+            this.fetchPartDetails();
+        }
+    }
+
+    setupEventListeners() {
+        // Price input formatting
+        this.priceInput.addEventListener('input', function () {
+            formatPriceInput(this);
+        });
+
+        // Form change detection
+        const formElements = document.querySelectorAll('input, textarea');
+        formElements.forEach(element => {
+            element.addEventListener('input', () => {
+                this.hasChanged = true;
+                console.log('Form has changed');
+            });
+        });
+
+        // Back button
+        this.backBtnDiv.addEventListener('click', () => this.handleBackButton());
+
+        // Form submission
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+    }
+
+    handleBackButton() {
+        if (this.hasChanged) {
             if (confirm('Are you sure you want to leave without saving?')) {
                 window.history.back();
             }
         } else {
             window.history.back();
         }
-    });
+    }
 
-    if (partId) {
+    async fetchPartDetails() {
         try {
             const formData = new FormData();
-            formData.append('partId', partId);
+            formData.append('partId', this.partId);
 
             const response = await fetch(`${HTTP_URL}/part/getById`, {
                 method: 'POST',
@@ -52,17 +73,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const partDetails = await response.json();
 
             if (partDetails) {
-                // Use value instead of textContent for input elements
-                document.getElementById('partName').value = partDetails.name || '';
-                document.getElementById('partSize').value = partDetails.size || '';
-                document.getElementById('partMaterial').value = partDetails.material || '';
-                document.getElementById('partBrand').value = partDetails.brand || '';
-
-                // Format the initial price value
-                if (partDetails.price) {
-                    priceInput.value = partDetails.price;
-                    formatPriceInput(priceInput);
-                }
+                this.populateForm(partDetails);
             } else {
                 throw new Error('Part details not found');
             }
@@ -72,53 +83,62 @@ document.addEventListener('DOMContentLoaded', async function () {
             alert(error.message || 'An error occurred. Please try again later.');
         }
     }
-});
 
-document.getElementById('partDetailsForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+    populateForm(partDetails) {
+        document.getElementById('partName').value = partDetails.name || '';
+        document.getElementById('partSize').value = partDetails.size || '';
+        document.getElementById('partMaterial').value = partDetails.material || '';
+        document.getElementById('partBrand').value = partDetails.brand || '';
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const partId = urlParams.get('id');
-
-    const formData = new FormData();
-    formData.append('partId', partId);
-    formData.append('partName', document.getElementById('partName').value);
-    formData.append('partSize', document.getElementById('partSize').value);
-    formData.append('partMaterial', document.getElementById('partMaterial').value);
-    formData.append('partBrand', document.getElementById('partBrand').value);
-
-    // Remove commas from price before sending to server
-    const priceValue = document.getElementById('partPrice').value.replace(/,/g, '');
-    formData.append('partPrice', priceValue);
-
-    // Check if any of the required fields are empty
-    if (document.getElementById('partName').value.trim() === '') {
-        alert('Please enter a part name.');
-        return;
+        if (partDetails.price) {
+            this.priceInput.value = partDetails.price;
+            formatPriceInput(this.priceInput);
+        }
     }
 
-    if (document.getElementById('partPrice').value.trim() === '') {
-        // update partPrice in formData with value 0 if empty
-        formData.append('partPrice', '0');
-    }
+    async handleSubmit(e) {
+        e.preventDefault();
 
-    try {
-        const response = await fetch(`${HTTP_URL}/part/update`, {
-            method: 'POST',
-            body: formData
-        });
+        const formData = new FormData();
+        formData.append('partId', this.partId);
+        formData.append('partName', document.getElementById('partName').value);
+        formData.append('partSize', document.getElementById('partSize').value);
+        formData.append('partMaterial', document.getElementById('partMaterial').value);
+        formData.append('partBrand', document.getElementById('partBrand').value);
 
-        if (!response.ok) {
-            throw new Error('Failed to update part details');
+        const priceValue = this.priceInput.value.replace(/,/g, '');
+        formData.append('partPrice', priceValue);
+
+        if (document.getElementById('partName').value.trim() === '') {
+            alert('Please enter a part name.');
+            return;
         }
 
-        // Set update flag in localStorage
-        localStorage.setItem('partsListNeedsUpdate', 'true');
+        if (this.priceInput.value.trim() === '') {
+            formData.set('partPrice', '0');
+        }
 
-        window.history.back();
+        try {
+            const response = await fetch(`${HTTP_URL}/part/update`, {
+                method: 'POST',
+                body: formData
+            });
 
-    } catch (error) {
-        console.error('Error updating part details:', error);
-        alert(error.message || 'An error occurred while saving. Please try again later.');
+            if (!response.ok) {
+                throw new Error('Failed to update part details');
+            }
+
+            localStorage.setItem('partsListNeedsUpdate', 'true');
+            window.history.back();
+
+        } catch (error) {
+            console.error('Error updating part details:', error);
+            alert(error.message || 'An error occurred while saving. Please try again later.');
+        }
     }
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    new PartDetailsManager();
 });

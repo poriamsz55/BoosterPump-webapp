@@ -1,6 +1,7 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
 import { converterToString, filterToString } from '../convert2str.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
 class AddProjectManager {
     constructor() {
@@ -22,6 +23,13 @@ class AddProjectManager {
 
         this.init();
 
+        handleEscKey(() => {
+            if (window.getComputedStyle(this.modal).display !== 'none') {
+                this.closeModal();
+            } else {
+                this.handleBackButton();
+            }
+        });
     }
 
     async init() {
@@ -38,6 +46,8 @@ class AddProjectManager {
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('addProjectDBBtn').addEventListener('click', () => this.saveProject());
         document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
+
+       
     }
 
     // handle back button

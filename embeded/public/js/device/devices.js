@@ -1,6 +1,7 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
 import { converterToString, filterToString } from '../convert2str.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
 class DevicesManager {
     constructor() {
@@ -12,6 +13,10 @@ class DevicesManager {
 
         // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
+
+        handleEscKey(() => {
+            window.history.back();
+        });
     }
 
     async checkForUpdates() {

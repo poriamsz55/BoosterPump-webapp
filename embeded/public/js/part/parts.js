@@ -1,5 +1,6 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
 class PartsManager {
     constructor() {
@@ -13,6 +14,14 @@ class PartsManager {
 
         // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
+
+        handleEscKey(() => {
+            if (window.getComputedStyle(this.modal).display !== 'none') {
+                this.closeModal();
+            } else {
+                window.history.back();
+            }
+        });
     }
 
     async checkForUpdates() {

@@ -1,5 +1,6 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
 class AddDeviceManager {
     constructor() {
@@ -32,6 +33,14 @@ class AddDeviceManager {
         });
 
         this.init();
+
+        handleEscKey(() => {
+            if (window.getComputedStyle(this.modal).display !== 'none') {
+                this.closeModal();
+            } else {
+                this.handleBackButton();
+            }
+        });
 
     }
 

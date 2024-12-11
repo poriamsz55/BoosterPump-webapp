@@ -2,6 +2,7 @@ import { HTTP_URL } from '../config.js';
 import { convertPriceToNumber, formatPriceValue, formatPriceInput } from '../format-price.js';
 import { ProjectDevice } from './project-device.js';
 import { converterToString, filterToString } from '../convert2str.js';
+import { handleEscKey } from '../keyboard-utils.js';
 
 // Project Details Manager
 class AddProjectDetailsManager {
@@ -32,8 +33,16 @@ class AddProjectDetailsManager {
 
         this.init();
 
-         // Add focus event listener
-         window.addEventListener('focus', () => this.checkForUpdates());
+        // Add focus event listener
+        window.addEventListener('focus', () => this.checkForUpdates());
+
+        handleEscKey(() => {
+            if (window.getComputedStyle(this.modal).display !== 'none') {
+                this.closeModal();
+            } else {
+                this.handleBackButton();
+            }
+        });
     }
 
     async checkForUpdates() {
@@ -61,7 +70,10 @@ class AddProjectDetailsManager {
         document.getElementById('extraPricesBtn').addEventListener('click', () => this.navigateToExtraPrices());
         document.getElementById('exportBtn').addEventListener('click', () => this.export());
         document.getElementById('backBtn').addEventListener('click', () => this.handleBackButton());
+
     }
+
+
 
     // id="backBtn" handle back button
     handleBackButton() {
@@ -74,7 +86,7 @@ class AddProjectDetailsManager {
                 this.renderAddedDevices([]);
                 window.history.back();
             }
-        }else{
+        } else {
             localStorage.removeItem('projectDevices');
             this.devices = [];
             this.addedDevices = [];
@@ -110,7 +122,7 @@ class AddProjectDetailsManager {
                     .catch(error => {
                         console.error('Error:', error);
                         alert('An error occurred. Please try again later.');
-                })
+                    })
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred. Please try again later.');
