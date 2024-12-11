@@ -3,6 +3,7 @@ package device
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	devicepart "github.com/poriamsz55/BoosterPump-webapp/internal/models/device_part"
 )
@@ -51,6 +52,7 @@ type Device struct {
 	Filter         bool                     `json:"filter"`
 	DevicePartList []*devicepart.DevicePart `json:"device_part"`
 	Price          uint64                   `json:"price"`
+	ModifiedAt     time.Time                `json:"modified_at"`
 }
 
 func NewEmptyDevice() *Device {

@@ -1,12 +1,15 @@
 package part
 
+import "time"
+
 type Part struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Price    uint64 `json:"price"`
-	Size     string `json:"size"`
-	Material string `json:"material"`
-	Brand    string `json:"brand"`
+	Id         int       `json:"id"`
+	Name       string    `json:"name"`
+	Price      uint64    `json:"price"`
+	Size       string    `json:"size"`
+	Material   string    `json:"material"`
+	Brand      string    `json:"brand"`
+	ModifiedAt time.Time `json:"modified_at"`
 }
 
 func NewEmptyPart() *Part {

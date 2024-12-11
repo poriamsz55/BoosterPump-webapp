@@ -47,6 +47,7 @@ func GetProjectDevicesByProjectId(projectID int) ([]*projectd.ProjectDevice, err
 			&p.Count,
 			&dvcId,
 			&p.ProjectId,
+			&p.ModifiedAt,
 		)
 		if err != nil {
 			return nil, err

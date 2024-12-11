@@ -2,13 +2,12 @@ package database
 
 import (
 	"database/sql"
-
-	_ "github.com/mattn/go-sqlite3" // SQLite driver
-
 	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -45,46 +44,52 @@ const (
 	columnPartMaterial       = "part_material"
 	columnPartBrand          = "part_brand"
 	columnPartPrice          = "part_price"
+	columnModifiedAt         = "modified_at"
 )
 
 var (
 	createProjectsTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
-        %s TEXT
-    )`, tableProjects, columnProjectID, columnProjectName)
+        %s TEXT,
+        %s DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, tableProjects, columnProjectID, columnProjectName, columnModifiedAt)
 
 	createExtraPriceTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
         %s TEXT,
         %s INTEGER,
         %s INTEGER,
+        %s DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE ON UPDATE CASCADE
-    )`, tableExtraPrice, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue, columnProjectIDFK, columnProjectIDFK, tableProjects, columnProjectID)
+    )`, tableExtraPrice, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue, columnProjectIDFK, columnModifiedAt, columnProjectIDFK, tableProjects, columnProjectID)
 
 	createProjectDevicesTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
         %s FLOAT,
         %s INTEGER,
         %s INTEGER,
+        %s DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE ON UPDATE CASCADE
-    )`, tableProjectDevices, columnProjectDeviceID, columnProjectDeviceCount, columnDeviceIDK, columnProjectIDFK, columnDeviceIDK, tableDevices, columnDeviceID, columnProjectIDFK, tableProjects, columnProjectID)
+    )`, tableProjectDevices, columnProjectDeviceID, columnProjectDeviceCount, columnDeviceIDK, columnProjectIDFK, columnModifiedAt, columnDeviceIDK, tableDevices, columnDeviceID, columnProjectIDFK, tableProjects, columnProjectID)
 
 	createDevicePartsTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
         %s FLOAT,
         %s INTEGER,
         %s INTEGER,
+        %s DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE ON UPDATE CASCADE
-    )`, tableDeviceParts, columnDevicePartID, columnDevicePartCount, columnPartIDK, columnDeviceIDFK, columnPartIDK, tableParts, columnPartID, columnDeviceIDFK, tableDevices, columnDeviceID)
+    )`, tableDeviceParts, columnDevicePartID, columnDevicePartCount, columnPartIDK, columnDeviceIDFK, columnModifiedAt, columnPartIDK, tableParts, columnPartID, columnDeviceIDFK, tableDevices, columnDeviceID)
 
 	createDevicesTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
         %s TEXT,
         %s INTEGER,
-        %s INTEGER
-    )`, tableDevices, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter)
+        %s INTEGER,
+        %s DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, tableDevices, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, columnModifiedAt)
 
 	createPartsTable = fmt.Sprintf(`CREATE TABLE %s (
         %s INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,8 +97,60 @@ var (
         %s TEXT,
         %s TEXT,
         %s TEXT,
-        %s INTEGER
-    )`, tableParts, columnPartID, columnPartName, columnPartSize, columnPartMaterial, columnPartBrand, columnPartPrice)
+        %s INTEGER,
+        %s DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, tableParts, columnPartID, columnPartName, columnPartSize, columnPartMaterial, columnPartBrand, columnPartPrice, columnModifiedAt)
+)
+
+// Triggers to update modified_at
+var (
+	createProjectsUpdateTrigger = fmt.Sprintf(`
+        CREATE TRIGGER update_projects_modified_at 
+        AFTER UPDATE ON %s
+        BEGIN
+            UPDATE %s SET %s = CURRENT_TIMESTAMP WHERE %s = NEW.%s;
+        END;
+    `, tableProjects, tableProjects, columnModifiedAt, columnProjectID, columnProjectID)
+
+	createExtraPriceUpdateTrigger = fmt.Sprintf(`
+        CREATE TRIGGER update_extra_price_modified_at 
+        AFTER UPDATE ON %s
+        BEGIN
+            UPDATE %s SET %s = CURRENT_TIMESTAMP WHERE %s = NEW.%s;
+        END;
+    `, tableExtraPrice, tableExtraPrice, columnModifiedAt, columnExtraPriceID, columnExtraPriceID)
+
+	createProjectDevicesUpdateTrigger = fmt.Sprintf(`
+        CREATE TRIGGER update_project_devices_modified_at 
+        AFTER UPDATE ON %s
+        BEGIN
+            UPDATE %s SET %s = CURRENT_TIMESTAMP WHERE %s = NEW.%s;
+        END;
+    `, tableProjectDevices, tableProjectDevices, columnModifiedAt, columnProjectDeviceID, columnProjectDeviceID)
+
+	createDevicePartsUpdateTrigger = fmt.Sprintf(`
+        CREATE TRIGGER update_device_parts_modified_at 
+        AFTER UPDATE ON %s
+        BEGIN
+            UPDATE %s SET %s = CURRENT_TIMESTAMP WHERE %s = NEW.%s;
+        END;
+    `, tableDeviceParts, tableDeviceParts, columnModifiedAt, columnDevicePartID, columnDevicePartID)
+
+	createDevicesUpdateTrigger = fmt.Sprintf(`
+        CREATE TRIGGER update_devices_modified_at 
+        AFTER UPDATE ON %s
+        BEGIN
+            UPDATE %s SET %s = CURRENT_TIMESTAMP WHERE %s = NEW.%s;
+        END;
+    `, tableDevices, tableDevices, columnModifiedAt, columnDeviceID, columnDeviceID)
+
+	createPartsUpdateTrigger = fmt.Sprintf(`
+        CREATE TRIGGER update_parts_modified_at 
+        AFTER UPDATE ON %s
+        BEGIN
+            UPDATE %s SET %s = CURRENT_TIMESTAMP WHERE %s = NEW.%s;
+        END;
+    `, tableParts, tableParts, columnModifiedAt, columnPartID, columnPartID)
 )
 
 type DBHelper struct {
@@ -178,6 +235,32 @@ func (h *DBHelper) CreateTables() error {
 	}
 
 	_, err = h.db.Exec(createPartsTable)
+	if err != nil {
+		return err
+	}
+
+	// Create triggers
+	_, err = h.db.Exec(createProjectsUpdateTrigger)
+	if err != nil {
+		return err
+	}
+	_, err = h.db.Exec(createExtraPriceUpdateTrigger)
+	if err != nil {
+		return err
+	}
+	_, err = h.db.Exec(createProjectDevicesUpdateTrigger)
+	if err != nil {
+		return err
+	}
+	_, err = h.db.Exec(createDevicePartsUpdateTrigger)
+	if err != nil {
+		return err
+	}
+	_, err = h.db.Exec(createDevicesUpdateTrigger)
+	if err != nil {
+		return err
+	}
+	_, err = h.db.Exec(createPartsUpdateTrigger)
 	if err != nil {
 		return err
 	}

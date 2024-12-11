@@ -62,10 +62,10 @@ func extraPriceExists(prjId int, expName string) error {
 func GetAllExtraPricesFromDB() ([]*extraprice.ExtraPrice, error) {
 
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s, %s
+        SELECT %s, %s, %s, %s, %s
         FROM %s
     `, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue,
-		columnProjectIDFK,
+		columnProjectIDFK, columnModifiedAt,
 		tableExtraPrice)
 
 	rows, err := instance.db.Query(query)
@@ -82,6 +82,7 @@ func GetAllExtraPricesFromDB() ([]*extraprice.ExtraPrice, error) {
 			&p.Name,
 			&p.Price,
 			&p.ProjectId,
+			&p.ModifiedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -99,11 +100,11 @@ func GetAllExtraPricesFromDB() ([]*extraprice.ExtraPrice, error) {
 func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s, %s
+        SELECT %s, %s, %s, %s, %s
         FROM %s
         WHERE %s = ?
     `, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue,
-		columnProjectIDFK,
+		columnProjectIDFK, columnModifiedAt,
 		tableExtraPrice, columnExtraPriceID)
 
 	var p extraprice.ExtraPrice
@@ -112,6 +113,7 @@ func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 		&p.Name,
 		&p.Price,
 		&p.ProjectId,
+		&p.ModifiedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -123,10 +125,10 @@ func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error) {
 
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s
+        SELECT %s, %s, %s, %s
         FROM %s
         WHERE %s = ?
-    `, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue,
+    `, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue, columnProjectIDFK,
 		tableExtraPrice, columnProjectIDFK)
 
 	var exps []*extraprice.ExtraPrice
@@ -139,10 +141,12 @@ func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error
 
 	for rows.Next() {
 		var p extraprice.ExtraPrice
+		p.ProjectId = prjId
 		err := rows.Scan(
 			&p.Id,
 			&p.Name,
 			&p.Price,
+			&p.ModifiedAt,
 		)
 		if err != nil {
 			return nil, err

@@ -35,13 +35,14 @@ func AddDevicePartToDB(dvcId int, count float64, prtId int) error {
 func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
 
 	query := fmt.Sprintf(`
-        SELECT dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s
+        SELECT dp.%s, dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s
         FROM %s dp
         JOIN %s p ON dp.%s = p.%s
         WHERE dp.%s = ?
     `,
-		columnDevicePartID, columnDevicePartCount,
-		columnPartID, columnPartName, columnPartSize, columnPartMaterial, columnPartBrand, columnPartPrice,
+		columnDevicePartID, columnDevicePartCount, columnModifiedAt,
+		columnPartID, columnPartName, columnPartSize, columnPartMaterial,
+		columnPartBrand, columnPartPrice, columnModifiedAt,
 		tableDeviceParts,
 		tableParts, columnPartIDK, columnPartID,
 		columnDeviceIDFK)
@@ -60,12 +61,14 @@ func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
 		err := rows.Scan(
 			&dp.Id,
 			&dp.Count,
+			&dp.ModifiedAt,
 			&part.Id,
 			&part.Name,
 			&part.Size,
 			&part.Material,
 			&part.Brand,
 			&part.Price,
+			&part.ModifiedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -86,13 +89,14 @@ func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
 func GetDevicePartByIdFromDB(id int) (*devicepart.DevicePart, error) {
 
 	query := fmt.Sprintf(`
-        SELECT dp.%s, dp.%s, dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s
+        SELECT dp.%s, dp.%s, dp.%s, dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s
         FROM %s dp
         JOIN %s p ON dp.%s = p.%s
         WHERE dp.%s = ?
     `,
-		columnDevicePartID, columnDevicePartCount, columnProjectIDFK, columnDeviceIDFK,
+		columnDevicePartID, columnDevicePartCount, columnProjectIDFK, columnDeviceIDFK, columnModifiedAt,
 		columnPartID, columnPartName, columnPartSize, columnPartMaterial, columnPartBrand, columnPartPrice,
+		columnModifiedAt,
 		tableDeviceParts,
 		tableParts, columnPartIDK, columnPartID,
 		columnDevicePartID)
@@ -104,12 +108,14 @@ func GetDevicePartByIdFromDB(id int) (*devicepart.DevicePart, error) {
 		&dp.Count,
 		&dp.DeviceId,
 		&dp.Part.Id,
+		&dp.ModifiedAt,
 		&p.Id,
 		&p.Name,
 		&p.Size,
 		&p.Material,
 		&p.Brand,
 		&p.Price,
+		&p.ModifiedAt,
 	)
 	if err != nil {
 		return nil, err

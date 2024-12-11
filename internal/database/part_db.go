@@ -64,10 +64,11 @@ func CheckPartFromDB(name, size, material, brand string) error {
 
 func GetAllPartsFromDB() ([]*part.Part, error) {
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s, %s, %s, %s
+        SELECT %s, %s, %s, %s, %s, %s, %s
         FROM %s
     `, columnPartID, columnPartName, columnPartSize,
 		columnPartMaterial, columnPartBrand, columnPartPrice,
+		columnModifiedAt,
 		tableParts)
 
 	rows, err := instance.db.Query(query)
@@ -86,6 +87,7 @@ func GetAllPartsFromDB() ([]*part.Part, error) {
 			&p.Material,
 			&p.Brand,
 			&p.Price,
+			&p.ModifiedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -101,13 +103,13 @@ func GetAllPartsFromDB() ([]*part.Part, error) {
 }
 
 func GetPartByIdFromDB(id int) (*part.Part, error) {
-
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s, %s, %s, %s
+        SELECT %s, %s, %s, %s, %s, %s, %s
         FROM %s
         WHERE %s = ?
     `, columnPartID, columnPartName, columnPartSize,
 		columnPartMaterial, columnPartBrand, columnPartPrice,
+		columnModifiedAt,
 		tableParts, columnPartID)
 
 	var p part.Part
@@ -118,6 +120,7 @@ func GetPartByIdFromDB(id int) (*part.Part, error) {
 		&p.Material,
 		&p.Brand,
 		&p.Price,
+		&p.ModifiedAt,
 	)
 	if err != nil {
 		return nil, err

@@ -1,6 +1,8 @@
 package project
 
 import (
+	"time"
+
 	extraprice "github.com/poriamsz55/BoosterPump-webapp/internal/models/extra_price"
 	projectdevice "github.com/poriamsz55/BoosterPump-webapp/internal/models/project_device"
 )
@@ -11,6 +13,7 @@ type Project struct {
 	Price             uint64                         `json:"price"`
 	ProjectDeviceList []*projectdevice.ProjectDevice `json:"project_device"`
 	ExtraPriceList    []*extraprice.ExtraPrice       `json:"extra_price"`
+	ModifiedAt        time.Time                      `json:"modified_at"`
 }
 
 func NewEmptyProject() *Project {

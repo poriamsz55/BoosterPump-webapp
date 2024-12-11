@@ -66,9 +66,10 @@ func CheckProjectFromDB(name string) error {
 func GetAllProjectsFromDB() ([]*project.Project, error) {
 
 	query := fmt.Sprintf(`
-        SELECT %s, %s
+        SELECT %s, %s, %s
         FROM %s
-    `, columnProjectID, columnProjectName, tableProjects)
+    `, columnProjectID, columnProjectName, columnModifiedAt,
+		tableProjects)
 
 	rows, err := instance.db.Query(query)
 	if err != nil {
@@ -79,7 +80,7 @@ func GetAllProjectsFromDB() ([]*project.Project, error) {
 	var projects []*project.Project
 	for rows.Next() {
 		p := project.NewEmptyProject()
-		err := rows.Scan(&p.Id, &p.Name)
+		err := rows.Scan(&p.Id, &p.Name, &p.ModifiedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -107,13 +108,14 @@ func GetAllProjectsFromDB() ([]*project.Project, error) {
 func GetProjectByIdFromDB(id int) (*project.Project, error) {
 
 	query := fmt.Sprintf(`
-        SELECT %s, %s
+        SELECT %s, %s, %s
         FROM %s
         WHERE %s = ?
-    `, columnProjectID, columnProjectName, tableProjects, columnProjectID)
+    `, columnProjectID, columnProjectName, columnModifiedAt,
+		tableProjects, columnProjectID)
 
 	p := project.NewEmptyProject()
-	err := instance.db.QueryRow(query, id).Scan(&p.Id, &p.Name)
+	err := instance.db.QueryRow(query, id).Scan(&p.Id, &p.Name, &p.ModifiedAt)
 	if err != nil {
 		return nil, err
 	}

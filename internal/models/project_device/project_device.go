@@ -2,16 +2,18 @@ package projectd
 
 import (
 	"math"
+	"time"
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 )
 
 type ProjectDevice struct {
-	Id        int            `json:"id"`
-	ProjectId int            `json:"project_id"`
-	Count     float64        `json:"count"`
-	Device    *device.Device `json:"device"`
-	Price     uint64         `json:"price"`
+	Id         int            `json:"id"`
+	ProjectId  int            `json:"project_id"`
+	Count      float64        `json:"count"`
+	Device     *device.Device `json:"device"`
+	Price      uint64         `json:"price"`
+	ModifiedAt time.Time      `json:"modified_at"`
 }
 
 func NewEmptyProjectDevice() *ProjectDevice {

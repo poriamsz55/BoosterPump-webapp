@@ -2,16 +2,18 @@ package devicepart
 
 import (
 	"math"
+	"time"
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
 )
 
 type DevicePart struct {
-	Id       int        `json:"id"`
-	DeviceId int        `json:"device_id"`
-	Price    uint64     `json:"price"`
-	Count    float64    `json:"count"`
-	Part     *part.Part `json:"part"`
+	Id         int        `json:"id"`
+	DeviceId   int        `json:"device_id"`
+	Price      uint64     `json:"price"`
+	Count      float64    `json:"count"`
+	Part       *part.Part `json:"part"`
+	ModifiedAt time.Time  `json:"modified_at"`
 }
 
 func NewEmptyDevicePart() *DevicePart {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
@@ -78,9 +79,10 @@ func CheckDeviceFromDB(d *device.Device) error {
 func GetAllDevicesFromDB() ([]*device.Device, error) {
 	// First, get all devices
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s, %s 
+        SELECT %s, %s, %s, %s, %s
         FROM %s
-    `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, tableDevices)
+    `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, columnModifiedAt,
+		tableDevices)
 
 	rows, err := instance.db.Query(query)
 	if err != nil {
@@ -94,8 +96,9 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 		var name string
 		var converter int
 		var filter bool
+		var mt time.Time
 
-		err := rows.Scan(&id, &name, &converter, &filter)
+		err := rows.Scan(&id, &name, &converter, &filter, &mt)
 		if err != nil {
 			return nil, err
 		}
@@ -107,6 +110,7 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 
 		dev := device.NewDevice(name, converterConv, filter)
 		dev.Id = id
+		dev.ModifiedAt = mt
 
 		// Get device parts for this device
 		deviceParts, err := GetDevicePartsByDeviceId(id)
@@ -130,10 +134,10 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 
 	// Get device information
 	query := fmt.Sprintf(`
-        SELECT %s, %s, %s, %s 
+        SELECT %s, %s, %s, %s, %s
         FROM %s 
         WHERE %s = ?
-    `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter,
+    `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, columnModifiedAt,
 		tableDevices, columnDeviceID)
 
 	row := instance.db.QueryRow(query, deviceID)
@@ -142,8 +146,9 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 	var name string
 	var converterInt int
 	var filter bool
+	var mt time.Time
 
-	err := row.Scan(&id, &name, &converterInt, &filter)
+	err := row.Scan(&id, &name, &converterInt, &filter, &mt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
@@ -158,6 +163,7 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 
 	dev := device.NewDevice(name, converter, filter)
 	dev.Id = id
+	dev.ModifiedAt = mt
 
 	// Get device parts for this device
 	deviceParts, err := GetDevicePartsByDeviceId(id)
