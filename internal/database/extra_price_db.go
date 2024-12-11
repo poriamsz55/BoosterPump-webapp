@@ -7,6 +7,7 @@ import (
 	"log"
 
 	extraprice "github.com/poriamsz55/BoosterPump-webapp/internal/models/extra_price"
+	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
 func AddExtraPriceToDB(prjId int, expName string, expValue uint64) error {
@@ -119,6 +120,7 @@ func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 		return nil, err
 	}
 
+	p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 	return &p, nil
 }
 
@@ -151,6 +153,8 @@ func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error
 		if err != nil {
 			return nil, err
 		}
+
+		p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 		exps = append(exps, &p)
 	}
 

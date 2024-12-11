@@ -7,6 +7,7 @@ import (
 
 	devicepart "github.com/poriamsz55/BoosterPump-webapp/internal/models/device_part"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
+	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
 func AddDevicePartToDB(dvcId int, count float64, prtId int) error {
@@ -74,6 +75,7 @@ func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
 			return nil, err
 		}
 
+		part.ModifiedAt = tehrantime.FormattedDateTime(part.ModifiedAt)
 		dp.Part = &part
 		dp.UpdatePrice()
 		deviceParts = append(deviceParts, &dp)
@@ -121,6 +123,7 @@ func GetDevicePartByIdFromDB(id int) (*devicepart.DevicePart, error) {
 		return nil, err
 	}
 
+	p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 	dp.Part = &p
 	dp.UpdatePrice()
 	return &dp, nil

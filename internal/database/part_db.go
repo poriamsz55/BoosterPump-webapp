@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
+	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
 func AddPartToDB(p *part.Part) error {
@@ -92,6 +93,8 @@ func GetAllPartsFromDB() ([]*part.Part, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 		parts = append(parts, &p)
 	}
 
@@ -126,6 +129,7 @@ func GetPartByIdFromDB(id int) (*part.Part, error) {
 		return nil, err
 	}
 
+	p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 	return &p, nil
 }
 

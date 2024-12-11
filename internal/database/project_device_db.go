@@ -5,6 +5,7 @@ import (
 	"log"
 
 	projectd "github.com/poriamsz55/BoosterPump-webapp/internal/models/project_device"
+	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
 func AddProjectDeviceToDB(prjId int, count float64, dvcId int) error {
@@ -60,6 +61,7 @@ func GetProjectDevicesByProjectId(projectID int) ([]*projectd.ProjectDevice, err
 		}
 		p.Device = dvc
 
+		p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 		projectDevices = append(projectDevices, &p)
 	}
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/project"
+	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
 func AddProjectToDB(p *project.Project) (int, error) {
@@ -134,6 +135,7 @@ func GetProjectByIdFromDB(id int) (*project.Project, error) {
 
 	p.UpdatePrice()
 
+	p.ModifiedAt = tehrantime.FormattedDateTime(p.ModifiedAt)
 	return p, nil
 }
 

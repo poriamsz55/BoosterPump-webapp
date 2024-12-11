@@ -9,6 +9,7 @@ import (
 
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/device"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/part"
+	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
 func AddDeviceToDB(d *device.Device) (int, error) {
@@ -110,7 +111,7 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 
 		dev := device.NewDevice(name, converterConv, filter)
 		dev.Id = id
-		dev.ModifiedAt = mt
+		dev.ModifiedAt = tehrantime.FormattedDateTime(mt)
 
 		// Get device parts for this device
 		deviceParts, err := GetDevicePartsByDeviceId(id)
@@ -163,7 +164,7 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 
 	dev := device.NewDevice(name, converter, filter)
 	dev.Id = id
-	dev.ModifiedAt = mt
+	dev.ModifiedAt = tehrantime.FormattedDateTime(mt)
 
 	// Get device parts for this device
 	deviceParts, err := GetDevicePartsByDeviceId(id)
