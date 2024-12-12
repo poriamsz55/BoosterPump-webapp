@@ -258,6 +258,8 @@ class ExtraPricesManager {
 
             if (Array.isArray(data)) {
                 this.extraPrices = data;
+                // reverse the array
+                this.extraPrices.reverse();
             } else {
                 console.error('Invalid response format:', data);
                 this.extraPrices = [];

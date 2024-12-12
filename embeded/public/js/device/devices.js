@@ -124,6 +124,7 @@ class DevicesManager {
 
             if (Array.isArray(data)) {
                 this.devices = data;
+                this.devices.reverse();
             } else {
                 console.error('Invalid response format:', data);
                 this.devices = [];

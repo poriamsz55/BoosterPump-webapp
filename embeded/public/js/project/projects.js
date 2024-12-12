@@ -111,6 +111,7 @@ class ProjectsManager {
 
             if (Array.isArray(data)) {
                 this.projects = data;
+                this.projects.reverse();
             } else {
                 console.error('Invalid response format:', data);
                 this.projects = [];

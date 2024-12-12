@@ -181,6 +181,7 @@ class PartsManager {
 
             if (Array.isArray(data)) {
                 this.parts = data;
+                this.parts.reverse();
             } else {
                 console.error('Invalid response format:', data);
                 this.parts = [];

@@ -208,6 +208,8 @@ class AddProjectDetailsManager {
                         }
                     }
 
+                    this.addedDevices.reverse();
+                    
                     // add addedDevices to localStorage
                     localStorage.setItem('projectDevices', JSON.stringify(this.addedDevices));
 
@@ -479,6 +481,7 @@ class AddProjectDetailsManager {
 
             if (Array.isArray(data)) {
                 this.devices = data;
+                this.devices.reverse();
             } else {
                 console.error('Invalid response format:', data);
                 this.devices = [];

@@ -167,6 +167,8 @@ class AddDeviceDetailsManager {
                         }
                     }
 
+                    this.addedParts.reverse();
+
                     // add addedParts to localStorage
                     localStorage.setItem('deviceParts', JSON.stringify(this.addedParts));
 
@@ -463,6 +465,7 @@ class AddDeviceDetailsManager {
 
             if (Array.isArray(data)) {
                 this.parts = data;
+                this.parts.reverse();
             } else {
                 console.error('Invalid response format:', data);
                 this.parts = [];
