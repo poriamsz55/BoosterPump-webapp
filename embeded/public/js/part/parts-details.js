@@ -14,7 +14,7 @@ class PartDetailsManager {
         this.setupEventListeners();
 
         handleEscKey(() => {
-            window.history.back();
+            this.handleBackButton();
         });
     }
 
