@@ -15,7 +15,7 @@ import (
 )
 
 func GetAllDevices(e echo.Context) error {
-	devices, err := database.GetAllDevicesFromDB()
+	devices, err := database.GetAllDevices(nil)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -41,7 +41,7 @@ func GetDeviceById(e echo.Context) error {
 }
 
 func getDeviceById(dvcId int) (*device.Device, error) {
-	return database.GetDeviceByIdFromDB(dvcId)
+	return database.GetDeviceByIdFromDB(nil, dvcId)
 }
 
 func AddDevice(e echo.Context) error {

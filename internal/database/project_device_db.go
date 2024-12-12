@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -30,10 +31,14 @@ func AddProjectDeviceToDB(prjId int, count float64, dvcId int) error {
 	return nil
 }
 
-func GetProjectDevicesByProjectId(projectID int) ([]*projectd.ProjectDevice, error) {
+func GetProjectDevicesByProjectId(db *sql.DB, projectID int) ([]*projectd.ProjectDevice, error) {
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE %s = ?`, tableProjectDevices, columnProjectIDFK)
 
-	rows, err := instance.db.Query(query, projectID)
+	if db == nil {
+		db = instance.db
+	}
+
+	rows, err := db.Query(query, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +60,7 @@ func GetProjectDevicesByProjectId(projectID int) ([]*projectd.ProjectDevice, err
 		}
 
 		// get device by device Id
-		dvc, err := GetDeviceByIdFromDB(dvcId)
+		dvc, err := GetDeviceByIdFromDB(db, dvcId)
 		if err != nil {
 			return nil, err
 		}

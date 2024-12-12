@@ -15,11 +15,11 @@
     },
     "StringFileInfo": {
         "Comments": "Booster Pump Application",
-        "CompanyName": "Your Company Name",
+        "CompanyName": "Booster Pump",
         "FileDescription": "Booster Pump Management System",
         "FileVersion": "1.0.0",
         "InternalName": "boosterpump",
-        "LegalCopyright": "© 2024 Your Company Name",
+        "LegalCopyright": "© 2024 Booster Pump",
         "LegalTrademarks": "",
         "OriginalFilename": "BoosterPump.exe",
         "PrivateBuild": "",

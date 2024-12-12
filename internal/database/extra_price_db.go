@@ -124,7 +124,11 @@ func GetExtraPriceByIdFromDB(id int) (*extraprice.ExtraPrice, error) {
 	return &p, nil
 }
 
-func GetExtraPricesByProjectIdFromDB(prjId int) ([]*extraprice.ExtraPrice, error) {
+func GetExtraPricesByProjectIdFromDB(db *sql.DB, prjId int) ([]*extraprice.ExtraPrice, error) {
+
+	if db == nil {
+		db = instance.db
+	}
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s

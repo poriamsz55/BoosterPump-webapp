@@ -64,7 +64,11 @@ func CheckProjectFromDB(name string) error {
 	return nil
 }
 
-func GetAllProjectsFromDB() ([]*project.Project, error) {
+func GetAllProjects(db *sql.DB) ([]*project.Project, error) {
+
+	if db == nil {
+		db = instance.db
+	}
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s
@@ -87,13 +91,13 @@ func GetAllProjectsFromDB() ([]*project.Project, error) {
 		}
 
 		// Get devices for this project
-		p.ProjectDeviceList, err = GetProjectDevicesByProjectId(p.Id)
+		p.ProjectDeviceList, err = GetProjectDevicesByProjectId(db, p.Id)
 		if err != nil {
 			return nil, err
 		}
 
 		// Get extra prices for this project
-		p.ExtraPriceList, err = GetExtraPricesByProjectIdFromDB(p.Id)
+		p.ExtraPriceList, err = GetExtraPricesByProjectIdFromDB(db, p.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +110,11 @@ func GetAllProjectsFromDB() ([]*project.Project, error) {
 	return projects, nil
 }
 
-func GetProjectByIdFromDB(id int) (*project.Project, error) {
+func GetProjectByIdFromDB(db *sql.DB, id int) (*project.Project, error) {
+
+	if db == nil {
+		db = instance.db
+	}
 
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s
@@ -122,13 +130,13 @@ func GetProjectByIdFromDB(id int) (*project.Project, error) {
 	}
 
 	// Get devices for this project
-	p.ProjectDeviceList, err = GetProjectDevicesByProjectId(id)
+	p.ProjectDeviceList, err = GetProjectDevicesByProjectId(db, id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Get extra prices for this project
-	p.ExtraPriceList, err = GetExtraPricesByProjectIdFromDB(id)
+	p.ExtraPriceList, err = GetExtraPricesByProjectIdFromDB(db, id)
 	if err != nil {
 		return nil, err
 	}

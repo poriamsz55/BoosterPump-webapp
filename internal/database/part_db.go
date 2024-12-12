@@ -10,12 +10,12 @@ import (
 	tehrantime "github.com/poriamsz55/BoosterPump-webapp/internal/time"
 )
 
-func AddPartToDB(p *part.Part) error {
+func AddPartToDB(p *part.Part) (int, error) {
 
 	// Check if part already exists
 	err := CheckPartFromDB(p.Name, p.Size, p.Material, p.Brand)
 	if err == nil {
-		return errors.New("Part already exists")
+		return -1, errors.New("Part already exists")
 	}
 
 	query := `INSERT INTO ` + tableParts + ` (` + columnPartName + `, ` +
@@ -27,17 +27,17 @@ func AddPartToDB(p *part.Part) error {
 	stmt, err := instance.db.Prepare(query)
 	if err != nil {
 		log.Printf("Error preparing statement: %v", err)
-		return err
+		return -1, err
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(p.Name, p.Size, p.Material, p.Brand, p.Price)
 	if err != nil {
 		log.Printf("Error executing statement: %v", err)
-		return err
+		return -1, err
 	}
 
-	return nil
+	return p.Id, nil
 }
 
 func CheckPartFromDB(name, size, material, brand string) error {
@@ -63,7 +63,12 @@ func CheckPartFromDB(name, size, material, brand string) error {
 	return nil
 }
 
-func GetAllPartsFromDB() ([]*part.Part, error) {
+func GetAllParts(db *sql.DB) ([]*part.Part, error) {
+
+	if db == nil {
+		db = instance.db
+	}
+
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s, %s, %s, %s
         FROM %s

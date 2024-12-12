@@ -77,7 +77,12 @@ func CheckDeviceFromDB(d *device.Device) error {
 	return nil
 }
 
-func GetAllDevicesFromDB() ([]*device.Device, error) {
+func GetAllDevices(db *sql.DB) ([]*device.Device, error) {
+
+	if db == nil {
+		db = instance.db
+	}
+
 	// First, get all devices
 	query := fmt.Sprintf(`
         SELECT %s, %s, %s, %s, %s
@@ -114,7 +119,7 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 		dev.ModifiedAt = tehrantime.FormattedDateTime(mt)
 
 		// Get device parts for this device
-		deviceParts, err := GetDevicePartsByDeviceId(id)
+		deviceParts, err := GetDevicePartsByDeviceId(db, id)
 		if err != nil {
 			return nil, err
 		}
@@ -131,7 +136,11 @@ func GetAllDevicesFromDB() ([]*device.Device, error) {
 	return devices, nil
 }
 
-func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
+func GetDeviceByIdFromDB(db *sql.DB, deviceID int) (*device.Device, error) {
+
+	if db == nil {
+		db = instance.db
+	}
 
 	// Get device information
 	query := fmt.Sprintf(`
@@ -141,7 +150,7 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
     `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, columnModifiedAt,
 		tableDevices, columnDeviceID)
 
-	row := instance.db.QueryRow(query, deviceID)
+	row := db.QueryRow(query, deviceID)
 
 	var id int
 	var name string
@@ -167,7 +176,7 @@ func GetDeviceByIdFromDB(deviceID int) (*device.Device, error) {
 	dev.ModifiedAt = tehrantime.FormattedDateTime(mt)
 
 	// Get device parts for this device
-	deviceParts, err := GetDevicePartsByDeviceId(id)
+	deviceParts, err := GetDevicePartsByDeviceId(db, id)
 	if err != nil {
 		return nil, err
 	}

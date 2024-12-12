@@ -18,7 +18,7 @@ func GetAllDeviceParts(e echo.Context) error {
 		return e.String(http.StatusBadRequest, "invalid device id")
 	}
 
-	deviceParts, err := database.GetDevicePartsByDeviceId(deviceId)
+	deviceParts, err := database.GetDevicePartsByDeviceId(nil, deviceId)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}

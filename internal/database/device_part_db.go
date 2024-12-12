@@ -33,7 +33,11 @@ func AddDevicePartToDB(dvcId int, count float64, prtId int) error {
 }
 
 // Helper function to get device parts for a specific device
-func GetDevicePartsByDeviceId(deviceID int) ([]*devicepart.DevicePart, error) {
+func GetDevicePartsByDeviceId(db *sql.DB, deviceID int) ([]*devicepart.DevicePart, error) {
+
+	if db == nil {
+		db = instance.db
+	}
 
 	query := fmt.Sprintf(`
         SELECT dp.%s, dp.%s, dp.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s, p.%s

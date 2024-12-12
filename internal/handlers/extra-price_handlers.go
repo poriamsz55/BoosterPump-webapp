@@ -13,7 +13,7 @@ import (
 
 func GetAllExtraPricesByProjectId(e echo.Context) error {
 	projectId, err := upload.Int(e, "projectId")
-	extraPrices, err := database.GetExtraPricesByProjectIdFromDB(projectId)
+	extraPrices, err := database.GetExtraPricesByProjectIdFromDB(nil, projectId)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}

@@ -12,7 +12,7 @@ import (
 )
 
 func GetAllParts(e echo.Context) error {
-	parts, err := database.GetAllPartsFromDB()
+	parts, err := database.GetAllParts(nil)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -48,12 +48,15 @@ func AddPart(e echo.Context) error {
 	}
 
 	p := part.NewPart(name, size, material, brand, price)
-	err = database.AddPartToDB(p)
+	id, err := database.AddPartToDB(p)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	return e.String(http.StatusOK, "part added to database successfully")
+	return e.JSON(http.StatusOK, map[string]string{
+		"message": "part added successfully",
+		"id":      strconv.Itoa(id),
+	})
 }
 
 func CopyPart(e echo.Context) error {
@@ -87,12 +90,15 @@ func CopyPart(e echo.Context) error {
 		newPart.Name += " (Copy)"
 	}
 
-	err = database.AddPartToDB(newPart)
+	newpId, err := database.AddPartToDB(newPart)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
 
-	return e.String(http.StatusOK, "part copied successfully")
+	return e.JSON(http.StatusOK, map[string]string{
+		"message": "part copied successfully",
+		"id":      strconv.Itoa(newpId),
+	})
 }
 
 func DeletePart(e echo.Context) error {

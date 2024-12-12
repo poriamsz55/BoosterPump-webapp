@@ -15,7 +15,7 @@ import (
 )
 
 func GetAllProjects(e echo.Context) error {
-	projects, err := database.GetAllProjectsFromDB()
+	projects, err := database.GetAllProjects(nil)
 	if err != nil {
 		return e.String(http.StatusInternalServerError, err.Error())
 	}
@@ -29,7 +29,7 @@ func GetProjectById(e echo.Context) error {
 		return e.String(http.StatusBadRequest, "invalid project id")
 	}
 
-	project, err := database.GetProjectByIdFromDB(id)
+	project, err := database.GetProjectByIdFromDB(nil, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return e.String(http.StatusNotFound, "project not found")
@@ -61,7 +61,7 @@ func CopyProject(e echo.Context) error {
 		return e.String(http.StatusBadRequest, "invalid project id")
 	}
 
-	originalProject, err := database.GetProjectByIdFromDB(prjId)
+	originalProject, err := database.GetProjectByIdFromDB(nil, prjId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return e.String(http.StatusNotFound, "project not found")
@@ -181,7 +181,7 @@ func ExportProject(e echo.Context) error {
 
 	fileName := e.FormValue("fileName")
 
-	prj, err := database.GetProjectByIdFromDB(prjId)
+	prj, err := database.GetProjectByIdFromDB(nil, prjId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return e.String(http.StatusNotFound, "project not found")
