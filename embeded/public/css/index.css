@@ -101,3 +101,13 @@
         max-width: 100%;
     }
 }
+
+#btnDownloadDB:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+#btnUploadDB:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}

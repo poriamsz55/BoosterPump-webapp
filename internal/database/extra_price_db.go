@@ -134,12 +134,12 @@ func GetExtraPricesByProjectIdFromDB(db *sql.DB, prjId int) ([]*extraprice.Extra
         SELECT %s, %s, %s, %s
         FROM %s
         WHERE %s = ?
-    `, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue, columnProjectIDFK,
+    `, columnExtraPriceID, columnExtraPriceName, columnExtraPriceValue, columnModifiedAt,
 		tableExtraPrice, columnProjectIDFK)
 
 	var exps []*extraprice.ExtraPrice
 
-	rows, err := instance.db.Query(query, prjId)
+	rows, err := db.Query(query, prjId)
 	if err != nil {
 		return nil, err
 	}

@@ -315,3 +315,24 @@ func InitializeDB() {
 	}
 
 }
+
+func RunDB() {
+	dbHelper := GetDBHelperInstance()
+
+	// check if database exists
+	databaseExists := dbHelper.CheckDatabase()
+
+	if !databaseExists {
+		err := dbHelper.LoadInitDatabase()
+		if err != nil {
+			fmt.Println("Error copying database from assets:", err)
+			return
+		}
+	}
+
+	err := dbHelper.Open()
+	if err != nil {
+		fmt.Println("Error opening database:", err)
+		return
+	}
+}

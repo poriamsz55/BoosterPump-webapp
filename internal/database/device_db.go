@@ -90,7 +90,7 @@ func GetAllDevices(db *sql.DB) ([]*device.Device, error) {
     `, columnDeviceID, columnDeviceName, columnDeviceConverter, columnDeviceFilter, columnModifiedAt,
 		tableDevices)
 
-	rows, err := instance.db.Query(query)
+	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}

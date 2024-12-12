@@ -14,6 +14,7 @@ import (
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/lorca"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/routes"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/temp"
 )
 
 func WebServer(e embed.FS, port string, routes ...func(e *echo.Echo)) error {
@@ -46,6 +47,10 @@ func WebServer(e embed.FS, port string, routes ...func(e *echo.Echo)) error {
 }
 
 func main() {
+
+	// delete every temp database created
+	// tempFile, err := os.CreateTemp("", "booster_db_temp_*.db")
+	temp.CleanupTempDatabases()
 
 	// start the database
 	database.InitializeDB()

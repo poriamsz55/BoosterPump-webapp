@@ -9,6 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
+	"github.com/poriamsz55/BoosterPump-webapp/internal/temp"
 )
 
 func DownloadDatabase(e echo.Context) error {
@@ -59,39 +60,69 @@ func DownloadDatabase(e echo.Context) error {
 }
 
 func UploadDatabase(e echo.Context) error {
+	temp.CleanupTempDatabases()
 
-	// Get the file path form the request
-	path := e.FormValue("path")
+	// Get the uploaded file
+	file, err := e.FormFile("database")
+	if err != nil {
+		return e.String(http.StatusBadRequest, "Error getting uploaded file: "+err.Error())
+	}
 
-	// get replace value
+	// Get replace value
 	replace := e.FormValue("replace") == "true"
 
-	// Open the file
-	file, err := os.Open(path)
+	// Create a temporary file to store the upload
+	tempFile, err := os.CreateTemp("", "booster_db_temp_*.db")
 	if err != nil {
-		return e.String(http.StatusInternalServerError, "Error opening file: "+err.Error())
+		return e.String(http.StatusInternalServerError, "Error creating temp file: "+err.Error())
 	}
-	defer file.Close()
+	defer os.Remove(tempFile.Name())
+	defer tempFile.Close()
 
-	// if replace is true, replace new database file with the database file
+	// Open the uploaded file
+	src, err := file.Open()
+	if err != nil {
+		return e.String(http.StatusInternalServerError, "Error opening uploaded file: "+err.Error())
+	}
+	defer src.Close()
+
+	// Copy uploaded file to temp file
+	_, err = io.Copy(tempFile, src)
+	if err != nil {
+		return e.String(http.StatusInternalServerError, "Error copying to temp file: "+err.Error())
+	}
+
 	if replace {
-		err := os.Remove("booster_pump.db")
-		if err != nil {
-			return e.String(http.StatusInternalServerError, "Error removing database file: "+err.Error())
+		database.CloseDB()
+
+		// Remove existing database
+		if err = os.Remove("booster_pump.db"); err != nil && !os.IsNotExist(err) {
+			return e.String(http.StatusInternalServerError, "Error removing existing database: "+err.Error())
 		}
 
-		// Copy the file to the database file
-		_, err = io.Copy(os.Stdout, file)
+		// Copy temp file to database file
+		dst, err := os.Create("booster_pump.db")
 		if err != nil {
-			return e.String(http.StatusInternalServerError, "Error copying file: "+err.Error())
+			return e.String(http.StatusInternalServerError, "Error creating new database: "+err.Error())
 		}
+		defer dst.Close()
+
+		if _, err = tempFile.Seek(0, 0); err != nil {
+			return e.String(http.StatusInternalServerError, "Error seeking temp file: "+err.Error())
+		}
+
+		if _, err = io.Copy(dst, tempFile); err != nil {
+			return e.String(http.StatusInternalServerError, "Error copying new database: "+err.Error())
+		}
+
+		database.RunDB()
 	} else {
-		// if !replace, add new database rows to the database file
-		err := database.Merge(path)
+		// Merge databases
+		err := database.Merge(tempFile.Name())
 		if err != nil {
 			return e.String(http.StatusInternalServerError, "Error merging database: "+err.Error())
 		}
 	}
 
-	return e.String(http.StatusOK, "Database file uploaded successfully")
+	return e.String(http.StatusOK, "Database uploaded successfully")
 }

@@ -14,7 +14,7 @@ func AddPartToDB(p *part.Part) (int, error) {
 
 	// Check if part already exists
 	err := CheckPartFromDB(p.Name, p.Size, p.Material, p.Brand)
-	if err == nil {
+	if err != nil {
 		return -1, errors.New("Part already exists")
 	}
 
@@ -77,7 +77,7 @@ func GetAllParts(db *sql.DB) ([]*part.Part, error) {
 		columnModifiedAt,
 		tableParts)
 
-	rows, err := instance.db.Query(query)
+	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}

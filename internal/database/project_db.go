@@ -15,7 +15,7 @@ func AddProjectToDB(p *project.Project) (int, error) {
 
 	// check if the project exists
 	err := CheckProjectFromDB(p.Name)
-	if err == nil {
+	if err != nil {
 		return -1, errors.New("Project already exists")
 	}
 
@@ -76,7 +76,7 @@ func GetAllProjects(db *sql.DB) ([]*project.Project, error) {
     `, columnProjectID, columnProjectName, columnModifiedAt,
 		tableProjects)
 
-	rows, err := instance.db.Query(query)
+	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}

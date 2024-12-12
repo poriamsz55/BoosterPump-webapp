@@ -52,7 +52,7 @@ func GetDevicePartsByDeviceId(db *sql.DB, deviceID int) ([]*devicepart.DevicePar
 		tableParts, columnPartIDK, columnPartID,
 		columnDeviceIDFK)
 
-	rows, err := instance.db.Query(query, deviceID)
+	rows, err := db.Query(query, deviceID)
 	if err != nil {
 		return nil, err
 	}
