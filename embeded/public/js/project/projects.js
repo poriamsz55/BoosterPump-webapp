@@ -1,6 +1,7 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
 import { handleEscKey } from '../keyboard-utils.js';
+import { gregorianToJalali, formatTime } from '../jalali.js';
 
 class ProjectsManager {
     constructor() {
@@ -55,6 +56,13 @@ class ProjectsManager {
                     <button class="action-button copy-btn" data-id="copy-${project.id}">
                         <i class="fas fa-copy"></i>
                     </button>
+                </div>
+
+                 <div class="card-datetime">
+                    <div class="datetime-container">
+                        <div>${gregorianToJalali(new Date(project.modified_at))}</div>
+                        <div>${formatTime(project.modified_at)}</div>
+                    </div>
                 </div>
             </div>
         `).join('');

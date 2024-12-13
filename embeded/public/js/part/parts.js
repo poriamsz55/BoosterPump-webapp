@@ -1,6 +1,7 @@
 import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
 import { handleEscKey } from '../keyboard-utils.js';
+import { gregorianToJalali, formatTime } from '../jalali.js';
 
 class PartsManager {
     constructor() {
@@ -77,6 +78,14 @@ class PartsManager {
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
+
+                <div class="card-datetime">
+                    <div class="datetime-container">
+                        <div>${gregorianToJalali(new Date(part.modified_at))}</div>
+                        <div>${formatTime(part.modified_at)}</div>
+                    </div>
+                </div>
+
             </div>
         `).join('');
 
@@ -107,6 +116,7 @@ class PartsManager {
             });
         });
     }
+
 
     handlePartClick(id) {
         window.location.href = `/parts/details?id=${id}`;

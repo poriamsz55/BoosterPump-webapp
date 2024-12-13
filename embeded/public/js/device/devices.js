@@ -2,6 +2,7 @@ import { HTTP_URL } from '../config.js';
 import { formatPriceValue } from '../format-price.js';
 import { converterToString, filterToString } from '../convert2str.js';
 import { handleEscKey } from '../keyboard-utils.js';
+import { gregorianToJalali, formatTime } from '../jalali.js';
 
 class DevicesManager {
     constructor() {
@@ -67,6 +68,13 @@ class DevicesManager {
                     <button class="action-button copy-btn" data-id="copy-${device.id}">
                         <i class="fas fa-copy"></i>
                     </button>
+                </div>
+
+                 <div class="card-datetime">
+                    <div class="datetime-container">
+                        <div>${gregorianToJalali(new Date(device.modified_at))}</div>
+                        <div>${formatTime(device.modified_at)}</div>
+                    </div>
                 </div>
             </div>
         `
