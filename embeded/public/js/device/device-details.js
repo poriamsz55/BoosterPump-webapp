@@ -398,8 +398,12 @@ class AddDeviceDetailsManager {
                    <div class="card-header">
                 <div class="card-price">قیمت: ${formatPriceValue(devicepart.price)}</div>
                 </div>
-                   <div class="card-header">
-                <div class="card-count">تعداد:‌${devicepart.count}</div>
+                <div class="card-header">
+                    <div class="card-count-container">
+                        <button class="count-btn minus-btn" id="minus-${devicepart.partId}">-</button>
+                        <div class="card-count">تعداد: ${devicepart.count}</div>
+                        <button class="count-btn plus-btn" id="plus-${devicepart.partId}">+</button>
+                    </div>
                 </div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${devicepart.partId}">
                     <i class="fas fa-trash"></i>
@@ -414,6 +418,41 @@ class AddDeviceDetailsManager {
     // attachAddedCardEventListeners
     attachAddedCardEventListeners() {
         const partsGrid = document.getElementById('addedPartsGrid');
+
+        partsGrid.querySelectorAll('.count-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hasChanged = true;
+                const partId = button.id.split('-')[1];
+                const part = this.addedParts.find(part => part.partId.toString() === partId.toString());
+                if (!part) return;
+
+                if (button.classList.contains('minus-btn')) {
+                    part.count = Math.max(part.count - 1, 1);
+                } else if (button.classList.contains('plus-btn')) {
+                    // convert part.count to number
+                    part.count = (parseInt(part.count) + 1).toString();
+                }
+
+                // get localstorage and update it
+                const deviceParts = JSON.parse(localStorage.getItem('deviceParts')) || [];
+                const existingPart = deviceParts.find(part => part.partId.toString() === partId.toString());
+                if (existingPart) {
+                    existingPart.count = part.count;
+                } else {
+                    deviceParts.push(part);
+                }
+                localStorage.setItem('deviceParts', JSON.stringify(deviceParts));
+
+                // update card count
+                const card = partsGrid.querySelector(`[data-part-id="${partId}"]`);
+                if (card) {
+                    card.querySelector('.card-count').textContent = `تعداد: ${part.count}`;
+                }
+            });
+        });
+
         partsGrid.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();

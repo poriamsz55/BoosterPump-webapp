@@ -209,7 +209,7 @@ class AddProjectDetailsManager {
                     }
 
                     this.addedDevices.reverse();
-                    
+
                     // add addedDevices to localStorage
                     localStorage.setItem('projectDevices', JSON.stringify(this.addedDevices));
 
@@ -415,8 +415,12 @@ class AddProjectDetailsManager {
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
                             </div>
-                            <div class="card-header">
-                                <div class="card-count">تعداد: ${device.count}</div>
+                             <div class="card-header">
+                                <div class="card-count-container">
+                                    <button class="count-btn minus-btn" id="minus-${device.deviceId}">-</button>
+                                    <div class="card-count">تعداد: ${device.count}</div>
+                                    <button class="count-btn plus-btn" id="plus-${device.deviceId}">+</button>
+                                </div>
                             </div>
                 <button type="button" class="action-button delete-btn" data-id="delete-${device.deviceId}">
                     <i class="fas fa-trash"></i>
@@ -431,6 +435,41 @@ class AddProjectDetailsManager {
     // attachAddedCardEventListeners
     attachAddedCardEventListeners() {
         const devicesGrid = document.getElementById('addedDevicesGrid');
+
+        devicesGrid.querySelectorAll('.count-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hasChanged = true;
+                const deviceId = button.id.split('-')[1];
+                const device = this.addedDevices.find(device => device.deviceId.toString() === deviceId.toString());
+                if (!device) return;
+
+                if (button.classList.contains('minus-btn')) {
+                    device.count = Math.max(device.count - 1, 1);
+                } else if (button.classList.contains('plus-btn')) {
+                    // convert device.count to number
+                    device.count = (parseInt(device.count) + 1).toString();
+                }
+
+                // get localstorage and update it
+                const projectDevices = JSON.parse(localStorage.getItem('projectDevices')) || [];
+                const existingDevice = projectDevices.find(device => device.deviceId.toString() === deviceId.toString());
+                if (existingDevice) {
+                    existingDevice.count = device.count;
+                } else {
+                    projectDevices.push(device);
+                }
+                localStorage.setItem('projectDevices', JSON.stringify(projectDevices));
+
+                // update card count
+                const card = devicesGrid.querySelector(`[data-device-id="${deviceId}"]`);
+                if (card) {
+                    card.querySelector('.card-count').textContent = `تعداد: ${device.count}`;
+                }
+            });
+        });
+
         devicesGrid.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();

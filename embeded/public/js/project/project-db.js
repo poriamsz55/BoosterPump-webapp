@@ -165,7 +165,7 @@ class AddProjectManager {
             const converterStr = converterToString(device.converter);
             const filterStr = filterToString(device.filter);
             deviceCard.innerHTML = `
-                  <div class="card-header">
+                            <div class="card-header">
                                 <span class="card-title">${this.escapeHtml(founded.name)}</span>
                             </div>
                              <div class="card-header">
@@ -187,7 +187,6 @@ class AddProjectManager {
                 <button type="button" class="action-button delete-btn" data-id="delete-${device.id}">
                     <i class="fas fa-trash"></i>
                 </button>
-                </div>
             `;
             devicesGrid.appendChild(deviceCard);
         });
@@ -205,18 +204,19 @@ class AddProjectManager {
                 e.stopPropagation();
                 this.hasChanged = true;
                 const deviceId = button.id.split('-')[1];
-                const device = this.addedDevices.find(device => device.id === Number(deviceId));
+                const device = this.addedDevices.find(device => device.id.toString() === deviceId.toString());
                 if (!device) return;
 
                 if (button.classList.contains('minus-btn')) {
                     device.count = Math.max(device.count - 1, 1);
                 } else if (button.classList.contains('plus-btn')) {
-                    device.count += 1;
+                    // convert device.count to number
+                    device.count = (parseInt(device.count) + 1).toString();
                 }
 
                 // get localstorage and update it
                 const projectDevices = JSON.parse(localStorage.getItem('projectDevices')) || [];
-                const existingDevice = projectDevices.find(device => device.id === Number(deviceId));
+                const existingDevice = projectDevices.find(device => device.id.toString() === deviceId.toString());
                 if (existingDevice) {
                     existingDevice.count = device.count;
                 } else {
