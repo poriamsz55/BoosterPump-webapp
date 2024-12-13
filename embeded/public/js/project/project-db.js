@@ -179,8 +179,9 @@ class AddProjectManager {
                             </div>
                             <div class="card-header">
                                 <div class="card-count-container">
+                                    <div class="card-count-title">تعداد:</div>
                                     <button class="count-btn minus-btn" id="minus-${device.id}">-</button>
-                                    <div class="card-count">تعداد: ${device.count}</div>
+                                    <div class="card-count">${device.count}</div>
                                     <button class="count-btn plus-btn" id="plus-${device.id}">+</button>
                                 </div>
                             </div>
@@ -227,7 +228,7 @@ class AddProjectManager {
                 // update card count
                 const card = devicesGrid.querySelector(`[data-device-id="${deviceId}"]`);
                 if (card) {
-                    card.querySelector('.card-count').textContent = `تعداد: ${device.count}`;
+                    card.querySelector('.card-count').textContent = `${device.count}`;
                 }
             });
         });

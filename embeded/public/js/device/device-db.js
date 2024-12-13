@@ -192,8 +192,9 @@ class AddDeviceManager {
                 </div>
                 <div class="card-header">
                     <div class="card-count-container">
+                        <div class="card-count-title">تعداد:</div>
                         <button class="count-btn minus-btn" id="minus-${part.id}">-</button>
-                        <div class="card-count">تعداد: ${part.count}</div>
+                        <div class="card-count">${part.count}</div>
                         <button class="count-btn plus-btn" id="plus-${part.id}">+</button>
                     </div>
                 </div>
@@ -240,7 +241,7 @@ class AddDeviceManager {
                 // update card count
                 const card = partsGrid.querySelector(`[data-part-id="${partId}"]`);
                 if (card) {
-                    card.querySelector('.card-count').textContent = `تعداد: ${part.count}`;
+                    card.querySelector('.card-count').textContent = `${part.count}`;
                 }
             });
         });
