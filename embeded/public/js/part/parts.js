@@ -16,13 +16,86 @@ class PartsManager {
         // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
 
+        this.sortIcon = document.querySelector('.sort-icon');
+        this.sortDropdown = document.querySelector('.sort-dropdown');
+        this.sortOptions = document.querySelectorAll('.sort-option');
+        this.setupSortEventListeners();
+
         handleEscKey(() => {
             if (window.getComputedStyle(this.modal).display !== 'none') {
                 this.closeModal();
+            }else if (this.sortDropdown.classList.contains('show')) {
+                this.sortDropdown.classList.remove('show');
             } else {
                 window.history.back();
             }
         });
+    }
+
+    setupSortEventListeners() {
+        // Toggle dropdown
+        this.sortIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.sortDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            this.sortDropdown.classList.remove('show');
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        this.sortDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Handle sort options
+        this.sortOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const sortType = option.dataset.sort;
+                const directionIcon = option.querySelector('.direction');
+                const isDescending = directionIcon.classList.contains('fa-arrow-down');
+                
+                // Update active state and direction for all options
+                this.sortOptions.forEach(opt => {
+                    opt.classList.remove('active');
+                    opt.querySelector('.direction').className = 'fas fa-arrow-up direction';
+                });
+                
+                // Update clicked option
+                option.classList.add('active');
+                directionIcon.className = isDescending 
+                    ? 'fas fa-arrow-up direction'
+                    : 'fas fa-arrow-down direction';
+
+                // Sort the parts
+                this.sortParts(sortType, !isDescending);
+            });
+        });
+    }
+
+    sortParts(sortType, isDescending) {
+        const sortedParts = [...this.parts].sort((a, b) => {
+            let valueA, valueB;
+            
+            if (sortType === 'name') {
+                valueA = a.name.toLowerCase();
+                valueB = b.name.toLowerCase();
+            } else if (sortType === 'date') {
+                valueA = new Date(a.modified_at);
+                valueB = new Date(b.modified_at);
+            }
+            
+            if (isDescending) {
+                [valueA, valueB] = [valueB, valueA];
+            }
+            
+            if (valueA < valueB) return -1;
+            if (valueA > valueB) return 1;
+            return 0;
+        });
+
+        this.renderParts(sortedParts);
     }
 
     async checkForUpdates() {
@@ -54,7 +127,7 @@ class PartsManager {
 
     renderParts(partsList) {
         this.partsGrid.innerHTML = partsList.map(part => `
-            <div class="card" data-id="${part.id}">
+            <div class="card" data-id="${part.id}" data-modified-at="${part.modified_at}">
                 <div class="card-header">
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
