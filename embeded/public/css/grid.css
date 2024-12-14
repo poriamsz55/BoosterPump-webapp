@@ -1,0 +1,97 @@
+:root {
+    --primary: #1a1a1a;
+    --secondary: #2d2d2d;
+    --text: #ecf0f1;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #4834d4;
+    --error: #e74c3c;
+    --success: #2ecc71;
+}
+
+
+/* Grid Section */
+.grid-section {
+    flex: 1;
+    min-width: 0; /* Important for flex layout */
+    border-radius: 15px;    
+    padding: 1rem 0;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+
+
+
+/* Grid layout */
+.grid {
+    display: grid;
+    max-height: calc(95vh - 200px);
+    overflow-y: auto;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    padding-bottom: 80px;
+    padding-right: 0.5rem; /* Space for scrollbar */
+}
+
+
+/* Custom scrollbar for grid */
+.grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.grid::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+/* Grid layout */
+.modal .grid {
+    flex: 1; /* Take remaining space */
+    min-height: 0; /* Important for Firefox */
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    padding-right: 0.5rem; /* Space for scrollbar */
+    margin: -1rem; /* Compensate for padding */
+    margin-bottom: 0;
+}
+
+
+/* Regular grid (not in modal) */
+.grid:not(.modal .grid) {
+    max-height: calc(95vh - 200px);
+    overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+
+    .grid-section {
+        height: 400px; /* Fixed height on mobile */
+    }
+}
+
+@media (max-width: 768px) {
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-section {
+        height: 350px;
+    }
+
+    .modal .grid {
+        grid-template-columns: 1fr;
+    }
+
+}

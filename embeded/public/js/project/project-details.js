@@ -13,7 +13,6 @@ class AddProjectDetailsManager {
         this.devicesGrid = document.getElementById('devicesGrid');
         this.searchInput = document.getElementById('searchDevices');
         this.modal = document.getElementById('addDeviceToProjectModal');
-        this.deviceForm = document.getElementById('addDeviceToProjectForm');
         // Remove e.preventDefault() as it's not needed here
         const urlParams = new URLSearchParams(window.location.search);
         this.projectId = urlParams.get('id');
@@ -255,10 +254,10 @@ class AddProjectDetailsManager {
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
                              <div class="card-header">
-                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                                <div class="card-sub-title">نوع تبدیل: ${converterStr}</div>
                             </div>
                             <div class="card-header">
-                                <div class="card-title">صافی ${filterStr}</div>
+                                <div class="card-sub-title">صافی ${filterStr}</div>
                             </div>
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
@@ -272,10 +271,10 @@ class AddProjectDetailsManager {
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
                              <div class="card-header">
-                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                                <div class="card-sub-title">نوع تبدیل: ${converterStr}</div>
                             </div>
                             <div class="card-header">
-                                <div class="card-title">صافی ${filterStr}</div>
+                                <div class="card-sub-title">صافی ${filterStr}</div>
                             </div>
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
@@ -324,11 +323,13 @@ class AddProjectDetailsManager {
 
         const countInput = document.createElement('input');
         countInput.type = 'number';
+        countInput.className = 'count-input';
         countInput.value = 1;
         countInput.min = '1';
         countInput.id = `count-${deviceId}`;
 
         const addButton = document.createElement('button');
+        addButton.className = 'card-button';
         addButton.type = 'button';
         addButton.textContent = 'افزودن به دستگاه';
         addButton.id = `add-to-project-${deviceId}`;
@@ -407,10 +408,10 @@ class AddProjectDetailsManager {
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
                              <div class="card-header">
-                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                                <div class="card-sub-title">نوع تبدیل: ${converterStr}</div>
                             </div>
                             <div class="card-header">
-                                <div class="card-title">صافی ${filterStr}</div>
+                                <div class="card-sub-title">صافی ${filterStr}</div>
                             </div>
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
@@ -423,9 +424,12 @@ class AddProjectDetailsManager {
                                     <button class="count-btn plus-btn" id="plus-${device.deviceId}">+</button>
                                 </div>
                             </div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${device.deviceId}">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="card-actions">
+                    <button type="button" class="action-button delete-btn" data-id="delete-${device.deviceId}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
             `;
             devicesGrid.appendChild(deviceCard);
         });
@@ -542,7 +546,6 @@ class AddProjectDetailsManager {
 
     openModal() {
         this.modal.style.display = 'flex';
-        this.deviceForm.reset();
     }
 
     closeModal() {
@@ -551,7 +554,6 @@ class AddProjectDetailsManager {
             card.classList.remove('selected');
         });
         this.modal.style.display = 'none';
-        this.deviceForm.reset();
     }
 
 

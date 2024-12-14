@@ -11,7 +11,6 @@ class AddProjectManager {
         this.searchInput = document.getElementById('searchDevices');
         this.modal = document.getElementById('addDeviceToProjectModal');
         this.form = document.getElementById('addProjectDBForm')
-        this.deviceForm = document.getElementById('addDeviceToProjectForm');
         
         this.hasChanged = false;
 
@@ -80,10 +79,10 @@ class AddProjectManager {
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
                              <div class="card-header">
-                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                                <div class="card-sub-title">نوع تبدیل: ${converterStr}</div>
                             </div>
                             <div class="card-header">
-                                <div class="card-title">صافی ${filterStr}</div>
+                                <div class="card-sub-title">صافی ${filterStr}</div>
                             </div>
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>
@@ -130,11 +129,13 @@ class AddProjectManager {
 
         const countInput = document.createElement('input');
         countInput.type = 'number';
+        countInput.className = 'count-input';
         countInput.value = 1;
         countInput.min = '1';
         countInput.id = `count-${deviceId}`;
 
         const addButton = document.createElement('button');
+        addButton.className = 'card-button';
         addButton.type = 'button';
         addButton.textContent = 'افزودن به دستگاه';
         addButton.id = `add-to-project-${deviceId}`;
@@ -169,10 +170,10 @@ class AddProjectManager {
                                 <span class="card-title">${this.escapeHtml(founded.name)}</span>
                             </div>
                              <div class="card-header">
-                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                                <div class="card-sub-title">نوع تبدیل: ${converterStr}</div>
                             </div>
                             <div class="card-header">
-                                <div class="card-title">صافی ${filterStr}</div>
+                                <div class="card-sub-title">صافی ${filterStr}</div>
                             </div>
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(founded.price)}</div>
@@ -185,9 +186,11 @@ class AddProjectManager {
                                     <button class="count-btn plus-btn" id="plus-${device.id}">+</button>
                                 </div>
                             </div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${device.id}">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="card-actions">
+                    <button type="button" class="action-button delete-btn" data-id="delete-${device.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             `;
             devicesGrid.appendChild(deviceCard);
         });
@@ -274,7 +277,6 @@ class AddProjectManager {
 
     openModal() {
         this.modal.style.display = 'flex';
-        this.deviceForm.reset();
     }
 
     closeModal() {
@@ -283,7 +285,6 @@ class AddProjectManager {
             card.classList.remove('selected');
         });
         this.modal.style.display = 'none';
-        this.deviceForm.reset();
     }
 
     async addToProject(deviceId, count) {

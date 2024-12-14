@@ -128,10 +128,10 @@ class DevicesManager {
                                 <span class="card-title">${this.escapeHtml(device.name)}</span>
                             </div>
                              <div class="card-header">
-                                <div class="card-title">نوع تبدیل: ${converterStr}</div>
+                                <div class="card-sub-title">نوع تبدیل: ${converterStr}</div>
                             </div>
                             <div class="card-header">
-                                <div class="card-title">صافی ${filterStr}</div>
+                                <div class="card-sub-title">صافی ${filterStr}</div>
                             </div>
                             <div class="card-header">
                                 <div class="card-price">قیمت: ${formatPriceValue(device.price)}</div>

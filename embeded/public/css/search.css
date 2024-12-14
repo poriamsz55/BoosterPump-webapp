@@ -1,0 +1,144 @@
+:root {
+    --primary: #1a1a1a;
+    --secondary: #2d2d2d;
+    --text: #ecf0f1;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #4834d4;
+    --error: #e74c3c;
+    --success: #2ecc71;
+}
+
+/* search */
+.search-container {
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(to bottom, var(--primary) 50%, transparent);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-input {
+    width: 95%;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 15px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 20px rgba(72, 52, 212, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sort-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 20px;
+}
+
+.sort-icon {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.sort-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sort-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 200px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 0.5rem;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sort-dropdown.show {
+    display: block;
+    animation: dropdownShow 0.3s ease;
+}
+
+@keyframes dropdownShow {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sort-option {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.sort-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sort-option.active {
+    background: var(--accent);
+}
+
+.sort-option i {
+    font-size: 0.9rem;
+}
+
+.sort-option i.direction {
+    margin-right: auto;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+
+    .sort-dropdown {
+        position: fixed;
+        top: auto;
+        bottom: 80px;
+        right: 20px;
+        width: calc(100% - 40px);
+    }
+
+    .sort-option {
+        padding: 1rem;
+    }
+}

@@ -1,0 +1,465 @@
+:root {
+    --primary: #1a1a1a;
+    --secondary: #2d2d2d;
+    --text: #ecf0f1;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #4834d4;
+    --error: #e74c3c;
+    --success: #2ecc71;
+}
+
+
+.card {
+    padding: 1.5rem;
+    border-radius: 15px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    direction: rtl;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Add minimum height to ensure consistent card size */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-header:last-of-type {
+    border-bottom: none;
+}
+
+/* Remove border from price header */
+.card-header:has(.card-price) {
+    border-bottom: none;
+}
+
+.card-header:has(.card-count-container) {
+    border-bottom: none;
+}
+
+
+.card-title {
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: 500;
+    padding-left: 70px;
+}
+
+.card-title:first-child {
+    color: var(--accent);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.card-sub-title {
+    color: var(--text);
+    font-weight: 400;
+    font-size: 1rem;
+}
+
+.card-price {
+    color: var(--text);
+    font-weight: 400;
+    font-size: 1rem;
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 2;
+}
+
+.action-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.delete-btn {
+    color: var(--error);
+}
+
+.copy-btn {
+    color: var(--success);
+}
+
+/* DateTime styles - Removed border */
+.card-datetime {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    direction: ltr;
+}
+
+.datetime-container {
+    font-size: 0.85em;
+    color: #6c757d;
+    text-align: left;
+}
+
+.datetime-container div {
+    line-height: 1.4;
+}
+
+.card-count-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.count-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.count-btn:hover {
+    background: #f0f0f0;
+}
+
+
+/* Selected Card State */
+.card.selected {
+    border: 2px solid var(--accent);
+    background: rgba(72, 52, 212, 0.1); /* Lighter version of accent color */
+    box-shadow: 0 0 15px rgba(72, 52, 212, 0.2);
+    transform: translateY(-3px);
+}
+
+
+.card.selected::before {
+    content: "✓";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 25px;
+    height: 25px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    border: 2px solid var(--text);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Disabled Card State */
+.card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--glass-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transform: none;
+    filter: grayscale(1);
+}
+
+.card.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--glass-bg);
+}
+
+.card.disabled::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    pointer-events: none;
+}
+
+/* Hover States */
+.card:not(.disabled):hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.card.selected:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(72, 52, 212, 0.3);
+}
+
+
+@media (max-width: 768px) {
+
+    .card {
+        padding: 1.2rem;
+        min-height: 220px;
+    }
+
+    .card-actions {
+        top: 1.2rem;
+        left: 1.2rem;
+    }
+
+    .action-button {
+        width: 28px;
+        height: 28px;
+    }
+
+    .card-title {
+        padding-left: 60px;
+        /* Adjusted for mobile */
+        font-size: 1rem;
+    }
+
+    .card-datetime {
+        bottom: 0.8rem;
+        left: 0.8rem;
+    }
+
+    .card.selected::before {
+        width: 22px;
+        height: 22px;
+        top: -8px;
+        right: -8px;
+        font-size: 12px;
+    }
+}
+
+
+/*  -------------------   */
+/* Controls Container */
+.card .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+/* Count Input */
+.count-input {
+    width: 50%;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+/* center the count input */
+.count-input {
+    margin: 0 auto;
+}
+
+.count-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 2px rgba(72, 52, 212, 0.15);
+}
+
+/* Remove spinner buttons */
+.count-input::-webkit-inner-spin-button,
+.count-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.count-input {
+    -moz-appearance: textfield;
+}
+
+/* Disabled States */
+.card.disabled {
+    opacity: 0.5;
+}
+
+.card.disabled .count-input {
+    opacity: 0.5;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: not-allowed;
+}
+
+/* Selected States */
+.card.selected .count-input {
+    border-color: var(--accent);
+    background: rgba(72, 52, 212, 0.08);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .card .controls {
+        gap: 0.5rem;
+        padding-top: 0.8rem;
+    }
+
+    .count-input {
+        width: 50px;
+        padding: 0.4rem;
+        font-size: 0.85rem;
+    }
+
+}
+
+/* RTL Support */
+[dir="rtl"] .card .controls {
+    flex-direction: row-reverse;
+}
+
+
+/* Card Button */
+.card-button {
+    width: 100%;
+    padding: 0.7rem 1.2rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Hover Effect */
+.card-button:hover {
+    background: var(--success);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 52, 212, 0.25);
+}
+
+/* Active/Press Effect */
+.card-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(72, 52, 212, 0.2);
+}
+
+/* Ripple Effect */
+.card-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.card-button:active::after {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+}
+
+/* Disabled State */
+.card-button:disabled {
+    background: var(--glass-bg);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border: 1px solid var(--glass-border);
+}
+
+/* Loading State */
+.card-button.loading {
+    color: transparent;
+    pointer-events: none;
+}
+
+.card-button.loading::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: button-loading 0.8s infinite linear;
+}
+
+@keyframes button-loading {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success State */
+.card-button.success {
+    background: var(--success-color, #22c55e);
+}
+
+/* Error State */
+.card-button.error {
+    background: var(--error-color, #ef4444);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-button {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* In Card Context */
+.card .card-button {
+    margin-top: auto; /* Push to bottom if in a card */
+}
+
+/* RTL Support */
+[dir="rtl"] .card-button {
+    font-family: inherit;
+}

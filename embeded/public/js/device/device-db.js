@@ -10,7 +10,6 @@ class AddDeviceManager {
         this.searchInput = document.getElementById('searchParts');
         this.modal = document.getElementById('addPartToDeviceModal');
         this.form = document.getElementById('addDeviceDBForm')
-        this.partForm = document.getElementById('addPartToDeviceForm');
 
         this.hasChanged = false;
 
@@ -88,13 +87,13 @@ class AddDeviceManager {
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                    <span class="card-sub-title">سایز: ${this.escapeHtml(part.size)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                    <span class="card-sub-title">جنس: ${this.escapeHtml(part.material)}</span>
                 </div>
                    <div class="card-header">
-                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                    <span class="card-sub-title">برند: ${this.escapeHtml(part.brand)}</span>
                 </div>
                    <div class="card-header">
                 <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
@@ -142,11 +141,13 @@ class AddDeviceManager {
 
         const countInput = document.createElement('input');
         countInput.type = 'number';
+        countInput.className = 'count-input';
         countInput.value = 1;
         countInput.min = '1';
         countInput.id = `count-${partId}`;
 
         const addButton = document.createElement('button');
+        addButton.className = 'card-button';
         addButton.type = 'button';
         addButton.textContent = 'افزودن به دستگاه';
         addButton.id = `add-to-device-${partId}`;
@@ -179,13 +180,13 @@ class AddDeviceManager {
                     <span class="card-title">${this.escapeHtml(founded.name)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">سایز: ${this.escapeHtml(founded.size)}</span>
+                    <span class="card-sub-title">سایز: ${this.escapeHtml(founded.size)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">جنس: ${this.escapeHtml(founded.material)}</span>
+                    <span class="card-sub-title">جنس: ${this.escapeHtml(founded.material)}</span>
                 </div>
                    <div class="card-header">
-                    <span class="card-title">برند: ${this.escapeHtml(founded.brand)}</span>
+                    <span class="card-sub-title">برند: ${this.escapeHtml(founded.brand)}</span>
                 </div>
                    <div class="card-header">
                 <div class="card-price">قیمت: ${formatPriceValue(founded.price)}</div>
@@ -198,9 +199,12 @@ class AddDeviceManager {
                         <button class="count-btn plus-btn" id="plus-${part.id}">+</button>
                     </div>
                 </div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${part.id}">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="card-actions">
+                    <button type="button" class="action-button delete-btn" data-id="delete-${part.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
             `;
             partsGrid.appendChild(partCard);
         });
@@ -289,7 +293,6 @@ class AddDeviceManager {
 
     openModal() {
         this.modal.style.display = 'flex';
-        this.partForm.reset();
     }
 
     closeModal() {
@@ -298,7 +301,6 @@ class AddDeviceManager {
             card.classList.remove('selected');
         });
         this.modal.style.display = 'none';
-        this.partForm.reset();
     }
 
     async addToDevice(partId, count) {

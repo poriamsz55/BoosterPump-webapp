@@ -7,6 +7,11 @@
     <title>Device Details</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
     <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/search.css">
+    <link rel="stylesheet" href="/public/css/form.css">
+    <link rel="stylesheet" href="/public/css/grid.css">
+    <link rel="stylesheet" href="/public/css/card.css">
+    <link rel="stylesheet" href="/public/css/modal.css">
     <script type="module" src="/public/js/device/device-details.js" defer></script>
 </head>
 
@@ -17,7 +22,7 @@
         <div class="content-wrapper">
             <!-- Form Section -->
             <div class="form-section">
-                <form id="deviceDetailsForm">
+                <form class="details-form" id="deviceDetailsForm">
                     <div class="form-group">
                         <label>نام دستگاه</label>
                         <input type="text" id="deviceName" placeholder="نام">
@@ -47,7 +52,7 @@
 
                     <!-- Add Part to Device (Btn) -->
                     <div class="form-group">
-                        <button type="button" class="add-part-button" id="addPartToDeviceBtn">
+                        <button type="button" class="add-button" id="addPartToDeviceBtn">
                             افزودن قطعه به دستگاه</button>
                     </div>
                 </form>
@@ -69,17 +74,15 @@
     <div class="modal-overlay" id="addPartToDeviceModal">
         <div class="modal">
             <div class="modal-title">افزودن قطعه به دستگاه</div>
-            <form id="addPartToDeviceForm">
-                <div class="search-container">
-                    <input type="search" class="search-input" placeholder="جستجوی قطعه..." id="searchParts">
-                </div>
-                <div class="grid" id="partsGrid">
-                    <!-- Parts will be dynamically added here -->
-                </div>
-                <div class="form-buttons">
-                    <button type="button" class="btn btn-cancel" id="cancelBtn">بستن فرم</button>
-                </div>
-            </form>
+            <div class="search-container">
+                <input type="search" class="search-input" placeholder="جستجوی قطعه..." id="searchParts">
+            </div>
+            <div class="grid" id="partsGrid">
+                <!-- Parts will be dynamically added here -->
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="btn btn-cancel" id="cancelBtn">بستن فرم</button>
+            </div>
         </div>
     </div>
 

@@ -12,7 +12,6 @@ class AddDeviceDetailsManager {
         this.partsGrid = document.getElementById('partsGrid');
         this.searchInput = document.getElementById('searchParts');
         this.modal = document.getElementById('addPartToDeviceModal');
-        this.partForm = document.getElementById('addPartToDeviceForm');
         // Remove e.preventDefault() as it's not needed here
         const urlParams = new URLSearchParams(window.location.search);
         this.deviceId = urlParams.get('id');
@@ -222,13 +221,13 @@ class AddDeviceDetailsManager {
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                         </div>
                         <div class="card-header">
-                            <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                            <span class="card-sub-title">سایز: ${this.escapeHtml(part.size)}</span>
                         </div>
                         <div class="card-header">
-                            <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                            <span class="card-sub-title">جنس: ${this.escapeHtml(part.material)}</span>
                         </div>
                         <div class="card-header">
-                            <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                            <span class="card-sub-title">برند: ${this.escapeHtml(part.brand)}</span>
                         </div>
                         <div class="card-header">
                         <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
@@ -242,13 +241,13 @@ class AddDeviceDetailsManager {
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                    <span class="card-sub-title">سایز: ${this.escapeHtml(part.size)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                    <span class="card-sub-title">جنس: ${this.escapeHtml(part.material)}</span>
                 </div>
                    <div class="card-header">
-                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                    <span class="card-sub-title">برند: ${this.escapeHtml(part.brand)}</span>
                 </div>
                    <div class="card-header">
                 <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
@@ -297,11 +296,13 @@ class AddDeviceDetailsManager {
 
         const countInput = document.createElement('input');
         countInput.type = 'number';
+        countInput.className = 'count-input';
         countInput.value = 1;
         countInput.min = '1';
         countInput.id = `count-${partId}`;
 
         const addButton = document.createElement('button');
+        addButton.className = 'card-button';
         addButton.type = 'button';
         addButton.textContent = 'افزودن به دستگاه';
         addButton.id = `add-to-device-${partId}`;
@@ -323,7 +324,6 @@ class AddDeviceDetailsManager {
         // add disabled class to card
         card.classList.add('disabled');
 
-        // remove count input field
         const countInput = document.getElementById(`count-${partId}`);
         countInput.remove();
 
@@ -387,13 +387,13 @@ class AddDeviceDetailsManager {
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                    <span class="card-sub-title">سایز: ${this.escapeHtml(part.size)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                    <span class="card-sub-title">جنس: ${this.escapeHtml(part.material)}</span>
                 </div>
                    <div class="card-header">
-                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                    <span class="card-sub-title">برند: ${this.escapeHtml(part.brand)}</span>
                 </div>
                    <div class="card-header">
                 <div class="card-price">قیمت: ${formatPriceValue(devicepart.price)}</div>
@@ -406,9 +406,11 @@ class AddDeviceDetailsManager {
                         <button class="count-btn plus-btn" id="plus-${devicepart.partId}">+</button>
                     </div>
                 </div>
-                <button type="button" class="action-button delete-btn" data-id="delete-${devicepart.partId}">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="card-actions">
+                    <button class="action-button delete-btn" data-id="delete-${devicepart.partId}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             `;
             partsGrid.appendChild(partCard);
         });
@@ -526,7 +528,6 @@ class AddDeviceDetailsManager {
 
     openModal() {
         this.modal.style.display = 'flex';
-        this.partForm.reset();
     }
 
     closeModal() {
@@ -535,7 +536,6 @@ class AddDeviceDetailsManager {
             card.classList.remove('selected');
         });
         this.modal.style.display = 'none';
-        this.partForm.reset();
     }
 
 

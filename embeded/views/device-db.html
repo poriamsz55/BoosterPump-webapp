@@ -7,6 +7,11 @@
     <title>Add Device to Database</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
     <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/search.css">
+    <link rel="stylesheet" href="/public/css/form.css">
+    <link rel="stylesheet" href="/public/css/grid.css">
+    <link rel="stylesheet" href="/public/css/card.css">
+    <link rel="stylesheet" href="/public/css/modal.css">
     <script type="module" src="/public/js/device/device-db.js" defer></script>
 </head>
 
@@ -14,49 +19,57 @@
     <button class="back-button" id="backBtn">بازگشت</button>
     <div class="container">
         <h1 class="title">اضافه کردن دستگاه</h1>
-        <form id="addDeviceDBForm">
-            <div class="form-group">
-                <label>نام دستگاه</label>
-                <input type="text" id="deviceName" placeholder="نام">
-            </div>
+        <div class="content-wrapper">
+            <!-- Form Section -->
+            <div class="form-section">
+                <form class="details-form" id="addDeviceDBForm">
+                    <div class="form-group">
+                        <label>نام دستگاه</label>
+                        <input type="text" id="deviceName" placeholder="نام">
+                    </div>
 
-            <!-- Converter (select) -->
-            <div class="form-group">
-                <!--  Converter Selcect here  -->
-                <select class="form-select" id="converterType" required>
-                    <option value="-1">انتخاب کنید</option>
-                    <option value="0">بدون تبدیل</option>
-                    <option value="1">تبدیل در دهش</option>
-                    <option value="2">تبدیل دو طرفه</option>
-                </select>
-            </div>
+                    <!-- Converter (select) -->
+                    <div class="form-group">
+                        <!--  Converter Selcect here  -->
+                        <select class="form-select" id="converterType" required>
+                            <option value="-1">انتخاب کنید</option>
+                            <option value="0">بدون تبدیل</option>
+                            <option value="1">تبدیل در دهش</option>
+                            <option value="2">تبدیل دو طرفه</option>
+                        </select>
+                    </div>
 
-            <!-- Filter (Checkbox) -->
-            <div class="form-group">
-                <label>صافی</label>
-                <input type="checkbox" id="filterCheckbox">
-            </div>
+                    <div class="form-group-row">
+                        <!-- Filter (Checkbox) -->
+                        <div class="form-group">
+                            <label>صافی</label>
+                            <input type="checkbox" id="filterCheckbox">
+                        </div>
 
-            <!-- Add Part to Device (Btn) -->
-            <div class="form-group">
-                <button type="button" class="btn" id="addPartToDeviceBtn">
-                    افزودن قطعه به دستگاه</button>
-            </div>
+                    </div>
 
-            <div class="grid" id="addedPartsGrid">
-                <!-- Parts will be dynamically added here -->
-            </div>
+                    <!-- Add Part to Device (Btn) -->
+                    <div class="form-group">
+                        <button type="button" class="add-button" id="addPartToDeviceBtn">
+                            افزودن قطعه به دستگاه</button>
+                    </div>
+                </form>
+                <div class="button-container">
+                    <button type="button" class="save-button" id="addDeviceDBBtn">ذخیره</button>
+                </div>
 
-        </form>
-        <div class="button-container">
-            <button type="button" class="save-button" id="addDeviceDBBtn">ذخیره</button>
+            </div>
+            <div class="grid-section">
+                <div class="grid" id="addedPartsGrid">
+                    <!-- Parts will be dynamically added here -->
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="addPartToDeviceModal">
         <div class="modal">
             <div class="modal-title">افزودن قطعه به دستگاه</div>
-            <form id="addPartToDeviceForm">
 
                 <div class="search-container">
                     <input type="search" class="search-input" placeholder="جستجوی قطعه..." id="searchParts">
@@ -70,7 +83,6 @@
                 <div class="form-buttons">
                     <button type="button" class="btn btn-cancel" id="cancelBtn">بستن فرم</button>
                 </div>
-            </form>
         </div>
     </div>
 

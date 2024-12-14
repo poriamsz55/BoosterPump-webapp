@@ -1,0 +1,85 @@
+:root {
+    --primary: #1a1a1a;
+    --secondary: #2d2d2d;
+    --text: #ecf0f1;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #4834d4;
+    --error: #e74c3c;
+    --success: #2ecc71;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center; /* Added to center vertically */
+}
+
+.modal {
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh; /* Limit modal height */
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    animation: modalShow 0.3s ease;
+    display: flex; /* Added flex display */
+    flex-direction: column;
+    overflow: hidden; /* Prevent modal overflow */
+}
+
+
+.modal .modal-title {
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.modal .search-container {
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.modal .form-buttons {
+    margin-top: 1.5rem;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+    text-align: center;
+}
+
+
+
+
+@keyframes modalShow {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .modal {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}

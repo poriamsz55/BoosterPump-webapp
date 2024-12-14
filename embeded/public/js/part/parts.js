@@ -132,13 +132,13 @@ class PartsManager {
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">سایز: ${this.escapeHtml(part.size)}</span>
+                    <span class="card-sub-title">سایز: ${this.escapeHtml(part.size)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-title">جنس: ${this.escapeHtml(part.material)}</span>
+                    <span class="card-sub-title">جنس: ${this.escapeHtml(part.material)}</span>
                 </div>
                    <div class="card-header">
-                    <span class="card-title">برند: ${this.escapeHtml(part.brand)}</span>
+                    <span class="card-sub-title">برند: ${this.escapeHtml(part.brand)}</span>
                 </div>
                    <div class="card-header">
                 <div class="card-price">قیمت: ${formatPriceValue(part.price)}</div>
