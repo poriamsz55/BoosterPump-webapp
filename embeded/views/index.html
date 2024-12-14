@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booster Pump</title>
     <link rel="stylesheet" href="/public/assets/css/all.min.css">
-    <link rel="stylesheet" href="/public/css/styles.css">
     <link rel="stylesheet" href="/public/css/index.css">
-    <script src="/public/assets/js/three.min.js"></script>
+    <script src="/public/assets/js/particles.min.js"></script>
 </head>
 <body>
-    <div id="scene-container"></div>
+    <div class="particles" id="particles"></div>
 
     <!-- Splash Screen -->
     <div class="splash-screen" id="splashScreen">
@@ -22,18 +21,20 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="button-container">
-            <button id="btnProjectPage" class="glass-button project">
-                <i class="fas fa-project-diagram"></i>
-                <span>Projects</span>
-            </button>
-            <button id="btnDevicePage" class="glass-button device">
-                <i class="fas fa-mobile-alt"></i>
-                <span>Devices</span>
-            </button>
-            <button id="btnPartPage" class="glass-button part">
-                <i class="fas fa-cogs"></i>
-                <span>Parts</span>
-            </button>
+            <div class="main-buttons">
+                <button id="btnProjectPage" class="glass-button project">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Projects</span>
+                </button>
+                <button id="btnDevicePage" class="glass-button device">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Devices</span>
+                </button>
+                <button id="btnPartPage" class="glass-button part">
+                    <i class="fas fa-cogs"></i>
+                    <span>Parts</span>
+                </button>
+            </div>
             
             <div class="utility-container">
                 <button id="btnDownloadDB" class="glass-button utility">
@@ -49,6 +50,6 @@
     </div>
 
     <script src="/public/js/index/index.js" defer></script>
-    <script src="/public/js/three.js" defer></script>
+    <script src="/public/js/particles.js" defer> </script>
 </body>
 </html>
