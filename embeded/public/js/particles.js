@@ -8,7 +8,7 @@ particlesJS('particles', {
             }
         },
         color: {
-            value: ["#90cdf4", "#63b3ed", "#4299e1"]  // Different shades of blue
+            value: ["#38bdf8", "#94a3b8", "#64748b"]  // Mix of bright and muted particles
         },
         opacity: {
             value: 0.3,
@@ -21,7 +21,7 @@ particlesJS('particles', {
         line_linked: {
             enable: true,
             distance: 150,
-            color: "#4299e1",
+            color: "#38bdf8",
             opacity: 0.2,
             width: 1
         },
