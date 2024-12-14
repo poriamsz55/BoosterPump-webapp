@@ -349,24 +349,26 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	// ---- Device report ----
 	// -----------------------
 	// Create individual device report sheets
-	for _, projectDevice := range project.ProjectDeviceList {
+	for pi, projectDevice := range project.ProjectDeviceList {
 		device := projectDevice.Device
 
-		// Create sheet name
-		deviceSheetText := fmt.Sprintf("%s %s ", device.Name, device.Converter)
-		if device.Filter {
-			deviceSheetText += "با صافی"
-		} else {
-			deviceSheetText += "بدون صافی"
-		}
+		deviceSheetText := fmt.Sprintf("دستگاه %v", pi)
 
 		// Create new sheet
 		f.NewSheet(deviceSheetText)
 
 		// Write header
+		var filterStr string
+		if device.Filter {
+			filterStr = "دارد"
+		} else {
+			filterStr = "ندارد"
+		}
+
+		headerName := fmt.Sprintf("%s %s %s", device.Name, device.Converter.String(), filterStr)
 		rowi = 1
 		coli = 1
-		headerText := fmt.Sprintf("%s برای %s - %f عدد", deviceSheetText, project.Name, projectDevice.Count)
+		headerText := fmt.Sprintf("%s - %v عدد", headerName, int(projectDevice.Count))
 		f.SetCellValue(deviceSheetText, getCellName(coli, rowi), headerText)
 		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+12, rowi+3), ew.deviceStyle)
 		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+12, rowi+3))
