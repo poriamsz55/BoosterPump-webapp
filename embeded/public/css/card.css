@@ -43,9 +43,14 @@
     border-bottom: none;
 }
 
+.card-header:has(.card-title) {
+    padding-bottom: 7px;
+}
+
 /* Remove border from price header */
 .card-header:has(.card-price) {
     border-bottom: none;
+    margin-bottom: 7px;
 }
 
 .card-header:has(.card-count-container) {
