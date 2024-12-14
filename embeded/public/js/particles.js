@@ -8,7 +8,7 @@ particlesJS('particles', {
             }
         },
         color: {
-            value: ["#38bdf8", "#94a3b8", "#64748b"]  // Mix of bright and muted particles
+            value: ["#38bdf8", "#94a3b8", "#64748b"]
         },
         opacity: {
             value: 0.3,

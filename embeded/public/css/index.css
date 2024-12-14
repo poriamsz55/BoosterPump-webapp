@@ -5,25 +5,31 @@
 }
 
 :root {
-    --bg-color: #0a192f;
+    /* Dark Matter Theme Colors */
+    --bg-start: #030712;
+    --bg-mid: #1e293b;
+    --bg-end: #334155;
+    --main-button-glow: rgba(56, 189, 248, 0.5);
+    --utility-button-glow: rgba(51, 65, 85, 0.4);
+    --text-color: #f8fafc;
+    --accent-bright: #38bdf8;
+    --accent-muted: #94a3b8;
+    --main-button-bg: rgba(56, 189, 248, 0.15);
+    --utility-button-bg: rgba(51, 65, 85, 0.2);
+    --glass-border: rgba(248, 250, 252, 0.1);
     --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --main-button-glow: rgba(66, 153, 225, 0.6);  /* Bright blue glow */
-    --utility-button-glow: rgba(45, 55, 72, 0.4);  /* Subtle slate glow */
-    --text-color: #e2e8f0;
 }
 
 body {
     min-height: 100vh;
-    background: var(--bg-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-color);
     overflow: hidden;
     background: linear-gradient(
         135deg,
-        #0a192f 0%,    /* Deep space blue */
-        #1a365d 50%,   /* Middle night blue */
-        #2c5282 100%   /* Bright stellar blue */
+        var(--bg-start) 0%,
+        var(--bg-mid) 50%,
+        var(--bg-end) 100%
     );
 }
 
@@ -43,7 +49,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bg-color);
+    background: var(--bg-start);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -53,7 +59,7 @@ body {
 
 .logo {
     font-size: 4rem;
-    color: #8b5cf6;
+    color: var(--accent-bright);
     animation: pulseLogo 2s infinite;
 }
 
@@ -71,11 +77,11 @@ body {
     flex-direction: column;
     gap: 30px;
     padding: 40px;
-    background: rgba(26, 32, 44, 0.4);
+    background: rgba(30, 41, 59, 0.4);
     backdrop-filter: blur(20px);
     border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 80px rgba(66, 153, 225, 0.2);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 80px rgba(56, 189, 248, 0.2);
     max-width: 900px;
     width: 90%;
 }
@@ -109,16 +115,16 @@ body {
 .glass-button.project,
 .glass-button.device,
 .glass-button.part {
-    background: rgba(66, 153, 225, 0.15);
+    background: var(--main-button-bg);
     box-shadow: 0 0 30px var(--main-button-glow);
-    transform: scale(1.05);  /* Make main buttons slightly larger */
-    padding: 35px;  /* Larger padding for main buttons */
+    transform: scale(1.05);
+    padding: 35px;
 }
 
 .glass-button.utility {
-    background: rgba(45, 55, 72, 0.2);
+    background: var(--utility-button-bg);
     box-shadow: 0 0 20px var(--utility-button-glow);
-    transform: scale(0.95);  /* Make utility buttons slightly smaller */
+    transform: scale(0.95);
 }
 
 .glass-button::before {
@@ -131,7 +137,7 @@ body {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(147, 197, 253, 0.2),  /* Softer shimmer effect */
+        rgba(56, 189, 248, 0.2),
         transparent
     );
     transition: 0.5s;
@@ -149,13 +155,13 @@ body {
 .glass-button.project i,
 .glass-button.device i,
 .glass-button.part i {
-    color: #90cdf4;  /* Bright blue icons for main buttons */
-    font-size: 2.8rem;  /* Larger icons for main buttons */
+    color: var(--accent-bright);
+    font-size: 2.8rem;
 }
 
 .glass-button.utility i {
-    color: #a0aec0;  /* Muted color for utility icons */
-    font-size: 2.2rem;  /* Smaller icons for utility buttons */
+    color: var(--accent-muted);
+    font-size: 2.2rem;
 }
 
 .glass-button:hover {
@@ -165,13 +171,13 @@ body {
 .glass-button.project:hover,
 .glass-button.device:hover,
 .glass-button.part:hover {
-    background: rgba(66, 153, 225, 0.25);
+    background: rgba(56, 189, 248, 0.25);
     box-shadow: 0 0 50px var(--main-button-glow);
     transform: translateY(-5px) scale(1.05);
 }
 
 .glass-button.utility:hover {
-    background: rgba(45, 55, 72, 0.3);
+    background: rgba(51, 65, 85, 0.3);
     box-shadow: 0 0 30px var(--utility-button-glow);
     transform: translateY(-5px) scale(0.95);
 }
@@ -180,14 +186,13 @@ body {
     display: flex;
     gap: 30px;
     justify-content: center;
-    opacity: 0.8;  /* Slightly fade utility buttons */
+    opacity: 0.8;
 }
 
 .utility-container .glass-button {
     flex: 1;
     max-width: 300px;
 }
-
 
 @keyframes fadeOut {
     to {
