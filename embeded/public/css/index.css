@@ -226,3 +226,101 @@ body {
         padding: 20px;
     }
 }
+
+.confirm-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(17, 25, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    direction: rtl; /* Add RTL direction */
+}
+
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 999;
+}
+
+.confirm-message {
+    color: #fff;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    text-align: right;
+    white-space: pre-line;
+    font-size: 0.95rem;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+}
+
+.confirm-button {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-button.replace {
+    background: #4834d4;
+    border-color: #4834d4;
+}
+
+.confirm-button.cancel {
+    background: rgba(226, 76, 76, 0.397);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.confirm-button:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.confirm-button.replace:hover {
+    background: #3b2aaf;
+}
+
+.confirm-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 480px) {
+    .confirm-dialog {
+        padding: 1.2rem;
+    }
+    
+    .confirm-buttons {
+        gap: 0.5rem;
+    }
+    
+    .confirm-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        min-width: 70px;
+    }
+}
