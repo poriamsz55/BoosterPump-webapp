@@ -72,7 +72,13 @@ body {
 }
 
 .search-container {
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(to bottom, var(--primary) 50%, transparent);
+    padding: 1rem 0;
     margin-bottom: 2rem;
+    align-items: center;
+    gap: 10px;
 }
 
 .search-input {
@@ -183,14 +189,33 @@ body {
 }
 
 
+/* Grid layout */
 .grid {
     display: grid;
-    max-height: 75vh;
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
-    margin-bottom: 2rem;
+    padding: 1rem;
+    padding-bottom: 80px;
 }
+
+
+/* Custom scrollbar for grid */
+.grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.grid::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
 
 .card {
     padding: 1.5rem;
@@ -202,7 +227,12 @@ body {
     cursor: pointer;
     direction: rtl;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 250px; /* Add minimum height to ensure consistent card size */
 }
+
 
 .card:hover {
     transform: translateY(-5px);
@@ -210,10 +240,80 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-header:last-of-type {
+    border-bottom: none;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: 500;
+    padding-left: 70px; /* Make space for action buttons */
+}
+
+.card-title:first-child {
+    color: var(--accent);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.card-price {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 2;
+}
+
+.action-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.delete-btn {
+    color: var(--error);
+}
+
+.copy-btn {
+    color: var(--success);
+}
+
+/* DateTime styles - Removed border */
 .card-datetime {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    bottom: 1rem;
+    left: 1rem;
     direction: ltr;
 }
 
@@ -221,6 +321,10 @@ body {
     font-size: 0.85em;
     color: #6c757d;
     text-align: left;
+}
+
+.datetime-container div {
+    line-height: 1.4;
 }
 
 .card-name {
@@ -461,6 +565,31 @@ body {
 }
 
 @media (max-width: 768px) {
+
+    .card {
+        padding: 1.2rem;
+        min-height: 220px;
+    }
+
+    .card-actions {
+        top: 1.2rem;
+        left: 1.2rem;
+    }
+
+    .action-button {
+        width: 28px;
+        height: 28px;
+    }
+
+    .card-title {
+        padding-left: 60px; /* Adjusted for mobile */
+        font-size: 1rem;
+    }
+
+    .card-datetime {
+        bottom: 0.8rem;
+        left: 0.8rem;
+    }
 
     .sort-dropdown {
         position: fixed;
