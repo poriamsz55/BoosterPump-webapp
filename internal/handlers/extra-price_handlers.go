@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/database"
@@ -22,7 +21,7 @@ func GetAllExtraPricesByProjectId(e echo.Context) error {
 }
 
 func GetExtraPriceById(e echo.Context) error {
-	id, err := strconv.Atoi(e.Param("id"))
+	id, err := upload.Int(e, "extraPriceId")
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid extraPrice id")
 	}

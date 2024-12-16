@@ -21,8 +21,6 @@ class ExtraPricesManager {
 
         this.init();
 
-        // Add focus event listener
-        window.addEventListener('focus', () => this.checkForUpdates());
 
         handleEscKey(() => {
             if (window.getComputedStyle(this.modal).display !== 'none') {
@@ -31,14 +29,6 @@ class ExtraPricesManager {
                 this.handleBackButton();
             }
         });
-    }
-
-    async checkForUpdates() {
-        if (localStorage.getItem('extraPricesListNeedsUpdate') === 'true') {
-            await this.getExtraPricesFromDB();
-            this.renderExtraPrices(this.extraPrices);
-            localStorage.removeItem('extraPricesListNeedsUpdate');
-        }
     }
 
     async init() {
@@ -68,8 +58,8 @@ class ExtraPricesManager {
 
     handleBackButton() {
         if (this.hasChanged) {
-            localStorage.setItem('projectsListNeedsUpdate', 'true');
             localStorage.setItem('projectDetailNeedsUpdate', 'true');
+            localStorage.setItem('projectsListNeedsUpdate', 'true');
         }
         window.history.back();
     }
@@ -297,6 +287,7 @@ class ExtraPricesManager {
     async copyExtraPrice(id) {
         const extraPriceToCopy = this.extraPrices.find(extraPrice => extraPrice.id.toString() === id.toString());
         if (extraPriceToCopy) {
+            this.hasChanged = true;
             try {
                 const formData = new FormData();
                 formData.append('extraPriceId', id);

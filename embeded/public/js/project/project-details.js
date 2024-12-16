@@ -30,10 +30,10 @@ class AddProjectDetailsManager {
             this.hasChanged = true;
         });
 
-        this.init();
 
-        // Add focus event listener
         window.addEventListener('focus', () => this.checkForUpdates());
+
+        this.init();
 
         handleEscKey(() => {
             if (window.getComputedStyle(this.modal).display !== 'none') {
@@ -46,8 +46,8 @@ class AddProjectDetailsManager {
 
     async checkForUpdates() {
         // extra price
-        if (localStorage.getItem('projectDetailNeedsUpdate') === 'true') {
-            await this.getProjectDetails();
+        if (localStorage.getItem('projectDetailNeedsUpdate') != null && localStorage.getItem('projectDetailNeedsUpdate') === 'true') {
+            await this.getExtraPricesByProjectId();
             localStorage.removeItem('projectDetailNeedsUpdate');
         }
     }
@@ -193,8 +193,8 @@ class AddProjectDetailsManager {
                         this.addedDevices = [];
                     } else {
                         for (const device of projectDetails.project_device) {
-                            (device)
-                            this.addedDevices.push(
+                            // Create new array instead of pushing to existing
+                            this.addedDevices = projectDetails.project_device.map(device =>
                                 new ProjectDevice(
                                     device.id,
                                     device.device.id,
@@ -230,6 +230,58 @@ class AddProjectDetailsManager {
             }
         }
     }
+
+
+    async getExtraPricesByProjectId() {
+        if (this.projectId) {
+            try {
+                const formData = new FormData();
+                formData.append('projectId', this.projectId);
+
+                const response = await fetch(`${HTTP_URL}/extraPrice/getAll`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                console.log(response);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch project details');
+                }
+
+                const extraPrices = await response.json();
+                console.log(extraPrices);
+                let price = 0;
+                for (const device of this.addedDevices) {
+                    price += device.price * device.count;
+                }
+                if (extraPrices) {
+                    if (extraPrices === null || extraPrices === undefined || extraPrices.length === 0) {
+                        // pass
+                    } else {
+                        // loop through extraPrices
+                        for (const extraPrice of extraPrices) {
+                            // update price
+                            price += extraPrice.price;
+                        }
+                    }
+                    
+                    // Format the initial price value
+                    this.priceInput.value = price.toString();
+                    formatPriceInput(this.priceInput);
+                } else {
+                    // Format the initial price value
+                    this.priceInput.value = price.toString();
+                    formatPriceInput(this.priceInput);
+                }
+
+            } catch (error) {
+                console.error('Error fetching project details:', error);
+                alert(error.message || 'An error occurred. Please try again later.');
+            }
+        }
+    }
+
 
     renderDevices(devicesList) {
 
