@@ -8,3 +8,7 @@ function formatPrice(input) {
     // Update the input value
     input.value = value;
 }
+
+function formatSize(size) {
+    size.value = `\u202A${size.value}\u202C`; 
+}

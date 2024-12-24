@@ -86,7 +86,7 @@ class PartDetailsManager {
 
     populateForm(partDetails) {
         document.getElementById('partName').value = partDetails.name || '';
-        document.getElementById('partSize').value = partDetails.size || '';
+        document.getElementById('partSize').value = this.formatSize(partDetails.size) || '';
         document.getElementById('partMaterial').value = partDetails.material || '';
         document.getElementById('partBrand').value = partDetails.brand || '';
 
@@ -135,6 +135,10 @@ class PartDetailsManager {
             console.error('Error updating part details:', error);
             alert(error.message || 'An error occurred while saving. Please try again later.');
         }
+    }
+
+    formatSize(size) {
+        return `\u202A${size}\u202C`;
     }
 }
 

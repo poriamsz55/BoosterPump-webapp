@@ -132,7 +132,7 @@ class PartsManager {
                     <span class="card-title">${this.escapeHtml(part.name)}</span>
                 </div>
                   <div class="card-header">
-                    <span class="card-sub-title">سایز: ${this.escapeHtml(part.size)}</span>
+                    <span class="card-sub-title">سایز: ${this.formatSize(part.size)}</span>
                 </div>
                   <div class="card-header">
                     <span class="card-sub-title">جنس: ${this.escapeHtml(part.material)}</span>
@@ -334,6 +334,13 @@ class PartsManager {
             .replace(/'/g, "&#039;");
     }
 
+    // formatSize(size) {
+    //     return `<span style="direction: ltr">${size}</span>`;
+    // }
+
+    formatSize(size) {
+        return `\u202A${size}\u202C`;
+    }
 
 }
 
