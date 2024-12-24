@@ -1,14 +1,18 @@
 
 export function converterToString(value) {
+    if (value===undefined) {
+        return "";
+    }
+
     let converterStr = '';
-    switch (value) {
-        case 0:
+    switch (value.toString()) {
+        case "0":
             converterStr = 'بدون تبدیل'
             break;
-        case 1:
+        case "1":
             converterStr = 'تبدیل در دهش'
             break;
-        case 2:
+        case "2":
             converterStr = 'تبدیل دو طرفه'
             break;
 

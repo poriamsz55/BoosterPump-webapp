@@ -201,7 +201,8 @@ class AddProjectDetailsManager {
                                     this.projectId,
                                     device.device.name,
                                     device.device.price,
-                                    device.count
+                                    device.count,
+                                    device.device
                                 )
                             );
                         }
@@ -243,14 +244,12 @@ class AddProjectDetailsManager {
                     body: formData
                 });
 
-                console.log(response);
 
                 if (!response.ok) {
                     throw new Error('Failed to fetch project details');
                 }
 
                 const extraPrices = await response.json();
-                console.log(extraPrices);
                 let price = 0;
                 for (const device of this.addedDevices) {
                     price += device.price * device.count;
@@ -420,7 +419,8 @@ class AddProjectDetailsManager {
             }
         }
 
-        const projectDevice = new ProjectDevice(-1, deviceId, this.projectId, device.name, device.price, count);
+        console.log(device);
+        const projectDevice = new ProjectDevice(-1, deviceId, this.projectId, device.name, device.price, count, device);
 
         const projectDevices = JSON.parse(localStorage.getItem('projectDevices')) || [];
         projectDevices.push(projectDevice);
@@ -451,8 +451,8 @@ class AddProjectDetailsManager {
             const deviceCard = document.createElement('div');
             deviceCard.classList.add('card');
             deviceCard.setAttribute('data-device-id', device.deviceId);
-            const converterStr = converterToString(device.converter);
-            const filterStr = filterToString(device.filter);
+            const converterStr = converterToString(device.device.converter);
+            const filterStr = filterToString(device.device.filter);
 
             deviceCard.innerHTML = `
 
