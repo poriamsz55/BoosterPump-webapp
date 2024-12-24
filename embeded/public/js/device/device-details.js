@@ -11,6 +11,7 @@ class AddDeviceDetailsManager {
         this.addedParts = [];
         this.partsGrid = document.getElementById('partsGrid');
         this.searchInput = document.getElementById('searchParts');
+        this.searchAddedInput = document.getElementById('searchAddedParts');
         this.modal = document.getElementById('addPartToDeviceModal');
         // Remove e.preventDefault() as it's not needed here
         const urlParams = new URLSearchParams(window.location.search);
@@ -64,6 +65,7 @@ class AddDeviceDetailsManager {
 
     setupEventListeners() {
         this.searchInput.addEventListener('input', (e) => this.handleSearch(e));
+        this.searchAddedInput.addEventListener('input', (e) => this.handleAddedSearch(e));
         document.getElementById('addPartToDeviceBtn').addEventListener('click', () => this.openModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('saveDeviceDBBtn').addEventListener('click', () => this.saveDevice());
@@ -524,6 +526,14 @@ class AddDeviceDetailsManager {
             part.name.toLowerCase().includes(searchTerm)
         );
         this.renderParts(filteredParts);
+    }
+
+    handleAddedSearch(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredParts = this.addedParts.filter(part =>
+            part.name.toLowerCase().includes(searchTerm)
+        );
+        this.renderAddedParts(filteredParts);
     }
 
     openModal() {

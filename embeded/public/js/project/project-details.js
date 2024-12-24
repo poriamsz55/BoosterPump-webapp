@@ -12,6 +12,7 @@ class AddProjectDetailsManager {
         this.addedDevices = [];
         this.devicesGrid = document.getElementById('devicesGrid');
         this.searchInput = document.getElementById('searchDevices');
+        this.searchAddedInput = document.getElementById('searchAddedDevices');
         this.modal = document.getElementById('addDeviceToProjectModal');
         // Remove e.preventDefault() as it's not needed here
         const urlParams = new URLSearchParams(window.location.search);
@@ -63,6 +64,7 @@ class AddProjectDetailsManager {
 
     setupEventListeners() {
         this.searchInput.addEventListener('input', (e) => this.handleSearch(e));
+        this.searchAddedInput.addEventListener('input', (e) => this.handleSearchAdded(e));
         document.getElementById('addDeviceToProjectBtn').addEventListener('click', () => this.openModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('saveProjectDBBtn').addEventListener('click', () => this.saveProject());
@@ -419,7 +421,6 @@ class AddProjectDetailsManager {
             }
         }
 
-        console.log(device);
         const projectDevice = new ProjectDevice(-1, deviceId, this.projectId, device.name, device.price, count, device);
 
         const projectDevices = JSON.parse(localStorage.getItem('projectDevices')) || [];
@@ -594,6 +595,14 @@ class AddProjectDetailsManager {
             device.name.toLowerCase().includes(searchTerm)
         );
         this.renderDevices(filteredDevices);
+    }
+
+    handleSearchAdded(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredDevices = this.addedDevices.filter(device =>
+            device.name.toLowerCase().includes(searchTerm)
+        );
+        this.renderAddedDevices(filteredDevices);
     }
 
     openModal() {

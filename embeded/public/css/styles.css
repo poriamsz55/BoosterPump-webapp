@@ -389,3 +389,9 @@ body {
     border-top-color: transparent;
     animation: button-loading 0.8s linear infinite;
 }
+
+.row-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
