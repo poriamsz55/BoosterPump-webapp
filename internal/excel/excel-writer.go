@@ -1,11 +1,14 @@
 package excel
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 	"strconv"
 
 	devicepart "github.com/poriamsz55/BoosterPump-webapp/internal/models/device_part"
 	"github.com/poriamsz55/BoosterPump-webapp/internal/models/project"
+	projectd "github.com/poriamsz55/BoosterPump-webapp/internal/models/project_device"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -39,6 +42,18 @@ func NewExcelWriter() *ExcelWriter {
 	}
 }
 
+func cmpProjectDevice(a, b *projectd.ProjectDevice) int {
+	return cmp.Compare(a.Device.Name, b.Device.Name)
+}
+
+func cmpPartSummary(a, b *devicepart.DevicePartMerged) int {
+	return cmp.Compare(a.DevicePart.Part.Name, b.DevicePart.Part.Name)
+}
+
+func cmpDevicePart(a, b *devicepart.DevicePart) int {
+	return cmp.Compare(a.Part.Name, b.Part.Name)
+}
+
 func GenerateProjectReport(project *project.Project, fileName string) error {
 
 	ew := NewExcelWriter()
@@ -60,19 +75,19 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	coli := 1
 	excelTitle := fmt.Sprintf("پروژه %s", project.Name)
 	f.SetCellValue(sheetName, getCellName(coli, rowi), excelTitle)
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+13, rowi+3), ew.headerStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+13, rowi+3))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+5, rowi+3), ew.headerStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+5, rowi+3))
 
 	// Write device header
 	rowi += 4
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "دستگاه ها")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+13, rowi+2), ew.deviceStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+13, rowi+2))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+5, rowi+2), ew.deviceStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+5, rowi+2))
 
 	// Write title row
 	rowi += 3
 	titles := []string{"نام دستگاه", "تبدیل", "صافی", "تعداد(مقدار)", "بهای واحد(ریال)", "بهای کل(ریال)"}
-	colSpans := []int{3, 2, 1, 2, 3, 3}
+	colSpans := []int{1, 1, 1, 1, 1, 1}
 
 	currentCol := coli
 	for i, title := range titles {
@@ -90,23 +105,26 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	rowi++
 	var totalDevicePrice uint64
 
+	// sort project.ProjectDeviceList by name
+	slices.SortFunc(project.ProjectDeviceList, cmpProjectDevice)
+
 	for _, projectDevice := range project.ProjectDeviceList {
 		coli := 1
 		device := projectDevice.Device
 
 		// Device name
 		f.SetCellValue(sheetName, getCellName(coli, rowi), device.Name)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Converter
-		coli += 3
+		coli += 1
 		f.SetCellValue(sheetName, getCellName(coli, rowi), device.Converter)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+1, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Filter
-		coli += 2
+		coli += 1
 		filterText := "ندارد"
 		if device.Filter {
 			filterText = "دارد"
@@ -117,21 +135,21 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		// Count
 		coli += 1
 		f.SetCellValue(sheetName, getCellName(coli, rowi), projectDevice.Count)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+1, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Price per unit
-		coli += 2
+		coli += 1
 		f.SetCellValue(sheetName, getCellName(coli, rowi), device.Price)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Total price
-		coli += 3
+		coli += 1
 		deviceTotalPrice := projectDevice.Price
 		f.SetCellValue(sheetName, getCellName(coli, rowi), deviceTotalPrice)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		totalDevicePrice += deviceTotalPrice
 		rowi++
@@ -140,13 +158,13 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	// Write total devices price row
 	coli = 1
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "جمع کل بهای دستگاه ها(ریال)")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+10, rowi), ew.titleStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+10, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+4, rowi), ew.titleStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+4, rowi))
 
-	coli += 11
+	coli += 5
 	f.SetCellValue(sheetName, getCellName(coli, rowi), totalDevicePrice)
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.priceStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.priceStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 	// -----------------------
 	// ---- Write extras ----
@@ -157,21 +175,21 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	// Create Extra Price Header
 	// Write "Extra Prices" header
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "هزینه های اضافی")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+5, rowi+2), ew.extraPriceStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+5, rowi+2))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+1, rowi+2), ew.extraPriceStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+1, rowi+2))
 
 	// Write column headers
 	rowi += 3
 	// Title column
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "عنوان")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.titleStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.titleStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 	// Price column
-	coli += 3
+	coli += 1
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "هزینه(ریال)")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.titleStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.titleStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 	// Write extra prices data
 	rowi++
@@ -182,14 +200,14 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 
 		// Write extra price name
 		f.SetCellValue(sheetName, getCellName(coli, rowi), extraPrice.Name)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Write extra price amount
-		coli += 3
+		coli += 1
 		f.SetCellValue(sheetName, getCellName(coli, rowi), extraPrice.Price)
-		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		totalExtraPrice += extraPrice.Price
 		rowi++
@@ -198,25 +216,39 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	// Write total extra prices row
 	coli = 1
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "جمع کل(ریال)")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.titleStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.titleStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
-	coli += 3
+	coli += 1
 	f.SetCellValue(sheetName, getCellName(coli, rowi), totalExtraPrice)
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.priceStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.priceStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 	// Write project total price
 	coli = 1
 	rowi += 2
 	f.SetCellValue(sheetName, getCellName(coli, rowi), "بهای کل پروژه(ریال)")
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+10, rowi), ew.titleStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+10, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.titleStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
-	coli += 11
+	coli += 1
 	f.SetCellValue(sheetName, getCellName(coli, rowi), project.Price)
-	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.priceStyle)
-	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(sheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.priceStyle)
+	f.MergeCell(sheetName, getCellName(coli, rowi), getCellName(coli, rowi))
+
+	// Adjust column widths for better readability
+	// You may need to adjust these values based on your needs
+	projectColumns := []string{"C", "D"}
+	for _, col := range projectColumns {
+		f.SetColWidth(sheetName, col, col, 15)
+	}
+
+	projectColumns = []string{"B", "E", "F"}
+	for _, col := range projectColumns {
+		f.SetColWidth(sheetName, col, col, 25)
+	}
+
+	f.SetColWidth(sheetName, "A", "A", 50)
 
 	// ---------------------
 	// ---- Write parts ----
@@ -229,8 +261,8 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	rowi = 1
 	coli = 1
 	f.SetCellValue(partSheetName, getCellName(coli, rowi), "قطعات")
-	f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+12, rowi+3), ew.deviceStyle)
-	f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+12, rowi+3))
+	f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+6, rowi+3), ew.deviceStyle)
+	f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+6, rowi+3))
 
 	// Write column headers
 	rowi += 4
@@ -238,13 +270,13 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		title   string
 		colSpan int
 	}{
-		{"نام قطعه", 3},
+		{"نام قطعه", 1},
 		{"سایز", 1},
 		{"جنس", 1},
-		{"برند", 2},
-		{"تعداد(مقدار)", 2},
-		{"بهای واحد(ریال)", 2},
-		{"بهای کل(ریال)", 2},
+		{"برند", 1},
+		{"تعداد(مقدار)", 1},
+		{"بهای واحد(ریال)", 1},
+		{"بهای کل(ریال)", 1},
 	}
 
 	currentCol = coli
@@ -279,18 +311,25 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	// Write merged parts data
 	rowi++
 	var totalPartsPrice uint64
-
+	partSummaryList := []*devicepart.DevicePartMerged{}
 	for _, mergedPart := range partSummaryMap {
+		partSummaryList = append(partSummaryList, mergedPart)
+	}
+
+	// sort
+	slices.SortFunc(partSummaryList, cmpPartSummary)
+
+	for _, mergedPart := range partSummaryList {
 		coli = 1
 		part := mergedPart.DevicePart.Part
 
 		// Part name
 		f.SetCellValue(partSheetName, getCellName(coli, rowi), part.Name)
-		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Size
-		coli += 3
+		coli += 1
 		f.SetCellValue(partSheetName, getCellName(coli, rowi), part.Size)
 		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
 
@@ -302,26 +341,26 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		// Brand
 		coli += 1
 		f.SetCellValue(partSheetName, getCellName(coli, rowi), part.Brand)
-		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi))
+		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Count
-		coli += 2
+		coli += 1
 		f.SetCellValue(partSheetName, getCellName(coli, rowi), mergedPart.Count)
-		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi))
+		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Price per unit
-		coli += 2
+		coli += 1
 		f.SetCellValue(partSheetName, getCellName(coli, rowi), part.Price)
-		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi))
+		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Total price
-		coli += 2
+		coli += 1
 		f.SetCellValue(partSheetName, getCellName(coli, rowi), mergedPart.Price)
-		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+1, rowi))
+		f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+		f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		totalPartsPrice += mergedPart.Price
 		rowi++
@@ -330,20 +369,27 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	// Write total parts price
 	coli = 1
 	f.SetCellValue(partSheetName, getCellName(coli, rowi), "جمع کل(ریال)")
-	f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+9, rowi), ew.titleStyle)
-	f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+9, rowi))
+	f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+5, rowi), ew.titleStyle)
+	f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+5, rowi))
 
-	coli += 10
+	coli += 6
 	f.SetCellValue(partSheetName, getCellName(coli, rowi), totalPartsPrice)
-	f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.priceStyle)
-	f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli+2, rowi))
+	f.SetCellStyle(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi), ew.priceStyle)
+	f.MergeCell(partSheetName, getCellName(coli, rowi), getCellName(coli, rowi))
 
 	// Adjust column widths for better readability
 	// You may need to adjust these values based on your needs
-	columns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"}
+	columns := []string{"B", "C", "D", "E"}
 	for _, col := range columns {
 		f.SetColWidth(partSheetName, col, col, 15)
 	}
+
+	columns = []string{"F", "G"}
+	for _, col := range columns {
+		f.SetColWidth(partSheetName, col, col, 25)
+	}
+
+	f.SetColWidth(partSheetName, "A", "A", 50)
 
 	// -----------------------
 	// ---- Device report ----
@@ -370,8 +416,8 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		coli = 1
 		headerText := fmt.Sprintf("%s - %v عدد", headerName, int(projectDevice.Count))
 		f.SetCellValue(deviceSheetText, getCellName(coli, rowi), headerText)
-		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+12, rowi+3), ew.deviceStyle)
-		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+12, rowi+3))
+		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+6, rowi+3), ew.deviceStyle)
+		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+6, rowi+3))
 
 		// Write column headers
 		rowi += 4
@@ -379,13 +425,13 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 			title   string
 			colSpan int
 		}{
-			{"اقلام", 3},
+			{"اقلام", 1},
 			{"سایز", 1},
 			{"جنس", 1},
-			{"برند", 2},
-			{"تعداد(مقدار)", 2},
-			{"بهای واحد(ریال)", 2},
-			{"بهای کل(ریال)", 2},
+			{"برند", 1},
+			{"تعداد(مقدار)", 1},
+			{"بهای واحد(ریال)", 1},
+			{"بهای کل(ریال)", 1},
 		}
 
 		currentCol := coli
@@ -402,17 +448,20 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		rowi++
 		var deviceTotalPrice uint64
 
+		// sort
+		slices.SortFunc(device.DevicePartList, cmpDevicePart)
+
 		for _, devicePart := range device.DevicePartList {
 			coli = 1
 			part := devicePart.Part
 
 			// Part name
 			f.SetCellValue(deviceSheetText, getCellName(coli, rowi), part.Name)
-			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.bodyStyle)
-			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+2, rowi))
+			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi))
 
 			// Size
-			coli += 3
+			coli += 1
 			f.SetCellValue(deviceSheetText, getCellName(coli, rowi), part.Size)
 			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
 
@@ -424,27 +473,27 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 			// Brand
 			coli += 1
 			f.SetCellValue(deviceSheetText, getCellName(coli, rowi), part.Brand)
-			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi))
+			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi))
 
 			// Count
-			coli += 2
+			coli += 1
 			f.SetCellValue(deviceSheetText, getCellName(coli, rowi), devicePart.Count)
-			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi))
+			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi))
 
 			// Price per unit
-			coli += 2
+			coli += 1
 			f.SetCellValue(deviceSheetText, getCellName(coli, rowi), part.Price)
-			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi))
+			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi))
 
 			// Total price for this part
-			coli += 2
+			coli += 1
 			partTotalPrice := devicePart.Price
 			f.SetCellValue(deviceSheetText, getCellName(coli, rowi), partTotalPrice)
-			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi), ew.bodyStyle)
-			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+1, rowi))
+			f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.bodyStyle)
+			f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi))
 
 			deviceTotalPrice += partTotalPrice
 			rowi++
@@ -453,19 +502,26 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 		// Write device total price
 		coli = 1
 		f.SetCellValue(deviceSheetText, getCellName(coli, rowi), "جمع کل(ریال)")
-		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+9, rowi), ew.titleStyle)
-		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+9, rowi))
+		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+5, rowi), ew.titleStyle)
+		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+5, rowi))
 
-		coli += 10
+		coli += 6
 		f.SetCellValue(deviceSheetText, getCellName(coli, rowi), deviceTotalPrice)
-		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli+2, rowi), ew.priceStyle)
-		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli+2, rowi))
+		f.SetCellStyle(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi), ew.priceStyle)
+		f.MergeCell(deviceSheetText, getCellName(coli, rowi), getCellName(coli, rowi))
 
 		// Adjust column widths for better readability
-		columns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"}
+		columns := []string{"B", "C", "D", "E"}
 		for _, col := range columns {
 			f.SetColWidth(deviceSheetText, col, col, 15)
 		}
+
+		columns = []string{"F", "G"}
+		for _, col := range columns {
+			f.SetColWidth(deviceSheetText, col, col, 25)
+		}
+
+		f.SetColWidth(deviceSheetText, "A", "A", 50)
 
 		type PointerBool *bool
 		var pointerBool PointerBool = PointerBool(new(bool))
@@ -486,6 +542,9 @@ func GenerateProjectReport(project *project.Project, fileName string) error {
 	f.SetSheetView("گزارش قطعات", 0, &excelize.ViewOptions{
 		RightToLeft: pointerBool,
 	})
+
+	// Delete Sheet1
+	f.DeleteSheet("Sheet1")
 
 	// Set the first sheet as active
 	defaultSheet, err := f.GetSheetIndex("گزارش پروژه")
